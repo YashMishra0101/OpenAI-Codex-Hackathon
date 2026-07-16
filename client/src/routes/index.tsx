@@ -6,6 +6,7 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage').then((m) => ({ default: m.LoginPage })));
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage').then((m) => ({ default: m.RegisterPage })));
 const VerifyEmailPage = lazy(() => import('@/pages/auth/VerifyEmailPage').then((m) => ({ default: m.VerifyEmailPage })));
+const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage').then((m) => ({ default: m.ProfilePage })));
 
 /**
  * Application router — React Router v7 in library mode (pure client-side SPA).
@@ -85,11 +86,11 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: '/dashboard/profile',
+        path: 'profile',
         element: (
-          <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-            <p className="text-muted-foreground">Profile — Phase 7</p>
-          </div>
+          <Suspense fallback={<div className="flex h-full items-center justify-center"><LoadingSpinner /></div>}>
+            <ProfilePage />
+          </Suspense>
         ),
       },
     ],

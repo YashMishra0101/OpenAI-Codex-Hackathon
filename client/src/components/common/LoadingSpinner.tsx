@@ -34,7 +34,7 @@ export function LoadingSpinner({
   size = 'md',
   className,
   label = 'Loading',
-}: LoadingSpinnerProps): JSX.Element {
+}: LoadingSpinnerProps) {
   return (
     <div
       role="status"
@@ -52,12 +52,12 @@ export function LoadingSpinner({
  * Centered full-viewport loading overlay.
  * Used for initial page load and route transitions.
  */
-export function PageLoader(): JSX.Element {
+export function FullScreenLoader({ message }: { message?: string }) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background">
       <div className="flex flex-col items-center gap-4">
         <LoadingSpinner size="lg" />
-        <p className="text-sm text-muted-foreground animate-pulse">Loading…</p>
+        <p className="text-sm text-muted-foreground animate-pulse">{message ?? 'Loading…'}</p>
       </div>
     </div>
   );

@@ -15,7 +15,7 @@ import { queryClient } from './lib/queryClient';
  *   4. Toaster              — toast notifications rendered outside the route tree
  *                             so they persist across route transitions
  */
-export default function App(): JSX.Element {
+export default function App() {
   return (
     <GoogleOAuthProvider clientId={import.meta.env['VITE_GOOGLE_CLIENT_ID'] as string}>
       <QueryClientProvider client={queryClient}>

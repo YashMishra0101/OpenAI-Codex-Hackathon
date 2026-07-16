@@ -18,7 +18,7 @@ function useIsAuthenticated(): boolean {
   return false;
 }
 
-export function ProtectedRoute(): JSX.Element {
+export function ProtectedRoute() {
   const isAuthenticated = useIsAuthenticated();
 
   if (!isAuthenticated) {
