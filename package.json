@@ -20,7 +20,8 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "argon2",
-      "esbuild"
+      "esbuild",
+      "mongodb-memory-server"
     ]
   }
 }
