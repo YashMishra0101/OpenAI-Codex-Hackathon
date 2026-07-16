@@ -1,0 +1,49 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Dependency directories
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Test coverage output (Vitest)
+coverage/
+
+# Env & Secrets
+.env
+.env.local
+.env.*.local
+.env.development
+.env.test
+.env.production
+!.env.example
+
+# Certificates & keys
+*.pem
+*.key
+*.cert
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# AI assistant local instructions/tooling
+.codex/
+
