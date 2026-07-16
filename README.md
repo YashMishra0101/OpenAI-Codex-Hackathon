@@ -4,6 +4,8 @@
 
 > This project is created using Codex for the **OpenAI Codex Hackathon**.
 
+> The OpenAI Codex Hackathon is hosted on [NamasteDev.com](https://namastedev.com) and organized by **Akshay Saini**.
+
 [![Vercel](https://img.shields.io/badge/Frontend-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 [![Render](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render&logoColor=black)](https://render.com/)
 [![Vite](https://img.shields.io/badge/Bundler-Vite_8-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)

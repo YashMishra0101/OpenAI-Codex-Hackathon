@@ -1,0 +1,26 @@
+{
+  "name": "ai-resume-job-tracker",
+  "private": true,
+  "version": "0.1.0",
+  "description": "AI-powered resume analysis and job tracking system",
+  "scripts": {
+    "dev": "concurrently --names \"server,client\" --prefix-colors \"cyan,magenta\" \"pnpm --filter server dev\" \"pnpm --filter client dev\"",
+    "build": "pnpm --filter server build && pnpm --filter client build",
+    "lint": "pnpm --filter server lint && pnpm --filter client lint",
+    "typecheck": "pnpm --filter server typecheck && pnpm --filter client typecheck",
+    "test": "pnpm --filter server test && pnpm --filter client test"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "pnpm": ">=9.0.0"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "argon2",
+      "esbuild"
+    ]
+  }
+}
