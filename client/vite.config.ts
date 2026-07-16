@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
+// @ts-ignore
 export default defineConfig({
   plugins: [
     // React Compiler (formerly React Forget) automatically optimizes rendering

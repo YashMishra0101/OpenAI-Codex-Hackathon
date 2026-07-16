@@ -52,3 +52,23 @@ export const forgotPasswordLimiter = rateLimit({
   legacyHeaders: false,
   message: rateLimitResponse(MSG.TOO_MANY_REQUESTS),
 });
+
+/** 
+ * Extremely strict rate limiter for expensive AI endpoints (e.g. Resume Analysis).
+ * Prevents abuse of API credits.
+ * Authenticated Users: 10 per hour
+ * Guest IPs: 2 per hour
+ */
+export const aiFeatureLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: (req: any, res: any) => {
+    // If authenticated, allow 10 requests. If guest, allow 2 requests.
+    return req.user?.userId ? 10 : 2;
+  },
+  keyGenerator: (req: any) => {
+    return req.user?.userId || req.ip || 'unknown';
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: rateLimitResponse('You have reached the maximum number of AI analyses for this hour. Please try again later.'),
+});

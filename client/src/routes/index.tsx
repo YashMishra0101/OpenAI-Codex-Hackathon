@@ -7,6 +7,10 @@ const LoginPage = lazy(() => import('@/pages/auth/LoginPage').then((m) => ({ def
 const RegisterPage = lazy(() => import('@/pages/auth/RegisterPage').then((m) => ({ default: m.RegisterPage })));
 const VerifyEmailPage = lazy(() => import('@/pages/auth/VerifyEmailPage').then((m) => ({ default: m.VerifyEmailPage })));
 const ProfilePage = lazy(() => import('@/pages/profile/ProfilePage').then((m) => ({ default: m.ProfilePage })));
+const AnalyzerPage = lazy(() => import('@/pages/analyzer/AnalyzerPage').then((m) => ({ default: m.AnalyzerPage })));
+const AnalyzerHistoryPage = lazy(() => import('@/pages/analyzer/AnalyzerHistoryPage').then((m) => ({ default: m.AnalyzerHistoryPage })));
+const AnalyzerDetailPage = lazy(() => import('@/pages/analyzer/AnalyzerDetailPage').then((m) => ({ default: m.AnalyzerDetailPage })));
+const JobTrackerPage = lazy(() => import('@/pages/jobs/JobTrackerPage').then((m) => ({ default: m.JobTrackerPage })));
 
 /**
  * Application router — React Router v7 in library mode (pure client-side SPA).
@@ -72,9 +76,9 @@ export const router = createBrowserRouter([
       {
         path: '/dashboard/resume-checker',
         element: (
-          <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-            <p className="text-muted-foreground">Resume Checker — Phase 10</p>
-          </div>
+          <Suspense fallback={<div className="flex h-full items-center justify-center"><LoadingSpinner /></div>}>
+            <AnalyzerHistoryPage />
+          </Suspense>
         ),
       },
       {
@@ -90,6 +94,30 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<div className="flex h-full items-center justify-center"><LoadingSpinner /></div>}>
             <ProfilePage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'analyzer',
+        element: (
+          <Suspense fallback={<div className="flex h-full items-center justify-center"><LoadingSpinner /></div>}>
+            <AnalyzerPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'analyzer/:id',
+        element: (
+          <Suspense fallback={<div className="flex h-full items-center justify-center"><LoadingSpinner /></div>}>
+            <AnalyzerDetailPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: 'jobs',
+        element: (
+          <Suspense fallback={<div className="flex h-full items-center justify-center"><LoadingSpinner /></div>}>
+            <JobTrackerPage />
           </Suspense>
         ),
       },

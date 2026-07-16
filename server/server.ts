@@ -12,6 +12,7 @@ import { connectDB } from './src/config/db.js';
 import { initSentry } from './src/config/sentry.js';
 import { env } from './src/config/env.js';
 import logger from './src/utils/logger.js';
+import { startAgenda } from './src/config/agenda.js';
 
 const startServer = async (): Promise<void> => {
   // Initialize Sentry error monitoring (production only)
@@ -20,7 +21,10 @@ const startServer = async (): Promise<void> => {
   // Step 3: Connect to MongoDB — env vars are guaranteed to exist at this point
   await connectDB();
 
-  // Step 4: Start Express server
+  // Step 4: Start Background Jobs (Agenda)
+  await startAgenda();
+
+  // Step 5: Start Express server
   app.listen(env.PORT, () => {
     logger.info(`Server running in ${env.NODE_ENV} mode`, { port: env.PORT });
   });

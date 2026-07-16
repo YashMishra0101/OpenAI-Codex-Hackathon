@@ -1,6 +1,8 @@
 import { Router, type Request, type Response } from 'express';
 import authRoutes from './authRoutes.js';
 import userRoutes from './userRoutes.js';
+import resumeRoutes from './resumeRoutes.js';
+import jobRoutes from './jobRoutes.js';
 
 const router = Router();
 
@@ -26,7 +28,7 @@ router.get('/health', (_req: Request, res: Response): void => {
 // Feature routers — mounted as each phase completes
 router.use('/auth', authRoutes);          // ✔ Phase 3/4
 router.use('/users', userRoutes);         // ✔ Phase 7
-// router.use('/resumes', resumeRoutes);  ← Phase 8/9
-// router.use('/jobs', jobRoutes);        ← Phase 13
+router.use('/resumes', resumeRoutes);     // ✔ Phase 8/9
+router.use('/jobs', jobRoutes);
 
 export default router;
