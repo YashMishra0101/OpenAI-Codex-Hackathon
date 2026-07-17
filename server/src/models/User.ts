@@ -29,12 +29,6 @@ export interface IUser {
   // OAuth fields
   googleId?: string;
   authProvider: 'email' | 'google';
-  // Optional social links
-  socialLinks: {
-    linkedin?: string;
-    github?: string;
-    portfolio?: string;
-  };
   createdAt: Date;
   updatedAt: Date;
 }
@@ -110,11 +104,6 @@ const userSchema = new Schema<UserDocument>(
         message: 'authProvider must be "email" or "google"',
       },
       default: 'email',
-    },
-    socialLinks: {
-      linkedin: { type: String, trim: true },
-      github: { type: String, trim: true },
-      portfolio: { type: String, trim: true },
     },
   },
   {

@@ -17,13 +17,6 @@ export const updateProfileSchema = z.object({
     .min(8, 'Password must be at least 8 characters')
     .max(72, 'Password must be 72 characters or fewer')
     .optional(),
-  socialLinks: z
-    .object({
-      linkedin: z.string().url().optional().or(z.literal('')),
-      github: z.string().url().optional().or(z.literal('')),
-      portfolio: z.string().url().optional().or(z.literal('')),
-    })
-    .optional(),
 });
 
 export type UpdateProfileDto = z.infer<typeof updateProfileSchema>;

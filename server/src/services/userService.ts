@@ -17,7 +17,6 @@ function toSafeUser(user: any): SafeUser {
     profileImage: user.profileImage,
     isVerified: user.isVerified,
     authProvider: user.authProvider,
-    socialLinks: user.socialLinks,
   };
 }
 
@@ -54,13 +53,6 @@ export async function updateProfile(userId: string, dto: UpdateProfileDto): Prom
 
   if (dto.name) user.name = dto.name;
   if (dto.password) user.password = await argon2.hash(dto.password);
-  
-  if (dto.socialLinks) {
-    user.socialLinks = {
-      ...user.socialLinks,
-      ...dto.socialLinks,
-    };
-  }
 
   await user.save();
   logger.info('USER_PROFILE_UPDATED', { userId });

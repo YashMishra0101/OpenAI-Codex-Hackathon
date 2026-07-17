@@ -31,11 +31,6 @@ export interface SafeUser {
   profileImage?: string;
   isVerified: boolean;
   authProvider: 'email' | 'google';
-  socialLinks: {
-    linkedin?: string;
-    github?: string;
-    portfolio?: string;
-  };
 }
 
 /**

@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import app from '../../app.js';
-import User from '../../models/User.js';
+import { User } from '../../models/User.js';
 
 // Mock the email service so we don't send emails during tests
 vi.mock('../../config/emailService.js', () => ({
@@ -61,20 +61,21 @@ describe('Auth API Integration Tests', () => {
     });
 
     it('should login successfully with correct credentials', async () => {
-      const res = await request(app)
+      const loginResponse = await request(app)
         .post('/api/v1/auth/login')
         .send({ email: testUser.email, password: testUser.password });
 
-      expect(res.status).toBe(200);
-      expect(res.body.success).toBe(true);
-      expect(res.body.data.accessToken).toBeDefined();
-      expect(res.body.data.user.email).toBe(testUser.email);
+      expect(loginResponse.status).toBe(200);
+      expect(loginResponse.body.success).toBe(true);
+      expect(loginResponse.body.data.accessToken).toBeDefined();
+      expect(loginResponse.body.data.user.email).toBe(testUser.email);
       
       // Should set a refresh token cookie
-      const cookies = res.headers['set-cookie'];
-      expect(cookies).toBeDefined();
-      expect(cookies[0]).toMatch(/refreshToken=/);
-      expect(cookies[0]).toMatch(/HttpOnly/);
+      const rawCookies = loginResponse.headers['set-cookie'];
+      const cookies = (Array.isArray(rawCookies) ? rawCookies : [rawCookies]).filter(Boolean) as string[];
+      const refreshTokenCookie = cookies.find((c: string) => c.startsWith('refreshToken='));
+      expect(refreshTokenCookie).toBeDefined();
+      expect(refreshTokenCookie).toMatch(/HttpOnly/);
     });
 
     it('should fail with incorrect password', async () => {
@@ -111,7 +112,10 @@ describe('Auth API Integration Tests', () => {
         .send({ email: testUser.email, password: testUser.password });
 
       // Extract the refresh token cookie
-      refreshTokenCookie = loginRes.headers['set-cookie'][0].split(';')[0];
+      const rawCookies = loginRes.headers['set-cookie'];
+      const cookies = (Array.isArray(rawCookies) ? rawCookies : [rawCookies]).filter(Boolean) as string[];
+      const refreshTokenHeader = cookies.find((c: string) => c.startsWith('refreshToken=')) || '';
+      refreshTokenCookie = refreshTokenHeader.split(';')[0] || '';
     });
 
     it('should issue a new access token when provided a valid refresh token cookie', async () => {
@@ -137,7 +141,8 @@ describe('Auth API Integration Tests', () => {
       const res = await request(app).post('/api/v1/auth/logout');
 
       expect(res.status).toBe(200);
-      const cookies = res.headers['set-cookie'];
+      const rawCookies = res.headers['set-cookie'];
+      const cookies = (Array.isArray(rawCookies) ? rawCookies : [rawCookies]).filter(Boolean) as string[];
       expect(cookies).toBeDefined();
       expect(cookies[0]).toMatch(/refreshToken=;/); // empty value
     });

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { api } from '@/lib/axios';
+import api from '@/lib/axios';
 
 export type JobStatus = 'Saved' | 'Applied' | 'Interview' | 'Offer' | 'Rejected';
 
@@ -94,8 +94,8 @@ export function useDeleteJob() {
 
 export function useScheduleReminder() {
   return useMutation({
-    mutationFn: async ({ id, date }: { id: string; date: string }) => {
-      const response = await api.post(`/jobs/${id}/reminders`, { date });
+    mutationFn: async ({ id, date, notes }: { id: string; date: string; notes?: string }) => {
+      const response = await api.post(`/jobs/${id}/reminders`, { date, notes });
       return response.data;
     },
   });

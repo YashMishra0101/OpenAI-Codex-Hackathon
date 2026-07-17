@@ -14,7 +14,7 @@ export function LoginPage() {
   const handleLogin = async (data: LoginFormData) => {
     try {
       setIsLoading(true);
-      await api.post('/api/v1/auth/login', data);
+      await api.post('/auth/login', data);
       toast.success('Logged in successfully!');
       
       // Temporary navigate to dashboard, will wire up actual auth state later in Phase 6
@@ -27,10 +27,13 @@ export function LoginPage() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold tracking-tight">Sign In</CardTitle>
+    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background relative overflow-hidden">
+      {/* Decorative background glows */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
+      
+      <Card className="w-full max-w-md relative z-10 border-primary/20 bg-surface/80 backdrop-blur-xl shadow-2xl">
+        <CardHeader className="space-y-2 text-center pb-8">
+          <CardTitle className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Sign In</CardTitle>
           <CardDescription>
             Enter your email and password to access your account
           </CardDescription>

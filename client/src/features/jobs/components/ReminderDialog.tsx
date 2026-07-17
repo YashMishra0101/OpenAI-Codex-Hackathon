@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { useScheduleReminder, JobApplication } from '../api/jobsApi';
 import { Clock, Calendar as CalendarIcon, CheckCircle2 } from 'lucide-react';
 
@@ -14,6 +15,7 @@ interface ReminderDialogProps {
 export function ReminderDialog({ open, onOpenChange, job }: ReminderDialogProps) {
   const [date, setDate] = useState('');
   const [time, setTime] = useState('');
+  const [notes, setNotes] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
   
   const scheduleReminder = useScheduleReminder();
@@ -25,7 +27,7 @@ export function ReminderDialog({ open, onOpenChange, job }: ReminderDialogProps)
     const scheduledDateTime = new Date(`${date}T${time}:00`);
 
     scheduleReminder.mutate(
-      { id: job._id, date: scheduledDateTime.toISOString() },
+      { id: job._id, date: scheduledDateTime.toISOString(), notes },
       {
         onSuccess: () => {
           setIsSuccess(true);
@@ -34,6 +36,7 @@ export function ReminderDialog({ open, onOpenChange, job }: ReminderDialogProps)
             setIsSuccess(false);
             setDate('');
             setTime('');
+            setNotes('');
           }, 2000);
         },
       }
@@ -47,6 +50,7 @@ export function ReminderDialog({ open, onOpenChange, job }: ReminderDialogProps)
         setIsSuccess(false);
         setDate('');
         setTime('');
+        setNotes('');
       }
     }}>
       <DialogContent className="sm:max-w-[425px]">
@@ -71,13 +75,18 @@ export function ReminderDialog({ open, onOpenChange, job }: ReminderDialogProps)
                   Date
                 </label>
                 <div className="relative">
-                  <CalendarIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <CalendarIcon className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
                     id="date"
                     type="date"
-                    className="pl-9"
+                    className="pl-9 cursor-pointer"
                     value={date}
                     onChange={(e) => setDate(e.target.value)}
+                    onClick={(e) => {
+                      if ('showPicker' in e.target) {
+                        (e.target as HTMLInputElement).showPicker();
+                      }
+                    }}
                     min={new Date().toISOString().split('T')[0]} // Can't schedule in the past
                   />
                 </div>
@@ -88,15 +97,34 @@ export function ReminderDialog({ open, onOpenChange, job }: ReminderDialogProps)
                   Time
                 </label>
                 <div className="relative">
-                  <Clock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                  <Clock className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
                   <Input
                     id="time"
                     type="time"
-                    className="pl-9"
+                    className="pl-9 cursor-pointer"
                     value={time}
                     onChange={(e) => setTime(e.target.value)}
+                    onClick={(e) => {
+                      if ('showPicker' in e.target) {
+                        (e.target as HTMLInputElement).showPicker();
+                      }
+                    }}
                   />
                 </div>
+              </div>
+
+              <div className="grid gap-2">
+                <label htmlFor="notes" className="text-sm font-medium">
+                  Notes (Optional)
+                </label>
+                <Textarea
+                  id="notes"
+                  placeholder="e.g. Remember to ask about the remote work policy"
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  className="resize-none"
+                  rows={3}
+                />
               </div>
             </div>
             

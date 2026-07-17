@@ -7,7 +7,7 @@ import { JobAnalyticsChart } from '@/features/jobs/components/JobAnalyticsChart'
 import { JobFormDialog } from '@/features/jobs/components/JobFormDialog';
 import { ReminderDialog } from '@/features/jobs/components/ReminderDialog';
 import { Button } from '@/components/ui/button';
-import { Plus, LayoutGrid, KanbanSquare } from 'lucide-react';
+import { Plus, List, KanbanSquare } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 export function JobTrackerPage() {
@@ -64,7 +64,7 @@ export function JobTrackerPage() {
               className="px-3"
               onClick={() => setViewMode('grid')}
             >
-              <LayoutGrid className="h-4 w-4 mr-2" /> Grid
+              <List className="h-4 w-4 mr-2" /> List
             </Button>
             <Button 
               variant={viewMode === 'board' ? 'secondary' : 'ghost'} 
@@ -94,7 +94,7 @@ export function JobTrackerPage() {
             </Button>
           </div>
         ) : viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="flex flex-col gap-2">
             {jobs?.map((job) => (
               <JobCard key={job._id} job={job} onEdit={handleEdit} onSetReminder={handleSetReminder} />
             ))}

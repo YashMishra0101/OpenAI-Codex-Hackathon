@@ -27,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useCreateJob, useUpdateJob, JobApplication, JobStatus } from '../api/jobsApi';
+import { useCreateJob, useUpdateJob, JobApplication } from '../api/jobsApi';
 import { toast } from 'react-hot-toast';
 
 const jobFormSchema = z.object({

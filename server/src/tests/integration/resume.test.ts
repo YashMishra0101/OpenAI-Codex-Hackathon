@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import app from '../../app.js';
-import User from '../../models/User.js';
-import Resume from '../../models/Resume.js';
+import { User } from '../../models/User.js';
+import { Resume } from '../../models/Resume.js';
 import { Buffer } from 'node:buffer';
 
 vi.mock('../../config/emailService.js', () => ({

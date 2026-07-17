@@ -71,28 +71,4 @@ export async function authenticate(
   }
 }
 
-/**
- * Optional authentication middleware.
- * Attaches req.user if a valid access token is present, otherwise continues.
- * Used for routes accessible to both guests and authenticated users.
- */
-export async function optionalAuth(
-  req: Request,
-  _res: Response,
-  next: NextFunction,
-): Promise<void> {
-  const token = req.cookies['accessToken'] as string | undefined;
 
-  if (!token) return next();
-
-  try {
-    const decoded = jwt.verify(token, env.JWT_SECRET) as AccessTokenPayload;
-    if (decoded.type === 'access') {
-      req.user = { userId: decoded.userId, email: decoded.email };
-    }
-  } catch {
-    // Token is invalid or expired — proceed as unauthenticated guest
-  }
-
-  return next();
-}

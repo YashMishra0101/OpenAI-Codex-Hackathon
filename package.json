@@ -18,10 +18,11 @@
     "pnpm": ">=9.0.0"
   },
   "pnpm": {
-    "onlyBuiltDependencies": [
+    "approvedBuilds": [
       "argon2",
       "esbuild",
-      "mongodb-memory-server"
+      "mongodb-memory-server",
+      "@sentry/node-cpu-profiler"
     ]
   }
 }

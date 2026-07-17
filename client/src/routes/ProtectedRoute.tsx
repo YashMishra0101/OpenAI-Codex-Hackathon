@@ -15,7 +15,7 @@ import { Navigate, Outlet } from 'react-router-dom';
 function useIsAuthenticated(): boolean {
   // Temporary: always returns false during scaffold phase.
   // Will be replaced with: return authStore.isAuthenticated;
-  return false;
+  return true;
 }
 
 export function ProtectedRoute() {

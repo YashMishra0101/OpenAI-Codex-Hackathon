@@ -23,7 +23,7 @@ export async function sendEmail({
   try {
     if (resend) {
       const data = await resend.emails.send({
-        from: 'Job Tracker <noreply@ai-resume-checker.com>', // Note: in production, you must verify this domain
+        from: 'Job Tracker <onboarding@resend.dev>', // Resend sandbox default testing email
         to,
         subject,
         html,
