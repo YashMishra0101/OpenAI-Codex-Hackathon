@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { RegisterForm } from '@/features/auth/components/RegisterForm';
 import { GoogleAuthButton } from '@/features/auth/components/GoogleAuthButton';
 import type { RegisterFormData } from '@/features/auth/schemas';
 import api from '@/lib/axios';
+import { FileText, KanbanSquare, Search } from 'lucide-react';
 
 export function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,38 +26,91 @@ export function RegisterPage() {
   };
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)] items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-background relative overflow-hidden">
-      {/* Decorative background glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/20 rounded-full blur-[120px] pointer-events-none" />
+    <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
+      <Link
+        to="/login"
+        className="absolute right-4 top-4 md:right-8 md:top-8 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+      >
+        Sign in
+      </Link>
       
-      <Card className="w-full max-w-md relative z-10 border-primary/20 bg-surface/80 backdrop-blur-xl shadow-2xl">
-        <CardHeader className="space-y-2 text-center pb-8">
-          <CardTitle className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Create an account</CardTitle>
-          <CardDescription>
-            Enter your details below to create your account
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <GoogleAuthButton isRegister />
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
+      {/* Left side branding (hidden on mobile) */}
+      <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
+        <div className="absolute inset-0 bg-zinc-900" />
+        <div className="relative z-20 flex items-center gap-2 font-bold text-lg text-primary">
+          <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
+            <span className="text-primary font-bold">C</span>
+          </div>
+          <span className="text-white">Codex<span className="text-primary">AI</span></span>
+        </div>
+        
+        <div className="relative z-20 mt-auto space-y-10">
+          <h2 className="text-3xl font-bold tracking-tight text-white leading-tight">
+            The ultimate AI toolkit <br />to land your next role.
+          </h2>
+          
+          <div className="space-y-5">
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/20">
+                <FileText className="w-5 h-5 text-primary" />
+              </div>
+              <span className="text-base font-medium text-zinc-300">AI Resume Checker</span>
             </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">
-                Or continue with email
-              </span>
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/20">
+                <KanbanSquare className="w-5 h-5 text-primary" />
+              </div>
+              <span className="text-base font-medium text-zinc-300">Smart Job Tracker</span>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/20">
+                <Search className="w-5 h-5 text-primary" />
+              </div>
+              <span className="text-base font-medium text-zinc-300">Advanced Google Dorks</span>
             </div>
           </div>
-          <RegisterForm onSubmit={handleRegister} isLoading={isLoading} />
-        </CardContent>
-        <CardFooter className="flex justify-center text-sm text-muted-foreground">
-          Already have an account?{' '}
-          <Link to="/login" className="ml-1 font-medium text-primary hover:underline">
-            Sign in
-          </Link>
-        </CardFooter>
-      </Card>
+        </div>
+      </div>
+
+      {/* Right side form */}
+      <div className="lg:p-8 flex items-center justify-center w-full h-full">
+        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+          <div className="flex flex-col space-y-2 text-center">
+            <h1 className="text-2xl font-semibold tracking-tight">
+              Create an account
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Enter your details below to create your account
+            </p>
+          </div>
+          
+          <div className="grid gap-6">
+            <GoogleAuthButton isRegister />
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <span className="w-full border-t" />
+              </div>
+              <div className="relative flex justify-center text-xs uppercase">
+                <span className="bg-background px-2 text-muted-foreground">
+                  Or continue with email
+                </span>
+              </div>
+            </div>
+            <RegisterForm onSubmit={handleRegister} isLoading={isLoading} />
+          </div>
+          
+          <p className="px-8 text-center text-sm text-muted-foreground">
+            By clicking continue, you agree to our{' '}
+            <Link to="/terms" className="underline underline-offset-4 hover:text-primary">
+              Terms of Service
+            </Link>{' '}
+            and{' '}
+            <Link to="/privacy" className="underline underline-offset-4 hover:text-primary">
+              Privacy Policy
+            </Link>.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

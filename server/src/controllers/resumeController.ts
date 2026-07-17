@@ -62,3 +62,41 @@ export async function getResumeByIdHandler(req: Request, res: Response): Promise
     data: resume,
   });
 }
+
+export async function regenerateQuestionsHandler(req: Request, res: Response): Promise<void> {
+  const userId = req.user!.userId;
+  const { id } = req.params;
+  const { numQuestions } = req.body;
+
+  const { Resume } = await import('../models/Resume.js');
+  const resume = await Resume.findOne({ _id: id, user: userId });
+
+  if (!resume) {
+    throw new ApiError(HTTP.NOT_FOUND, 'Resume analysis not found');
+  }
+
+  if (resume.questionGenerationCount >= 5) {
+    throw new ApiError(HTTP.TOO_MANY_REQUESTS, 'You have reached the maximum limit of 5 question generations for this resume. Please upload a new resume to generate more questions.');
+  }
+
+  logger.info('REGENERATE_QUESTIONS_STARTED', { userId, resumeId: id, count: resume.questionGenerationCount + 1 });
+
+  const { generateInterviewQuestions } = await import('../services/aiService.js');
+  
+  const newQuestions = await generateInterviewQuestions({
+    resumeText: resume.resumeText,
+    jobDescription: resume.jobDescription,
+    numQuestions,
+  });
+
+  resume.interviewQuestions = newQuestions;
+  resume.questionGenerationCount += 1;
+  await resume.save();
+
+  logger.info('REGENERATE_QUESTIONS_COMPLETED', { userId, resumeId: id });
+
+  res.status(HTTP.OK).json({
+    success: true,
+    data: resume,
+  });
+}

@@ -12,6 +12,7 @@ export interface IResume extends Document {
   };
   interviewQuestions: string[];
   searchQueries: Array<{ query: string; category: string }>;
+  questionGenerationCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -34,6 +35,7 @@ const resumeSchema = new Schema<IResume>(
         category: { type: String },
       },
     ],
+    questionGenerationCount: { type: Number, default: 1 },
   },
   {
     timestamps: true,

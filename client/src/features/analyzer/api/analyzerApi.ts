@@ -29,6 +29,7 @@ export interface AnalyzeResumeResponse {
     analysis: AIResponse['analysis'];
     interviewQuestions: AIResponse['interviewQuestions'];
     searchQueries: AIResponse['searchQueries'];
+    questionGenerationCount: number;
     createdAt: string;
   };
 }
@@ -55,6 +56,20 @@ export function useAnalyzeResume() {
         },
       });
 
+      return response.data;
+    },
+  });
+}
+
+interface RegenerateQuestionsVariables {
+  resumeId: string;
+  numQuestions: number;
+}
+
+export function useRegenerateQuestions() {
+  return useMutation({
+    mutationFn: async ({ resumeId, numQuestions }: RegenerateQuestionsVariables): Promise<AnalyzeResumeResponse> => {
+      const response = await api.post(`/resumes/${resumeId}/questions`, { numQuestions });
       return response.data;
     },
   });

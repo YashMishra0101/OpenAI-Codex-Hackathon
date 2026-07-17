@@ -42,6 +42,8 @@ function buildPrompt(params: AIAnalysisParams): string {
 Based on your analysis, return a structured JSON response.
 Do not output markdown code blocks (like \`\`\`json). Return ONLY raw JSON.
 
+CRITICAL: For "searchQueries", you MUST generate authentic, complex "Google Dorks" (using operators like site:, intitle:, inurl:, filetype:, OR, exact match quotes ""). DO NOT generate simple keywords. These should be ready to paste directly into Google.
+
 The JSON object MUST have this exact schema:
 {
   "overallVerdict": "Strong" | "Partial" | "Weak",
@@ -50,10 +52,10 @@ The JSON object MUST have this exact schema:
     "improvements": ["...", "..."]
   },
   "interviewQuestions": ["...", "..."], // Between 10 and 50 tailored questions
-  "searchQueries": [ // Generate exactly 10 advanced Google search queries
-    { "query": "...", "category": "job" },       // 8 queries of category "job"
-    { "query": "...", "category": "learning" },  // 1 query of category "learning"
-    { "query": "...", "category": "interview" }  // 1 query of category "interview"
+  "searchQueries": [ // Generate exactly 15 authentic Google Dork search queries
+    { "query": "site:lever.co OR site:greenhouse.io intitle:\"Software Engineer\" \"React\"", "category": "job" }, // 9 queries of category "job"
+    { "query": "site:github.com \"frontend interview questions\" \"react\"", "category": "learning" },  // 3 queries of category "learning"
+    { "query": "site:reddit.com/r/cscareerquestions \"Google\" \"interview experience\" \"frontend\"", "category": "interview" }  // 3 queries of category "interview"
   ]
 }
 `;
@@ -154,5 +156,95 @@ export async function analyzeResume(params: AIAnalysisParams): Promise<any> {
       error: parseError.message,
     });
     throw new ApiError(HTTP.INTERNAL_SERVER_ERROR, 'Failed to parse AI analysis response.');
+  }
+}
+
+export async function generateInterviewQuestions(
+  params: AIAnalysisParams & { numQuestions: number }
+): Promise<string[]> {
+  const { resumeText, jobDescription, numQuestions } = params;
+
+  let prompt = `You are a strict, senior technical recruiter.\nGenerate EXACTLY ${numQuestions} highly relevant interview questions based on the following resume`;
+
+  if (jobDescription) {
+    prompt += ` and job description.`;
+  }
+  prompt += `\n\nResume Text:\n${resumeText}\n\n`;
+
+  if (jobDescription) {
+    prompt += `Job Description:\n${jobDescription}\n\n`;
+  }
+
+  prompt += `
+Based on your analysis, return a structured JSON response.
+Do not output markdown code blocks (like \`\`\`json). Return ONLY raw JSON.
+
+The JSON object MUST have this exact schema:
+{
+  "interviewQuestions": ["...", "..."] // Exactly ${numQuestions} questions
+}
+`;
+
+  const hash = crypto.createHash('sha256').update(prompt).digest('hex');
+
+  if (aiCache.has(hash)) {
+    logger.info('AI_CACHE_HIT_QUESTIONS', { hash });
+    return JSON.parse(aiCache.get(hash)!).interviewQuestions;
+  }
+
+  let resultString = '';
+
+  const geminiModels = [
+    'gemini-3.1-flash-lite',
+    'gemini-3.1-flash-image',
+    'gemini-2.0-flash-lite',
+    'gemini-2.0-flash',
+  ];
+
+  if (geminiClient && !process.env.SIMULATE_GEMINI_FAILURE) {
+    for (const modelName of geminiModels) {
+      try {
+        const response = await geminiClient.models.generateContent({
+          model: modelName,
+          contents: prompt,
+        });
+        resultString = response.text || '';
+        if (resultString) break;
+      } catch (err) {
+        // next model
+      }
+    }
+  }
+
+  if (!resultString) {
+    try {
+      if (!groqClient) throw new Error('Groq client not initialized');
+      const completion = await groqClient.chat.completions.create({
+        messages: [{ role: 'user', content: prompt }],
+        model: 'llama-3.3-70b-versatile',
+        response_format: { type: 'json_object' },
+      });
+      resultString = completion.choices[0]?.message?.content || '';
+    } catch (err: any) {
+      throw new ApiError(HTTP.INTERNAL_SERVER_ERROR, 'AI Providers are currently unavailable.');
+    }
+  }
+
+  try {
+    let cleaned = resultString.trim();
+    if (cleaned.startsWith('```')) {
+      cleaned = cleaned.replace(/^```(?:json)?/, '').replace(/```$/, '').trim();
+    }
+    const parsedData = JSON.parse(cleaned);
+    
+    // We import aiQuestionsResponseSchema at the top of the file, let's just do dynamic import or define it inline here.
+    // Wait, I should import it at the top of the file. I will do that in the next step.
+    const { aiQuestionsResponseSchema } = await import('../validations/resumeValidation.js');
+    const validatedData = aiQuestionsResponseSchema.parse(parsedData);
+    
+    aiCache.set(hash, JSON.stringify(validatedData));
+    return validatedData.interviewQuestions;
+  } catch (parseError: any) {
+    throw new ApiError(HTTP.INTERNAL_SERVER_ERROR, 'Failed to parse AI generated questions.');
   }
 }

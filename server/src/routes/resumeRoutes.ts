@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { analyzeResumeHandler, getResumeHistoryHandler, getResumeByIdHandler } from '../controllers/resumeController.js';
+import { analyzeResumeHandler, getResumeHistoryHandler, getResumeByIdHandler, regenerateQuestionsHandler } from '../controllers/resumeController.js';
 import { authenticate } from '../middlewares/auth.js';
 import { uploadImage } from '../middlewares/upload.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
@@ -41,5 +41,10 @@ router.get('/', asyncHandler(getResumeHistoryHandler));
 
 // GET /api/v1/resumes/:id
 router.get('/:id', asyncHandler(getResumeByIdHandler));
+
+// POST /api/v1/resumes/:id/questions
+import { validate } from '../middlewares/validate.js';
+import { generateQuestionsSchema } from '../validations/resumeValidation.js';
+router.post('/:id/questions', validate(generateQuestionsSchema), asyncHandler(regenerateQuestionsHandler));
 
 export default router;

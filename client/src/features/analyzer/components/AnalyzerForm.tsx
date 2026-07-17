@@ -78,34 +78,44 @@ export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
             <FormLabel>Resume PDF <span className="text-red-500">*</span></FormLabel>
             <div
               {...getRootProps()}
-              className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors ${
-                isDragActive ? 'border-primary bg-primary/5' : 'border-border hover:border-primary/50 hover:bg-muted/50'
-              } ${fileError ? 'border-destructive' : ''}`}
+              className={`group relative border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-all duration-200 ${
+                isDragActive ? 'border-primary bg-primary/5 scale-[0.99]' : 'border-border hover:border-primary/50 hover:bg-muted/30'
+              } ${fileError ? 'border-destructive bg-destructive/5' : ''}`}
             >
               <input {...getInputProps()} />
               {resumeFile ? (
-                <div className="flex flex-col items-center gap-2">
-                  <FileText className="h-10 w-10 text-primary" />
-                  <p className="text-sm font-medium">{resumeFile.name}</p>
-                  <p className="text-xs text-muted-foreground">{(resumeFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                <div className="flex flex-col items-center gap-3 animate-in fade-in zoom-in duration-300">
+                  <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+                    <FileText className="h-8 w-8 text-primary" />
+                  </div>
+                  <div>
+                    <p className="text-base font-medium text-foreground">{resumeFile.name}</p>
+                    <p className="text-sm text-muted-foreground">{(resumeFile.size / 1024 / 1024).toFixed(2)} MB</p>
+                  </div>
                   <Button
                     type="button"
-                    variant="ghost"
+                    variant="outline"
                     size="sm"
-                    className="mt-2 text-destructive hover:text-destructive"
+                    className="mt-2 text-destructive hover:text-destructive hover:bg-destructive/10"
                     onClick={(e) => {
                       e.stopPropagation();
                       setResumeFile(null);
                     }}
                   >
-                    <X className="h-4 w-4 mr-1" /> Remove
+                    <X className="h-4 w-4 mr-2" /> Remove File
                   </Button>
                 </div>
               ) : (
-                <div className="flex flex-col items-center gap-2">
-                  <UploadCloud className="h-10 w-10 text-muted-foreground" />
-                  <p className="text-sm font-medium">Drag & drop your resume here</p>
-                  <p className="text-xs text-muted-foreground">PDF only, max 10MB</p>
+                <div className="flex flex-col items-center gap-3">
+                  <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center group-hover:bg-primary/10 group-hover:scale-110 transition-all duration-300">
+                    <UploadCloud className="h-8 w-8 text-muted-foreground group-hover:text-primary transition-colors" />
+                  </div>
+                  <div>
+                    <p className="text-base font-medium text-foreground">
+                      <span className="text-primary hover:underline">Click to upload</span> or drag and drop
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">PDF format, up to 10MB</p>
+                  </div>
                 </div>
               )}
             </div>

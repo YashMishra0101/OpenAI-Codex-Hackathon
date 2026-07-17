@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
+import { Upload, Trash2 } from 'lucide-react';
 import api from '@/lib/axios';
 
 interface ProfileImageUploadProps {
@@ -19,7 +20,7 @@ export function ProfileImageUpload({
   isGoogleUser = false,
   onSuccess,
 }: ProfileImageUploadProps) {
-  const [isUploading, setIsUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [imgError, setImgError] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -52,7 +53,7 @@ export function ProfileImageUpload({
     formData.append('image', file);
 
     try {
-      setIsUploading(true);
+      setIsLoading(true);
       setImgError(false);
       const res = await api.patch('/users/me/profile-image', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
@@ -62,18 +63,32 @@ export function ProfileImageUpload({
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to upload image');
     } finally {
-      setIsUploading(false);
+      setIsLoading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const handleRemoveImage = async () => {
+    try {
+      setIsLoading(true);
+      setImgError(false);
+      await api.delete('/users/me/profile-image');
+      toast.success('Profile picture removed!');
+      onSuccess('');
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || 'Failed to remove image');
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const showImage = Boolean(currentImageUrl) && !imgError;
 
   return (
-    <div className="flex flex-col items-center space-y-4">
+    <div className="flex flex-col items-center space-y-6">
       {/* Avatar */}
-      <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-muted bg-muted flex items-center justify-center">
-        {isUploading ? (
+      <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-full border-4 border-muted bg-muted flex items-center justify-center">
+        {isLoading ? (
           <LoadingSpinner size="lg" />
         ) : showImage ? (
           <img
@@ -90,28 +105,52 @@ export function ProfileImageUpload({
         )}
       </div>
 
-      {/* Only show upload controls for non-Google users */}
-      {!isGoogleUser && (
-        <>
-          <input
-            type="file"
-            accept="image/*"
-            className="hidden"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            disabled={isUploading}
-          />
-          <Button
-            variant="outline"
-            size="sm"
-            disabled={isUploading}
-            onClick={() => fileInputRef.current?.click()}
-          >
-            {isUploading ? 'Uploading...' : 'Change Picture'}
-          </Button>
-          <p className="text-xs text-muted-foreground text-center">JPEG, PNG or WebP. Max 5MB.</p>
-        </>
-      )}
+      {/* Upload Controls */}
+      <div className="flex flex-col w-full max-w-[200px] space-y-2 text-center">
+        {!isGoogleUser ? (
+          <>
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              disabled={isLoading}
+            />
+            <Button
+              variant="secondary"
+              size="sm"
+              disabled={isLoading}
+              onClick={() => fileInputRef.current?.click()}
+              className="w-full"
+            >
+              <Upload className="mr-2 h-4 w-4" />
+              {showImage ? 'Change picture' : 'Upload picture'}
+            </Button>
+            {showImage && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                disabled={isLoading}
+                onClick={handleRemoveImage}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                Remove
+              </Button>
+            )}
+            <p className="text-xs text-muted-foreground mt-2">
+              JPEG, PNG, or WebP. Max 5MB.
+            </p>
+          </>
+        ) : (
+          <div className="space-y-1">
+            <p className="text-xs text-muted-foreground">
+              Avatar managed by Google.
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

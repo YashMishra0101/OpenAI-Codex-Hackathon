@@ -9,11 +9,9 @@ import type { UserData } from '@/features/auth/context/AuthContext';
 export function ProfilePage() {
   const { user, updateUser, isLoading: authLoading } = useAuth();
   
-  // Create a local copy to avoid modifying the auth context directly until save succeeds
   const [userData, setUserData] = useState<UserData | null>(user);
 
   useEffect(() => {
-    // Sync local state when global auth user changes
     if (user) setUserData(user);
   }, [user]);
 
@@ -40,7 +38,7 @@ export function ProfilePage() {
   const isGoogleUser = userData?.authProvider === 'google';
 
   return (
-    <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 max-w-4xl">
+    <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 max-w-5xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Profile Settings</h1>
         <p className="text-muted-foreground mt-2">
@@ -53,7 +51,7 @@ export function ProfilePage() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Left Column — Profile Picture */}
         <div className="md:col-span-1">
-          <Card>
+          <Card className="border-border/50 shadow-sm">
             <CardHeader>
               <CardTitle>Profile Picture</CardTitle>
               {isGoogleUser && (
@@ -73,7 +71,7 @@ export function ProfilePage() {
 
         {/* Right Column — Personal Information */}
         <div className="md:col-span-2">
-          <Card>
+          <Card className="border-border/50 shadow-sm">
             <CardHeader>
               <CardTitle>Personal Information</CardTitle>
               <CardDescription>

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle2, AlertTriangle } from 'lucide-react';
@@ -9,7 +10,8 @@ interface AnalysisResultProps {
   data: AnalyzeResumeResponse['data'];
 }
 
-export function AnalysisResult({ data }: AnalysisResultProps) {
+export function AnalysisResult({ data: initialData }: AnalysisResultProps) {
+  const [data, setData] = useState(initialData);
   const getVerdictBadge = (verdict: string) => {
     switch (verdict) {
       case 'Strong':
@@ -72,7 +74,11 @@ export function AnalysisResult({ data }: AnalysisResultProps) {
       
       {/* Interactive Phase 11 Components */}
       <div className="grid md:grid-cols-2 gap-6">
-        <InterviewQuestions questions={data.interviewQuestions} />
+        <InterviewQuestions 
+          resumeId={data._id}
+          initialQuestions={data.interviewQuestions}
+          initialCount={data.questionGenerationCount || 1}
+        />
         <SearchQueries queries={data.searchQueries} />
       </div>
     </div>

@@ -86,11 +86,16 @@ export function JobTrackerPage() {
             Failed to load job applications. Please try again.
           </div>
         ) : jobs?.length === 0 ? (
-          <div className="text-center py-16 border rounded-lg bg-muted/20 border-dashed">
-            <h3 className="text-lg font-medium text-foreground mb-1">No applications yet</h3>
-            <p className="text-sm text-muted-foreground mb-4">You haven't added any job applications to track.</p>
-            <Button onClick={handleAddNew} variant="outline">
-              <Plus className="mr-2 h-4 w-4" /> Add your first job
+          <div className="flex flex-col items-center justify-center py-24 text-center border rounded-xl bg-muted/10 border-dashed border-border/60">
+            <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+              <KanbanSquare className="h-8 w-8 text-primary" />
+            </div>
+            <h3 className="text-xl font-semibold tracking-tight text-foreground mb-2">No applications tracked yet</h3>
+            <p className="text-sm text-muted-foreground mb-6 max-w-sm">
+              Start organizing your job hunt. Add your first application to track its status, set reminders, and analyze your success rate.
+            </p>
+            <Button onClick={handleAddNew} size="lg" className="shadow-sm">
+              <Plus className="mr-2 h-4 w-4" /> Add Your First Job
             </Button>
           </div>
         ) : viewMode === 'grid' ? (

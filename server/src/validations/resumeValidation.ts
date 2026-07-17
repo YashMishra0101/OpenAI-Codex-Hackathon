@@ -19,20 +19,35 @@ export const aiResponseSchema = z.object({
         category: z.enum(['job', 'learning', 'interview']),
       })
     )
-    .min(10, 'Must provide exactly 10 search queries')
-    .max(10, 'Must provide exactly 10 search queries')
+    .min(15, 'Must provide exactly 15 search queries')
+    .max(15, 'Must provide exactly 15 search queries')
     .refine(
       (queries) => {
         const jobCount = queries.filter((q) => q.category === 'job').length;
         const learningCount = queries.filter((q) => q.category === 'learning').length;
         const interviewCount = queries.filter((q) => q.category === 'interview').length;
         
-        return jobCount === 8 && learningCount === 1 && interviewCount === 1;
+        return jobCount === 9 && learningCount === 3 && interviewCount === 3;
       },
       {
-        message: 'Search queries must be exactly 8 job, 1 learning, and 1 interview category.',
+        message: 'Search queries must be exactly 9 job, 3 learning, and 3 interview category.',
       }
     ),
 });
 
 export type AIResponseDto = z.infer<typeof aiResponseSchema>;
+
+export const generateQuestionsSchema = z.object({
+  numQuestions: z
+    .number()
+    .int()
+    .min(10, 'Must request at least 10 questions')
+    .max(50, 'Must request at most 50 questions'),
+});
+
+export const aiQuestionsResponseSchema = z.object({
+  interviewQuestions: z
+    .array(z.string())
+    .min(10, 'Must provide at least 10 interview questions')
+    .max(50, 'Must provide at most 50 interview questions'),
+});

@@ -14,20 +14,24 @@ const AnalyzerHistoryPage = lazy(() => import('@/pages/analyzer/AnalyzerHistoryP
 const AnalyzerDetailPage = lazy(() => import('@/pages/analyzer/AnalyzerDetailPage').then((m) => ({ default: m.AnalyzerDetailPage })));
 const JobTrackerPage = lazy(() => import('@/pages/jobs/JobTrackerPage').then((m) => ({ default: m.JobTrackerPage })));
 
+const LandingPage = lazy(() => import('@/pages/LandingPage').then((m) => ({ default: m.LandingPage })));
+
 /**
  * Application router — React Router v7 in library mode (pure client-side SPA).
  */
 export const router = createBrowserRouter([
   // ── Public routes ─────────────────────────────────────────────────────────
   {
-    path: '/',
-    element: (
-      <Navigate to="/jobs" replace />
-    ),
-  },
-  {
     element: <PublicRoute />,
     children: [
+      {
+        path: '/',
+        element: (
+          <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><LoadingSpinner /></div>}>
+            <LandingPage />
+          </Suspense>
+        ),
+      },
       {
         path: '/login',
         element: (

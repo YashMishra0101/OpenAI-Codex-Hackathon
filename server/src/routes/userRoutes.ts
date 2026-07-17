@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getMe, updateMe, uploadProfileImage } from '../controllers/userController.js';
+import { getMe, updateMe, uploadProfileImage, deleteProfileImage } from '../controllers/userController.js';
 import { authenticate } from '../middlewares/auth.js';
 import { validate } from '../middlewares/validate.js';
 import { updateProfileSchema } from '../validations/userValidation.js';
@@ -20,5 +20,8 @@ router.put('/me', validate(updateProfileSchema), asyncHandler(updateMe));
 // PATCH /api/v1/users/me/profile-image
 // multer parses the multipart/form-data before the controller runs
 router.patch('/me/profile-image', uploadImage.single('image'), asyncHandler(uploadProfileImage));
+
+// DELETE /api/v1/users/me/profile-image
+router.delete('/me/profile-image', asyncHandler(deleteProfileImage));
 
 export default router;

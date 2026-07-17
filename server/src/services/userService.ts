@@ -61,11 +61,32 @@ export async function updateProfile(userId: string, dto: UpdateProfileDto): Prom
 }
 
 /**
+ * Helper to delete an image from Cloudinary by extracting its public_id.
+ */
+async function deleteImageFromCloudinary(imageUrl: string) {
+  if (!imageUrl || !imageUrl.includes('res.cloudinary.com')) return;
+
+  try {
+    const parts = imageUrl.split('/');
+    const folderAndFile = parts.slice(-2).join('/');
+    const publicId = folderAndFile.split('.')[0];
+    
+    if (publicId) {
+      await cloudinary.uploader.destroy(publicId);
+      logger.info('CLOUDINARY_IMAGE_DELETED', { publicId });
+    }
+  } catch (error: any) {
+    logger.error('CLOUDINARY_DELETE_ERROR', { error: error.message, imageUrl });
+  }
+}
+
+/**
  * Uploads a profile picture to Cloudinary and updates the user record.
  * Crucially cleans up the temp file created by Multer's diskStorage to prevent leaks.
  */
 export async function updateProfileImage(userId: string, filePath: string): Promise<SafeUser> {
   let uploadResult;
+  const oldUser = await User.findById(userId);
 
   try {
     // Upload image to Cloudinary (folder 'profiles' groups them together)
@@ -98,7 +119,40 @@ export async function updateProfileImage(userId: string, filePath: string): Prom
     throw new ApiError(HTTP.NOT_FOUND, 'User not found');
   }
 
+  // Delete old image if it existed and belonged to Cloudinary
+  if (oldUser && oldUser.profileImage) {
+    await deleteImageFromCloudinary(oldUser.profileImage);
+  }
+
   logger.info('USER_PROFILE_IMAGE_UPDATED', { userId, imageUrl: uploadResult.secure_url });
+
+  return toSafeUser(user);
+}
+
+/**
+ * Removes the user's profile image.
+ */
+export async function removeProfileImage(userId: string): Promise<SafeUser> {
+  const oldUser = await User.findById(userId);
+  if (!oldUser) {
+    throw new ApiError(HTTP.NOT_FOUND, 'User not found');
+  }
+
+  if (oldUser.profileImage) {
+    await deleteImageFromCloudinary(oldUser.profileImage);
+  }
+
+  const user = await User.findByIdAndUpdate(
+    userId,
+    { profileImage: '' },
+    { new: true }
+  );
+
+  if (!user) {
+    throw new ApiError(HTTP.NOT_FOUND, 'User not found');
+  }
+
+  logger.info('USER_PROFILE_IMAGE_REMOVED', { userId });
 
   return toSafeUser(user);
 }

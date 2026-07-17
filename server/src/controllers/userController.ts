@@ -1,7 +1,7 @@
 import type { Request, Response } from 'express';
 import { HTTP } from '../constants/httpStatus.js';
 import { ApiError } from '../utils/ApiError.js';
-import { getProfile, updateProfile, updateProfileImage } from '../services/userService.js';
+import { getProfile, updateProfile, updateProfileImage, removeProfileImage } from '../services/userService.js';
 
 /**
  * GET /api/v1/users/me
@@ -49,6 +49,22 @@ export async function uploadProfileImage(req: Request, res: Response): Promise<v
   res.status(HTTP.OK).json({
     success: true,
     message: 'Profile image updated successfully',
+    data: user,
+  });
+}
+
+/**
+ * DELETE /api/v1/users/me/profile-image
+ * Removes the user's profile image.
+ */
+export async function deleteProfileImage(req: Request, res: Response): Promise<void> {
+  const userId = req.user!.userId;
+  
+  const user = await removeProfileImage(userId);
+  
+  res.status(HTTP.OK).json({
+    success: true,
+    message: 'Profile image removed successfully',
     data: user,
   });
 }
