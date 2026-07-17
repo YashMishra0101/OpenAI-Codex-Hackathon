@@ -3,51 +3,33 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ProfileForm } from '@/features/profile/components/ProfileForm';
 import { ProfileImageUpload } from '@/features/profile/components/ProfileImageUpload';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import api from '@/lib/axios';
-import toast from 'react-hot-toast';
-
-interface UserData {
-  id: string;
-  name: string;
-  email: string;
-  profileImage?: string;
-  authProvider: 'email' | 'google';
-  isVerified: boolean;
-}
+import { useAuth } from '@/features/auth/context/AuthContext';
+import type { UserData } from '@/features/auth/context/AuthContext';
 
 export function ProfilePage() {
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const { user, updateUser, isLoading: authLoading } = useAuth();
+  
+  // Create a local copy to avoid modifying the auth context directly until save succeeds
+  const [userData, setUserData] = useState<UserData | null>(user);
 
   useEffect(() => {
-    let isMounted = true;
-
-    api.get('/users/me')
-      .then((res) => {
-        if (isMounted) {
-          setUserData(res.data.data);
-          setIsLoading(false);
-        }
-      })
-      .catch((err) => {
-        if (isMounted) {
-          toast.error(err.response?.data?.message || 'Failed to load profile');
-          setIsLoading(false);
-        }
-      });
-
-    return () => { isMounted = false; };
-  }, []);
+    // Sync local state when global auth user changes
+    if (user) setUserData(user);
+  }, [user]);
 
   const handleProfileUpdate = (newData: UserData) => {
     setUserData(newData);
+    updateUser(newData);
   };
 
   const handleImageUpdate = (newImageUrl: string) => {
-    setUserData((prev) => prev ? { ...prev, profileImage: newImageUrl } : prev);
+    if (!userData) return;
+    const updated = { ...userData, profileImage: newImageUrl };
+    setUserData(updated);
+    updateUser(updated);
   };
 
-  if (isLoading) {
+  if (authLoading || !userData) {
     return (
       <div className="flex h-[calc(100vh-64px)] items-center justify-center">
         <LoadingSpinner size="lg" />

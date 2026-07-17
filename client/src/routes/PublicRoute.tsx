@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
-import api from '@/lib/axios';
+import { useAuth } from '@/features/auth/context/AuthContext';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 /**
@@ -10,23 +9,7 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
  * this component automatically redirects them to the main dashboard.
  */
 export function PublicRoute() {
-  const [isLoading, setIsLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-
-  useEffect(() => {
-    // Check if the user has an active session
-    api.get('/users/me')
-      .then(() => {
-        setIsAuthenticated(true);
-      })
-      .catch(() => {
-        // Expected if they are not logged in
-        setIsAuthenticated(false);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, []);
+  const { isAuthenticated, isLoading } = useAuth();
 
   if (isLoading) {
     return (

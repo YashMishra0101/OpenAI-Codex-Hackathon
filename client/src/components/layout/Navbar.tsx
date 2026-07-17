@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, LogOut } from 'lucide-react';
 import { Button } from '../ui/button';
-import api from '@/lib/axios';
+import { useAuth } from '@/features/auth/context/AuthContext';
 import toast from 'react-hot-toast';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { logout, user } = useAuth();
 
   const navLinks = [
     { name: 'Dashboard', path: '/dashboard' },
@@ -16,13 +17,10 @@ export function Navbar() {
     { name: 'Profile', path: '/profile' },
   ];
 
-  const navigate = useNavigate();
-
   const handleLogout = async () => {
     try {
-      await api.post('/auth/logout');
+      await logout();
       toast.success('Logged out successfully');
-      navigate('/login');
     } catch (err: any) {
       toast.error('Failed to logout');
     }

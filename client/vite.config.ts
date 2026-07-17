@@ -41,11 +41,14 @@ export default defineConfig({
     rollupOptions: {
       output: {
         // Split vendor code for better long-term caching
-        manualChunks: {
-          'react-vendor': ['react', 'react-dom'],
-          'router': ['react-router-dom'],
-          'query': ['@tanstack/react-query'],
-        } as any,
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react') || id.includes('react-dom')) return 'react-vendor';
+            if (id.includes('react-router') || id.includes('@remix-run')) return 'router';
+            if (id.includes('@tanstack/react-query')) return 'query';
+            return 'vendor';
+          }
+        },
       },
     },
   },

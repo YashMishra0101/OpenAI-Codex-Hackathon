@@ -17,8 +17,8 @@ export function LoginPage() {
       await api.post('/auth/login', data);
       toast.success('Logged in successfully!');
       
-      // Temporary navigate to dashboard, will wire up actual auth state later in Phase 6
-      navigate('/dashboard');
+      // Reload the application to hydrate the global AuthContext
+      window.location.href = '/dashboard';
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to login');
     } finally {

@@ -1,4 +1,4 @@
-import { Badge } from '@/components/ui/badge';
+
 import { MapPin, DollarSign, Calendar, MoreVertical, Link as LinkIcon, Pencil, Bell, Trash2 } from 'lucide-react';
 import {
   DropdownMenu,

@@ -20,6 +20,9 @@ interface UserData {
   id: string;
   name: string;
   email: string;
+  profileImage?: string;
+  isVerified: boolean;
+  authProvider: 'email' | 'google';
 }
 
 interface ProfileFormProps {

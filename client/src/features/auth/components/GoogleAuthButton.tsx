@@ -20,7 +20,8 @@ export function GoogleAuthButton({ isRegister = false }: GoogleAuthButtonProps) 
       setIsLoading(true);
       await api.post('/auth/google', { credential: response.credential });
       toast.success(isRegister ? 'Account created successfully!' : 'Logged in successfully!');
-      navigate('/dashboard');
+      // Reload the application to hydrate the global AuthContext
+      window.location.href = '/dashboard';
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Google authentication failed');
     } finally {
