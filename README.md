@@ -114,7 +114,7 @@ Keep every application organized in one powerful dashboard:
 | **AI**              | Google Gemini 3.5 Flash free tier (`gemini-3.5-flash`) — Primary · Groq Qwen 3.6 27B free tier (`qwen/qwen3.6-27b`) — Fallback                                           |
 | **Database**        | MongoDB Atlas + Mongoose (ODM)                                                                                                                                           |
 | **Storage**         | Cloudinary (profile images + resume PDFs)                                                                                                                                |
-| **Email**           | Resend SDK (3,000 emails/month free)                                                                                                                                     |
+| **Email**           | Nodemailer + Gmail (500 emails/day free)                                                                                                                                 |
 | **Testing**         | Vitest · React Testing Library · Supertest                                                                                                                               |
 | **Monitoring**      | Sentry (5K errors/month free), Winston structured logging                                                                                                                |
 | **CI/CD**           | GitHub Actions (lint + test on every push)                                                                                                                               |
@@ -142,8 +142,8 @@ Keep every application organized in one powerful dashboard:
 └────┬─────────────┬────────────────┬────────────────┬────────┘
      │             │                │                │
      ▼             ▼                ▼                ▼
-MongoDB         Gemini 3.5      Cloudinary        Resend
-Atlas           Flash API       (Storage)         (Email)
+MongoDB         Gemini 3.5      Cloudinary        Nodemailer
+Atlas           Flash API       (Storage)         (Gmail)
 (Primary DB)    + Groq Qwen 3.6 27B
                 (AI Fallback)
 ```
@@ -249,7 +249,7 @@ The monorepo setup lets `client/` and `server/` share a single Git repo, unified
 | **UptimeRobot**    | Keep-alive pings every 10 min | 50 monitors free                         |
 | **MongoDB Atlas**  | Database                      | 512 MB forever free                      |
 | **Cloudinary**     | Media storage & CDN           | 25 GB/month free                         |
-| **Resend**         | Email delivery                | 3,000 emails/month free                  |
+| **Nodemailer**     | Email delivery                | 500 emails/day free via Gmail            |
 | **Sentry**         | Error monitoring              | 5,000 errors/month free                  |
 | **GitHub Actions** | CI/CD pipeline                | 2,000 min/month free                     |
 

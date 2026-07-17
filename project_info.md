@@ -48,7 +48,7 @@ This project goes beyond a typical MERN stack application. Here are the key diff
 | **AI** | Google Gemini 3.5 Flash API free tier (primary) + Groq API free tier (fallback) |
 | **Database** | MongoDB Atlas + Mongoose (ODM) |
 | **Storage** | Cloudinary |
-| **Email** | Resend |
+| **Email** | Nodemailer + Gmail |
 | **Hosting** | Vercel (Frontend), Render (Backend), UptimeRobot (Keep-Alive) |
 | **Monitoring** | Sentry (Free: 5K errors/month) |
 | **CI/CD** | GitHub Actions (lint + test on push) |
@@ -167,7 +167,7 @@ All profile changes are saved to MongoDB and reflected immediately across the ap
 ### Email Reminders (Optional)
 - User can **choose to set a reminder** for any application
 - User selects reminder time (24 hours before, 1 hour before, or custom)
-- Email sent at the selected time via Resend
+- Email sent at the selected time via Nodemailer
 - Email includes: Company, Role, Time, Notes
 - **Agenda.js persists all reminder jobs directly in MongoDB** — jobs automatically resume after any server restart, cold start, or crash with no manual re-scheduling code needed
 
@@ -256,11 +256,11 @@ Where the app saves profile photos and resume PDFs.
 * **Free:** The platform gets 25GB of storage/bandwidth per month.
 * **Paid:** Only if there are tons of HD images/videos.
 
-**Resend SDK**
-Resend is a developer-focused email delivery platform with an official Node.js SDK. Instead of configuring an SMTP transport (as you would with Nodemailer), you simply call `resend.emails.send({ from, to, subject, html })` — one function, no transport setup, no SMTP credentials to manage. This produces significantly cleaner code and removes an entire dependency from the project.
-* **Free:** 3,000 emails per month (100 per day) — sufficient for portfolio scale.
-* **Why Resend SDK over Nodemailer + Resend SMTP:** Nodemailer is an SMTP transport library — it was designed to talk to any SMTP server. Using it with Resend means writing SMTP configuration boilerplate (`createTransport`, host, port, auth) just to wrap a service that already has a clean REST API. The official Resend SDK removes all of that: authenticate with an API key, call one method, done. Less code, no SMTP config, and first-class TypeScript types out of the box.
-* **Paid:** Only if the app sends more than 3,000 emails/month.
+**Nodemailer**
+Nodemailer is an SMTP transport library for Node.js. It connects securely to Gmail's SMTP servers using a 16-character App Password, allowing the application to send transactional emails (verifications, password resets, reminders) completely free of charge.
+* **Free:** 500 emails per day (Gmail limit) — sufficient for portfolio scale.
+* **Why Nodemailer + Gmail:** Using a professional email provider like Resend requires owning and verifying a custom domain, which costs money. Nodemailer with a free Gmail account completely bypasses this limitation, ensuring a 100% free deployment for the entire stack.
+* **Paid:** Free forever with standard Gmail limits.
 
 **Vercel + Render**
 Where the website lives on the internet.
