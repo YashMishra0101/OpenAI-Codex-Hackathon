@@ -12,6 +12,7 @@ export interface IJobApplication extends Document {
   salary?: string;
   notes?: string;
   appliedDate?: Date;
+  reminderCount: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -56,6 +57,10 @@ const jobApplicationSchema = new Schema<IJobApplication>(
     },
     appliedDate: {
       type: Date,
+    },
+    reminderCount: {
+      type: Number,
+      default: 0,
     },
   },
   {

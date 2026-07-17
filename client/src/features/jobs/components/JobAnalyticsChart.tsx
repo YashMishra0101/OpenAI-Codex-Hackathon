@@ -1,5 +1,5 @@
 import { useJobStats } from '../api/jobsApi';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import {
   BarChart,
   Bar,
@@ -10,24 +10,27 @@ import {
   Cell,
   ResponsiveContainer,
 } from 'recharts';
-import { Skeleton } from '@/components/ui/skeleton';
 
-const BAR_COLORS: Record<string, string> = {
-  Saved: '#64748b',
-  Applied: '#3b82f6',
-  Interview: '#f59e0b',
-  Offer: '#10b981',
-  Rejected: '#ef4444',
+// Matches design-system colors exactly
+const BAR_CONFIG: Record<string, { fill: string; label: string }> = {
+  Reminder:  { fill: 'hsl(160 10% 40%)',  label: 'Reminder'  },
+  Applied:   { fill: 'hsl(213 94% 63%)',  label: 'Applied'   },
+  Interview: { fill: 'hsl(38 92% 50%)',   label: 'Interview' },
+  Offer:     { fill: 'hsl(160 84% 39%)',  label: 'Offer'     },
+  Rejected:  { fill: 'hsl(0 84% 60%)',    label: 'Rejected'  },
 };
 
-// Custom tooltip that stays inside the card
 function CustomTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
+  const cfg = BAR_CONFIG[label];
   return (
-    <div className="rounded-lg border border-border bg-popover px-3 py-2 text-sm shadow-md">
-      <p className="font-medium text-foreground">{label}</p>
+    <div className="rounded-lg border border-border/60 bg-surface-raised px-3 py-2.5 shadow-lg text-sm">
+      <p className="font-semibold text-foreground mb-0.5">{label}</p>
       <p className="text-muted-foreground">
-        Count: <span className="font-semibold text-foreground">{payload[0].value}</span>
+        <span style={{ color: cfg?.fill }} className="font-bold">
+          {payload[0].value}
+        </span>{' '}
+        application{payload[0].value !== 1 ? 's' : ''}
       </p>
     </div>
   );
@@ -36,9 +39,13 @@ function CustomTooltip({ active, payload, label }: any) {
 export function JobAnalyticsChart() {
   const { data: stats, isLoading, isError } = useJobStats();
 
+  const total = stats
+    ? stats.Saved + stats.Applied + stats.Interview + stats.Offer + stats.Rejected
+    : 0;
+
   const chartData = stats
     ? [
-        { name: 'Saved',     count: stats.Saved     },
+        { name: 'Reminder',  count: stats.Saved     },
         { name: 'Applied',   count: stats.Applied   },
         { name: 'Interview', count: stats.Interview },
         { name: 'Offer',     count: stats.Offer     },
@@ -47,63 +54,94 @@ export function JobAnalyticsChart() {
     : [];
 
   return (
-    <Card className="shadow-sm h-full flex flex-col">
-      <CardHeader className="pb-0 pt-5 px-5">
-        <CardTitle className="text-base font-semibold">Application Funnel</CardTitle>
-      </CardHeader>
+    <div className="rounded-xl border border-border/50 bg-surface/40 p-5">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h3 className="text-sm font-semibold text-foreground">Application Funnel</h3>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            {isLoading ? '—' : `${total} total application${total !== 1 ? 's' : ''}`}
+          </p>
+        </div>
+      </div>
 
-      <CardContent className="flex-1 px-2 pb-4 pt-2">
-        {isLoading ? (
-          <Skeleton className="w-full h-[260px] rounded-md" />
-        ) : isError ? (
-          <div className="h-[260px] flex items-center justify-center text-sm text-destructive">
-            Failed to load chart data
-          </div>
-        ) : (
-          /* Give the container an explicit pixel height — Recharts needs this */
-          <div className="w-full" style={{ height: 260 }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={chartData}
-                margin={{ top: 8, right: 8, left: -24, bottom: 0 }}
-                barCategoryGap="35%"
-              >
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  vertical={false}
-                  stroke="rgba(148,163,184,0.15)"
-                />
-                <XAxis
-                  dataKey="name"
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 11, fill: '#94a3b8' }}
-                  dy={8}
-                />
-                <YAxis
-                  axisLine={false}
-                  tickLine={false}
-                  tick={{ fontSize: 11, fill: '#94a3b8' }}
-                  allowDecimals={false}
-                  width={32}
-                />
-                <Tooltip
-                  content={<CustomTooltip />}
-                  cursor={{ fill: 'rgba(148,163,184,0.08)' }}
-                  /* Keep tooltip inside the SVG viewport */
-                  allowEscapeViewBox={{ x: false, y: false }}
-                  wrapperStyle={{ zIndex: 10 }}
-                />
-                <Bar dataKey="count" radius={[6, 6, 0, 0]} maxBarSize={48}>
-                  {chartData.map((entry) => (
-                    <Cell key={entry.name} fill={BAR_COLORS[entry.name]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        )}
-      </CardContent>
-    </Card>
+      {/* Chart */}
+      {isLoading ? (
+        <div className="space-y-2">
+          <Skeleton className="w-full h-[180px] rounded-lg" />
+        </div>
+      ) : isError ? (
+        <div className="h-[180px] flex items-center justify-center">
+          <p className="text-sm text-destructive">Failed to load chart</p>
+        </div>
+      ) : total === 0 ? (
+        <div className="h-[180px] flex items-center justify-center">
+          <p className="text-sm text-muted-foreground">No data yet</p>
+        </div>
+      ) : (
+        <div style={{ height: 180 }}>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={chartData}
+              margin={{ top: 4, right: 0, left: -28, bottom: 0 }}
+              barCategoryGap="30%"
+            >
+              <CartesianGrid
+                strokeDasharray="3 3"
+                vertical={false}
+                stroke="hsl(160 10% 16% / 0.6)"
+              />
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 10, fill: 'hsl(160 10% 60%)' }}
+                dy={6}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fontSize: 10, fill: 'hsl(160 10% 60%)' }}
+                allowDecimals={false}
+                width={28}
+              />
+              <Tooltip
+                content={<CustomTooltip />}
+                cursor={{ fill: 'hsl(160 10% 16% / 0.4)' }}
+                allowEscapeViewBox={{ x: false, y: false }}
+                wrapperStyle={{ zIndex: 10 }}
+              />
+              <Bar dataKey="count" radius={[5, 5, 0, 0]} maxBarSize={40}>
+                {chartData.map((entry) => (
+                  <Cell
+                    key={entry.name}
+                    fill={BAR_CONFIG[entry.name]?.fill ?? 'hsl(160 10% 40%)'}
+                    fillOpacity={0.85}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+
+      {/* Legend */}
+      {!isLoading && !isError && total > 0 && (
+        <div className="flex flex-wrap gap-x-4 gap-y-1.5 mt-4 pt-4 border-t border-border/40">
+          {chartData.map((item) => (
+            <div key={item.name} className="flex items-center gap-1.5">
+              <span
+                className="h-2 w-2 rounded-full shrink-0"
+                style={{ backgroundColor: BAR_CONFIG[item.name]?.fill }}
+              />
+              <span className="text-xs text-muted-foreground">
+                {item.name}{' '}
+                <span className="text-foreground font-medium">{item.count}</span>
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }

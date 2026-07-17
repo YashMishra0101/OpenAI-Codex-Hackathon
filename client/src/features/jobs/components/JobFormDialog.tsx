@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/select';
 import { useCreateJob, useUpdateJob, JobApplication } from '../api/jobsApi';
 import { toast } from 'react-hot-toast';
+import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 const jobFormSchema = z.object({
   companyName: z.string().min(1, 'Company name is required').max(100),
@@ -37,6 +38,7 @@ const jobFormSchema = z.object({
   url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   location: z.string().max(100).optional(),
   salary: z.string().max(100).optional(),
+  appliedDate: z.string().optional(),
   notes: z.string().max(2000).optional(),
 });
 
@@ -48,10 +50,17 @@ interface JobFormDialogProps {
   job?: JobApplication | null;
 }
 
+const STATUS_OPTIONS = [
+  { value: 'Saved',     label: 'Reminder' },
+  { value: 'Applied',   label: 'Applied' },
+  { value: 'Interview', label: 'Interview' },
+  { value: 'Offer',     label: 'Offer' },
+  { value: 'Rejected',  label: 'Rejected' },
+] as const;
+
 export function JobFormDialog({ open, onOpenChange, job }: JobFormDialogProps) {
   const createMutation = useCreateJob();
   const updateMutation = useUpdateJob();
-
   const isEditMode = !!job;
 
   const form = useForm<JobFormValues>({
@@ -63,6 +72,7 @@ export function JobFormDialog({ open, onOpenChange, job }: JobFormDialogProps) {
       url: '',
       location: '',
       salary: '',
+      appliedDate: '',
       notes: '',
     },
   });
@@ -76,6 +86,9 @@ export function JobFormDialog({ open, onOpenChange, job }: JobFormDialogProps) {
         url: job.url || '',
         location: job.location || '',
         salary: job.salary || '',
+        appliedDate: job.appliedDate
+          ? new Date(job.appliedDate).toISOString().split('T')[0]
+          : '',
         notes: job.notes || '',
       });
     } else if (!job && open) {
@@ -86,6 +99,7 @@ export function JobFormDialog({ open, onOpenChange, job }: JobFormDialogProps) {
         url: '',
         location: '',
         salary: '',
+        appliedDate: '',
         notes: '',
       });
     }
@@ -118,17 +132,22 @@ export function JobFormDialog({ open, onOpenChange, job }: JobFormDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[500px]">
+      <DialogContent className="sm:max-w-[640px]">
         <DialogHeader>
-          <DialogTitle>{isEditMode ? 'Edit Job Application' : 'Add Job Application'}</DialogTitle>
-          <DialogDescription>
-            {isEditMode ? 'Update the details of your job application.' : 'Track a new job opportunity.'}
+          <DialogTitle className="text-lg font-semibold">
+            {isEditMode ? 'Edit Application' : 'Add Application'}
+          </DialogTitle>
+          <DialogDescription className="text-sm text-muted-foreground">
+            {isEditMode
+              ? 'Update the details of your job application.'
+              : 'Track a new job opportunity in your pipeline.'}
           </DialogDescription>
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+            {/* Row 1: Company + Title + Status (3 columns) */}
+            <div className="grid grid-cols-3 gap-3">
               <FormField
                 control={form.control}
                 name="companyName"
@@ -155,54 +174,47 @@ export function JobFormDialog({ open, onOpenChange, job }: JobFormDialogProps) {
                   </FormItem>
                 )}
               />
+              <FormField
+                control={form.control}
+                name="status"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Status</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      value={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select status" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {STATUS_OPTIONS.map((opt) => (
+                          <SelectItem key={opt.value} value={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="Saved">Saved</SelectItem>
-                      <SelectItem value="Applied">Applied</SelectItem>
-                      <SelectItem value="Interview">Interview</SelectItem>
-                      <SelectItem value="Offer">Offer</SelectItem>
-                      <SelectItem value="Rejected">Rejected</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="url"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Job Post URL (Optional)</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://..." {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="grid grid-cols-2 gap-4">
+            {/* Row 2: Location + Salary + Applied Date (3 columns) */}
+            <div className="grid grid-cols-3 gap-3">
               <FormField
                 control={form.control}
                 name="location"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Location (Optional)</FormLabel>
+                    <FormLabel>
+                      Location{' '}
+                      <span className="text-muted-foreground font-normal">(optional)</span>
+                    </FormLabel>
                     <FormControl>
                       <Input placeholder="Remote, NY..." {...field} />
                     </FormControl>
@@ -215,9 +227,25 @@ export function JobFormDialog({ open, onOpenChange, job }: JobFormDialogProps) {
                 name="salary"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Salary (Optional)</FormLabel>
+                    <FormLabel>
+                      Salary{' '}
+                      <span className="text-muted-foreground font-normal">(optional)</span>
+                    </FormLabel>
                     <FormControl>
-                      <Input placeholder="$120k - $150k" {...field} />
+                      <Input placeholder="$120k – $150k" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="appliedDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Applied Date</FormLabel>
+                    <FormControl>
+                      <Input type="date" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -225,26 +253,68 @@ export function JobFormDialog({ open, onOpenChange, job }: JobFormDialogProps) {
               />
             </div>
 
+            {/* Row 3: URL (full width) */}
             <FormField
               control={form.control}
-              name="notes"
+              name="url"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Notes (Optional)</FormLabel>
+                  <FormLabel>
+                    Job Post URL{' '}
+                    <span className="text-muted-foreground font-normal">(optional)</span>
+                  </FormLabel>
                   <FormControl>
-                    <Textarea placeholder="Interviewer names, thoughts..." {...field} />
+                    <Input placeholder="https://..." {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
 
-            <div className="pt-2 flex justify-end gap-2">
-              <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isLoading}>
+            {/* Row 4: Notes (full width, compact) */}
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Notes{' '}
+                    <span className="text-muted-foreground font-normal">(optional)</span>
+                  </FormLabel>
+                  <FormControl>
+                    <Textarea
+                      placeholder="Recruiter name, interview notes, next steps..."
+                      className="resize-none"
+                      rows={2}
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Actions */}
+            <div className="flex justify-end gap-2 pt-1">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={isLoading}
+              >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? 'Saving...' : 'Save'}
+              <Button type="submit" disabled={isLoading} className="min-w-[90px]">
+                {isLoading ? (
+                  <>
+                    <LoadingSpinner size="sm" className="mr-2" />
+                    Saving...
+                  </>
+                ) : isEditMode ? (
+                  'Save Changes'
+                ) : (
+                  'Add Job'
+                )}
               </Button>
             </div>
           </form>

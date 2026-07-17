@@ -16,18 +16,18 @@
   /* ── Color System — Linear Style (Midnight & Emerald) ──────────────── */
 
   /* Surfaces */
-  --color-background:       hsl(222 25% 6%);    /* Midnight slate bg */
-  --color-surface:          hsl(222 25% 9%);    /* card / panel bg */
-  --color-surface-raised:   hsl(222 25% 12%);   /* elevated card */
-  --color-border:           hsl(222 20% 18%);   /* subtle divider */
-  --color-input:            hsl(222 20% 15%);   /* form field bg */
+  --color-background:       hsl(160 10% 6%);    /* Deep Emerald/Slate bg */
+  --color-surface:          hsl(160 10% 8%);    /* card / panel bg */
+  --color-surface-raised:   hsl(160 10% 11%);   /* elevated card */
+  --color-border:           hsl(160 10% 16%);   /* subtle divider */
+  --color-input:            hsl(160 10% 14%);   /* form field bg */
   --color-card:             var(--color-surface);
   --color-popover:          var(--color-surface-raised);
 
   /* Text */
   --color-foreground:          hsl(0 0% 98%);   /* primary text */
-  --color-muted-foreground:    hsl(222 10% 60%); /* secondary text */
-  --color-placeholder:         hsl(222 10% 45%); /* placeholder text */
+  --color-muted-foreground:    hsl(160 10% 60%); /* secondary text */
+  --color-placeholder:         hsl(160 10% 45%); /* placeholder text */
   --color-card-foreground:     var(--color-foreground);
   --color-popover-foreground:  var(--color-foreground);
 
@@ -121,4 +121,32 @@
     background-color: var(--color-primary-subtle);
     color: var(--color-foreground);
   }
+}
+
+/* ── Landing Page Utilities ─────────────────────────────────────────────────
+   Additive styles specific to the landing/marketing pages.
+   ─────────────────────────────────────────────────────────────────────────── */
+
+/* Subtle dot-grid background for visual texture */
+.bg-grid-pattern {
+  background-image: radial-gradient(
+    circle,
+    hsl(160 10% 20% / 40%) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+}
+
+/* Gradient fade mask — hides grid at edges for a polished look */
+.bg-grid-fade {
+  mask-image: radial-gradient(
+    ellipse 80% 60% at 50% 40%,
+    black 30%,
+    transparent 100%
+  );
+  -webkit-mask-image: radial-gradient(
+    ellipse 80% 60% at 50% 40%,
+    black 30%,
+    transparent 100%
+  );
 }

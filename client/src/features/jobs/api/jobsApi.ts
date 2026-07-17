@@ -13,6 +13,7 @@ export interface JobApplication {
   salary?: string;
   notes?: string;
   appliedDate?: string;
+  reminderCount?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -93,10 +94,14 @@ export function useDeleteJob() {
 }
 
 export function useScheduleReminder() {
+  const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, date, notes }: { id: string; date: string; notes?: string }) => {
       const response = await api.post(`/jobs/${id}/reminders`, { date, notes });
       return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['jobs'] });
     },
   });
 }

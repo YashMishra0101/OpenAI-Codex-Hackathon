@@ -69,9 +69,20 @@ export function VerifyEmailPage() {
         </div>
         
         <div className="relative z-20 mt-auto space-y-10">
-          <h2 className="text-3xl font-bold tracking-tight text-white leading-tight">
-            The ultimate AI toolkit <br />to land your next role.
-          </h2>
+          <div className="space-y-4">
+            <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+              <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
+              Welcome to CodexAI
+            </div>
+            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-white leading-[1.2]">
+              The <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-300">AI-powered</span> <br />
+              resume analysis &<br />
+              job tracking system.
+            </h2>
+            <p className="text-zinc-400 text-base max-w-sm">
+              Everything you need to land your next role, unified in one elegant workspace.
+            </p>
+          </div>
           
           <div className="space-y-5">
             <div className="flex items-center gap-4">

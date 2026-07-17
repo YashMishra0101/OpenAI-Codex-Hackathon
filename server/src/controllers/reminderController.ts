@@ -6,6 +6,7 @@ import { ApiError } from '../utils/ApiError.js';
 import logger from '../utils/logger.js';
 import { z } from 'zod';
 import { User } from '../models/User.js';
+import { JobApplication } from '../models/JobApplication.js';
 
 const scheduleReminderSchema = z.object({
   body: z.object({
@@ -44,6 +45,9 @@ export async function scheduleReminderHandler(req: Request, res: Response): Prom
   });
 
   logger.info('REMINDER_SCHEDULED', { userId, jobId: id, date: scheduledDate });
+
+  // 5. Increment reminder count on the job document
+  await JobApplication.findByIdAndUpdate(id, { $inc: { reminderCount: 1 } });
 
   res.status(HTTP.OK).json({
     success: true,
