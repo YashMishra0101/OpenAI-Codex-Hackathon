@@ -43,7 +43,8 @@ const envSchema = z.object({
   CLOUDINARY_API_SECRET: z.string().optional(),
 
   // ── Email — optional at startup; validated when feature is used ───────────
-  RESEND_API_KEY: z.string().optional(),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
 
   // ── Google OAuth — optional at startup; validated when feature is used ────
   GOOGLE_CLIENT_ID: z.string().optional(),

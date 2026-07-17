@@ -4,7 +4,7 @@
 
 > This project is created using Codex for the **OpenAI Codex Hackathon**.
 >
-> The OpenAI Codex Hackathon is hosted on [NamasteDev.com](https://namastedev.com) and organized by **Akshay Saini**.
+> The OpenAI Codex Hackathon is hosted on [namasteDev.com](https://namastedev.com) and organized by **Akshay Saini**.
 
 [![Vercel](https://img.shields.io/badge/Frontend-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
 [![Render](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render&logoColor=black)](https://render.com/)
@@ -154,15 +154,15 @@ Atlas           Flash API       (Storage)         (Email)
 
 Production-level security practices implemented throughout:
 
-| Practice            | Implementation                                                                                                 |
-| ------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Password Hashing    | **argon2** (memory-hard, stronger than bcrypt)                                                                 |
-| Session Management  | **JWT** with HttpOnly cookies (prevents XSS token theft)                                                       |
-| Token Strategy      | **Access + Refresh token** rotation                                                                            |
-| Type & Input Safety | **TypeScript** compile-time checking plus **Zod** runtime schemas on every route and AI response               |
-| Security Headers    | **Helmet.js** configured for production                                                                        |
-| File Safety         | **Multer** type/size restrictions (PDF only, max 5MB)                                                          |
-| Observability       | **Winston** structured auth logging — no passwords or tokens ever logged                                       |
+| Practice            | Implementation                                                                                   |
+| ------------------- | ------------------------------------------------------------------------------------------------ |
+| Password Hashing    | **argon2** (memory-hard, stronger than bcrypt)                                                   |
+| Session Management  | **JWT** with HttpOnly cookies (prevents XSS token theft)                                         |
+| Token Strategy      | **Access + Refresh token** rotation                                                              |
+| Type & Input Safety | **TypeScript** compile-time checking plus **Zod** runtime schemas on every route and AI response |
+| Security Headers    | **Helmet.js** configured for production                                                          |
+| File Safety         | **Multer** type/size restrictions (PDF only, max 5MB)                                            |
+| Observability       | **Winston** structured auth logging — no passwords or tokens ever logged                         |
 
 ---
 

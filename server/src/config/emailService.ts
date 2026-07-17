@@ -1,14 +1,20 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import logger from '../utils/logger.js';
 import { env } from './env.js';
 
-let resend: Resend | null = null;
+let transporter: nodemailer.Transporter | null = null;
 
-if (env.RESEND_API_KEY) {
-  resend = new Resend(env.RESEND_API_KEY);
-  logger.info('Resend Email Service initialized.');
+if (env.SMTP_USER && env.SMTP_PASS) {
+  transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: env.SMTP_USER,
+      pass: env.SMTP_PASS,
+    },
+  });
+  logger.info('Nodemailer Email Service initialized.');
 } else {
-  logger.warn('RESEND_API_KEY is missing. Email delivery will be mocked in the console.');
+  logger.warn('SMTP credentials missing. Email delivery will be mocked in the console.');
 }
 
 export async function sendEmail({
@@ -21,20 +27,15 @@ export async function sendEmail({
   html: string;
 }): Promise<boolean> {
   try {
-    if (resend) {
-      const data = await resend.emails.send({
-        from: 'Job Tracker <onboarding@resend.dev>', // Resend sandbox default testing email
+    if (transporter) {
+      const info = await transporter.sendMail({
+        from: `"AI Resume Checker & Job Tracker" <${env.SMTP_USER}>`,
         to,
         subject,
         html,
       });
 
-      if (data.error) {
-        logger.error('Failed to send email via Resend', data.error);
-        return false;
-      }
-
-      logger.info(`Email sent to ${to} (ID: ${data.data?.id})`);
+      logger.info(`Email sent to ${to} (Message-ID: ${info.messageId})`);
       return true;
     } else {
       // MOCK MODE

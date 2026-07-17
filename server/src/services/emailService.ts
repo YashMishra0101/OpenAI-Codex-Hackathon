@@ -1,43 +1,44 @@
-import { Resend } from 'resend';
+import nodemailer from 'nodemailer';
 import { env } from '../config/env.js';
 import logger from '../utils/logger.js';
 
 /**
- * Email service using the Resend SDK.
+ * Email service using Nodemailer and Gmail.
  *
- * Why Resend over Nodemailer?
- *   Resend is purpose-built for transactional emails with a first-class Node SDK.
- *   No SMTP configuration or app-password juggling. The API key is the only
- *   credential needed. Generous free tier (100 emails/day) covers this project.
+ * Uses a standard SMTP transport configured for Gmail.
+ * To use this, you must supply your Gmail address (SMTP_USER) and a generated
+ * 16-character App Password (SMTP_PASS) in the environment variables.
  *
- * The Resend client is initialized lazily — if RESEND_API_KEY is not configured,
- * email sends fail with a clear log warning instead of crashing the server.
- * This allows Phase 1-2 development without an email service.
- *
- * FROM address: must be a verified domain in your Resend account.
- *   Development: use 'onboarding@resend.dev' (Resend's sandbox — only sends to
- *                the account owner's email)
- *   Production:  must be 'noreply@yourdomain.com' (verified in Resend dashboard)
+ * The Nodemailer transporter is initialized lazily — if SMTP credentials are
+ * missing, email sends will fail gracefully with a log warning instead of crashing.
  */
 
-const FROM_EMAIL = 'AI Resume Tracker <noreply@resend.dev>';
 const APP_NAME = 'AI Resume Checker & Job Tracker';
 
-let _resendClient: Resend | null = null;
+let _transporter: nodemailer.Transporter | null = null;
 
-function getResendClient(): Resend {
-  if (!_resendClient) {
-    if (!env.RESEND_API_KEY) {
-      throw new Error('RESEND_API_KEY is not configured — email sending is disabled');
+function getTransporter(): nodemailer.Transporter {
+  if (!_transporter) {
+    if (!env.SMTP_USER || !env.SMTP_PASS) {
+      throw new Error('SMTP_USER and SMTP_PASS are not configured — email sending is disabled');
     }
-    _resendClient = new Resend(env.RESEND_API_KEY);
+    _transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: env.SMTP_USER,
+        pass: env.SMTP_PASS,
+      },
+    });
   }
-  return _resendClient;
+  return _transporter;
+}
+
+function getFromAddress(): string {
+  // Uses a formatted Display Name with the actual Gmail address
+  return `"${APP_NAME}" <${env.SMTP_USER}>`;
 }
 
 // ── Email templates ──────────────────────────────────────────────────────────
-// Minimal but professional HTML templates. Kept inline (no template engine)
-// to avoid build step complexity. Phase 15 will move to React Email.
 
 function verificationEmailHtml(name: string, verificationUrl: string): string {
   return `
@@ -126,17 +127,15 @@ export async function sendVerificationEmail(
   const verificationUrl = `${env.CLIENT_URL}/verify-email?token=${token}`;
 
   try {
-    const client = getResendClient();
-    await client.emails.send({
-      from: FROM_EMAIL,
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: getFromAddress(),
       to: email,
       subject: `Verify your email — ${APP_NAME}`,
       html: verificationEmailHtml(name, verificationUrl),
     });
     logger.info('EMAIL_VERIFICATION_SENT', { email });
   } catch (err) {
-    // Log the failure but don't throw — the user was created successfully.
-    // They can request a resend. Email delivery failure ≠ registration failure.
     logger.error('EMAIL_VERIFICATION_FAILED', {
       email,
       error: err instanceof Error ? err.message : String(err),
@@ -152,9 +151,9 @@ export async function sendPasswordResetEmail(
   const resetUrl = `${env.CLIENT_URL}/reset-password?token=${token}`;
 
   try {
-    const client = getResendClient();
-    await client.emails.send({
-      from: FROM_EMAIL,
+    const transporter = getTransporter();
+    await transporter.sendMail({
+      from: getFromAddress(),
       to: email,
       subject: `Reset your password — ${APP_NAME}`,
       html: passwordResetEmailHtml(name, resetUrl),
