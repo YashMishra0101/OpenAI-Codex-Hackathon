@@ -25,7 +25,7 @@ import type {
 const cookieBase: CookieOptions = {
   httpOnly: true,                              // Not readable by client JS — XSS protection
   secure: env.NODE_ENV === 'production',       // HTTPS-only in production
-  sameSite: 'strict',                          // Blocks CSRF by default
+  sameSite: 'lax',                             // Allows cross-site redirects (e.g. Google Auth)
   path: '/',
 };
 

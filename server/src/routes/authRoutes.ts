@@ -2,11 +2,7 @@ import { Router } from 'express';
 import { authController } from '../controllers/authController.js';
 import { authenticate } from '../middlewares/auth.js';
 import { validate } from '../middlewares/validate.js';
-import {
-  loginLimiter,
-  registerLimiter,
-  forgotPasswordLimiter,
-} from '../middlewares/rateLimiter.js';
+
 import {
   registerSchema,
   loginSchema,
@@ -23,10 +19,9 @@ const router = Router();
  * Auth routes — all prefixed with /api/v1/auth
  *
  * Middleware order per route:
- *   1. Rate limiter    — blocks brute-force before any expensive DB/argon2 work
- *   2. validate()      — Zod input validation before business logic runs
- *   3. authenticate    — JWT check for protected routes (logout)
- *   4. authController  — thin HTTP handler that calls authService
+ *   1. validate()      — Zod input validation before business logic runs
+ *   2. authenticate    — JWT check for protected routes (logout)
+ *   3. authController  — thin HTTP handler that calls authService
  *
  * All routes follow RESTful conventions:
  *   POST /register         — create a new account
@@ -44,14 +39,12 @@ const router = Router();
 
 router.post(
   '/register',
-  registerLimiter,
   validate(registerSchema),
   authController.register,
 );
 
 router.post(
   '/login',
-  loginLimiter,
   validate(loginSchema),
   authController.login,
 );
@@ -75,7 +68,6 @@ router.post(
 
 router.post(
   '/forgot-password',
-  forgotPasswordLimiter,
   validate(forgotPasswordSchema),
   authController.forgotPassword,
 );

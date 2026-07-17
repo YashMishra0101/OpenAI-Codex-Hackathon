@@ -30,7 +30,7 @@ This project goes beyond a typical MERN stack application. Here are the key diff
 | **Type Safety** | TypeScript (strict mode) + Zod | Compile-time contracts plus runtime validation at every untrusted boundary |
 | **System Design** | Scalable Architecture | Modular folder structure, clean code patterns, and database design best practices |
 | **Performance & Cost** | SHA-256 Caching | Hashes inputs to bypass redundant API calls, dropping latency from ~5s down to ~50ms and saving free-tier tokens |
-| **Web Security** | Helmet.js, Zod, JWT, express-rate-limit | Security headers, robust validation, XSS prevention, and API quota protection |
+| **Web Security** | Helmet.js, Zod, JWT | Security headers, robust validation, XSS prevention |
 | **Observability** | Winston Structured Logging | Captures detailed insights into auth failures, token lifecycle, and critical API flows without exposing sensitive data |
 
 ---
@@ -65,21 +65,12 @@ User enters Name, Email, Password. Account created. Verification email sent. Aft
 **Google Login**
 One-click signup/login using `@react-oauth/google` (Google's official React SDK) on the frontend and `google-auth-library` (Google's official Node.js package) on the backend for ID token verification. No password needed. Account linked to Google profile.
 
-**Guest Mode**
-Try the app without signup. **Only AI-Powered Resume Checker feature is available.** To protect system resources, Guest Mode enforces a strict IP-based rate limit combined with **Cloudflare Turnstile**. This prevents automated proxy-rotator bots from bypassing IP limits and draining our AI API quotas. Other features require a full account.
 
 ### Login
 - Email + Password OR Google OAuth
 - JWT tokens (Access + Refresh)
 - Redirect to the main page after successful verification
 
-### Auth Rate Limiting (Brute-Force Protection)
-Auth routes are protected with a separate `express-rate-limit` configuration to prevent brute-force and credential-stuffing attacks:
-- **`/login`** — 10 attempts per 15 minutes per IP
-- **`/register`** — 5 attempts per 15 minutes per IP
-- **`/forgot-password`** — 3 attempts per 15 minutes per IP
-
-This is independent of the AI route rate limiter. Even though passwords are hashed with argon2, rate limiting stops the attack before it reaches the hashing layer — defense in depth.
 
 ### Structured Auth Logging (Observability)
 To ensure the authentication system is fully observable and debuggable in production, structured logging (via Winston) tracks critical flows without exposing sensitive data (no passwords or tokens):
@@ -120,7 +111,7 @@ All profile changes are saved to MongoDB and reflected immediately across the ap
 5. AI analyzes the resume (and job description/search preferences when provided) using Gemini 3.5 Flash API (`gemini-3.5-flash` model) with Groq Qwen 3.6 27B (`qwen/qwen3.6-27b`) as automatic fallback.
 6. Shows an overall verdict followed by three structured sub-features.
 7. Analysis results (along with the unique SHA-256 content hash) are **saved to the database** — users can view their past analyses anytime, and the system can reuse the data for future identical requests.
-8. **Cache TTL (Privacy/Cleanup):** A MongoDB TTL index automatically deletes cached analysis entries after 30 days. This prevents stale data from accumulating indefinitely and ensures guest analyses (which have no user-initiated delete option) are cleaned up automatically.
+8. **Cache TTL (Privacy/Cleanup):** A MongoDB TTL index automatically deletes cached analysis entries after 30 days. This prevents stale data from accumulating indefinitely.
 
 ### Analysis Results
 
@@ -251,7 +242,6 @@ Groq's fast inference engine running Qwen 3.6 27B — used as automatic fallback
 * **Model identifier:** `qwen/qwen3.6-27b`.
 * **Free tier:** Available for limited portfolio usage. OpenAI-compatible API format.
 * **Architecture:** `aiService.ts` tries Gemini 3.5 Flash first → if it fails/times out → automatically retries with Groq Qwen → returns result from whichever succeeds. Every provider response is treated as `unknown` and validated against a Zod schema before the typed result reaches the rest of the application.
-* **Quota Protection:** An `express-rate-limit` window combined with Cloudflare Turnstile is heavily applied exclusively to the AI route. Authenticated users are limited (e.g., 5 requests per 15 mins), while Guest users must pass a Turnstile challenge and face strict IP-based limits to explicitly prevent scraping or bot abuse.
 * **Dual-Failure Handling:** If both Gemini and Groq fail (downtime, rate-limited, or network error), the API returns a `503 Service Unavailable` with a user-friendly message: *"Our analysis service is temporarily unavailable. Please try again in a few minutes."* No partial or malformed data is ever returned to the client.
 
 **MongoDB Atlas + Mongoose**

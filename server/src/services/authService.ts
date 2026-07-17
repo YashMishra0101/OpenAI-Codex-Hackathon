@@ -63,7 +63,6 @@ function toSafeUser(user: {
   profileImage?: string;
   isVerified: boolean;
   authProvider: 'email' | 'google';
-  socialLinks: { linkedin?: string; github?: string; portfolio?: string };
 }): SafeUser {
   return {
     id: user.id as string,
@@ -72,7 +71,6 @@ function toSafeUser(user: {
     profileImage: user.profileImage,
     isVerified: user.isVerified,
     authProvider: user.authProvider,
-    socialLinks: user.socialLinks,
   };
 }
 

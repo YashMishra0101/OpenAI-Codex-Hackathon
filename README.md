@@ -3,7 +3,7 @@
 # AI-Powered Resume Analysis & Job Tracking System
 
 > This project is created using Codex for the **OpenAI Codex Hackathon**.
-
+>
 > The OpenAI Codex Hackathon is hosted on [NamasteDev.com](https://namastedev.com) and organized by **Akshay Saini**.
 
 [![Vercel](https://img.shields.io/badge/Frontend-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
@@ -91,8 +91,6 @@ Keep every application organized in one powerful dashboard:
 
 - **Email/Password** signup with email verification (re-send supported)
 - **Google OAuth 2.0** — via `@react-oauth/google` (frontend) + `google-auth-library` (backend token verification)
-- **Guest Mode** — try the AI Resume Checker without creating an account  
-  _(Protected by IP-based rate limiting + Cloudflare Turnstile to prevent bot abuse)_
 
 ---
 
@@ -138,7 +136,7 @@ Keep every application organized in one powerful dashboard:
 ┌─────────────────────────────────────────────────────────────┐
 │                    Backend (Express API)                    │
 │       TypeScript (strict) · Node.js · JWT · Helmet.js · Zod │
-│          express-rate-limit · Multer · Agenda.js            │
+│                    Multer · Agenda.js                       │
 │                  Route → Controller → Service → Model       │
 │                     (API versioned at /api/v1/)             │
 └────┬─────────────┬────────────────┬────────────────┬────────┘
@@ -163,9 +161,7 @@ Production-level security practices implemented throughout:
 | Token Strategy      | **Access + Refresh token** rotation                                                                            |
 | Type & Input Safety | **TypeScript** compile-time checking plus **Zod** runtime schemas on every route and AI response               |
 | Security Headers    | **Helmet.js** configured for production                                                                        |
-| Rate Limiting       | **express-rate-limit** — tiered limits (5 req/15 min for auth users, strict IP limits for guests on AI routes) |
 | File Safety         | **Multer** type/size restrictions (PDF only, max 5MB)                                                          |
-| Bot Prevention      | **Cloudflare Turnstile** on Guest Mode AI access                                                               |
 | Observability       | **Winston** structured auth logging — no passwords or tokens ever logged                                       |
 
 ---

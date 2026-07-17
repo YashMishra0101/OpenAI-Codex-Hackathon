@@ -23,7 +23,7 @@ export function VerifyEmailPage() {
     if (!token || verifyAttempted.current) return;
     verifyAttempted.current = true;
 
-    api.post('/api/v1/auth/verify-email', { token })
+    api.post('/auth/verify-email', { token })
       .then(() => {
         setStatus('success');
       })
@@ -39,7 +39,7 @@ export function VerifyEmailPage() {
     
     try {
       setIsResending(true);
-      await api.post('/api/v1/auth/resend-verification', { email });
+      await api.post('/auth/resend-verification', { email });
       toast.success('Verification email sent (if account exists).');
       setEmail('');
     } catch (err: any) {

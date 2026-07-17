@@ -6,14 +6,23 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 import api from '@/lib/axios';
 import toast from 'react-hot-toast';
 
+interface UserData {
+  id: string;
+  name: string;
+  email: string;
+  profileImage?: string;
+  authProvider: 'email' | 'google';
+  isVerified: boolean;
+}
+
 export function ProfilePage() {
-  const [userData, setUserData] = useState<any>(null);
+  const [userData, setUserData] = useState<UserData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
-    
-    api.get('/api/v1/users/me')
+
+    api.get('/users/me')
       .then((res) => {
         if (isMounted) {
           setUserData(res.data.data);
@@ -26,16 +35,16 @@ export function ProfilePage() {
           setIsLoading(false);
         }
       });
-      
+
     return () => { isMounted = false; };
   }, []);
 
-  const handleProfileUpdate = (newData: any) => {
+  const handleProfileUpdate = (newData: UserData) => {
     setUserData(newData);
   };
 
   const handleImageUpdate = (newImageUrl: string) => {
-    setUserData((prev: any) => ({ ...prev, profileImage: newImageUrl }));
+    setUserData((prev) => prev ? { ...prev, profileImage: newImageUrl } : prev);
   };
 
   if (isLoading) {
@@ -46,44 +55,56 @@ export function ProfilePage() {
     );
   }
 
+  const isGoogleUser = userData?.authProvider === 'google';
+
   return (
     <div className="container mx-auto py-10 px-4 sm:px-6 lg:px-8 max-w-4xl">
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight">Profile Settings</h1>
         <p className="text-muted-foreground mt-2">
-          Manage your account settings and profile information.
+          {isGoogleUser
+            ? 'Your profile is managed by Google.'
+            : 'Manage your account settings and profile information.'}
         </p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-        {/* Left Column - Profile Picture */}
+        {/* Left Column — Profile Picture */}
         <div className="md:col-span-1">
           <Card>
             <CardHeader>
               <CardTitle>Profile Picture</CardTitle>
+              {isGoogleUser && (
+                <CardDescription>Synced from your Google account.</CardDescription>
+              )}
             </CardHeader>
             <CardContent>
-              <ProfileImageUpload 
-                currentImageUrl={userData?.profileImage} 
-                onSuccess={handleImageUpdate} 
+              <ProfileImageUpload
+                currentImageUrl={userData?.profileImage}
+                userName={userData?.name}
+                isGoogleUser={isGoogleUser}
+                onSuccess={handleImageUpdate}
               />
             </CardContent>
           </Card>
         </div>
 
-        {/* Right Column - Profile Details */}
+        {/* Right Column — Personal Information */}
         <div className="md:col-span-2">
           <Card>
             <CardHeader>
               <CardTitle>Personal Information</CardTitle>
               <CardDescription>
-                Update your contact details and social links.
+                {isGoogleUser
+                  ? 'Your name and email are provided by Google and cannot be changed here.'
+                  : 'Update your name, email, or password.'}
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ProfileForm 
-                initialData={userData} 
-                onSuccess={handleProfileUpdate} 
+              <ProfileForm
+                initialData={userData}
+                isGoogleUser={isGoogleUser}
+                onSuccess={handleProfileUpdate}
               />
             </CardContent>
           </Card>

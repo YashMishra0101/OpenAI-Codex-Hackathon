@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 import 'dotenv/config'; // Load .env
 import { env } from '../config/env.js';
-import User from '../models/User.js';
-import Resume from '../models/Resume.js';
-import JobApplication from '../models/JobApplication.js';
+import { User } from '../models/User.js';
+import { Resume } from '../models/Resume.js';
+import { JobApplication } from '../models/JobApplication.js';
 import logger from '../utils/logger.js';
 import argon2 from 'argon2';
 
@@ -31,38 +31,36 @@ async function seedDatabase() {
     });
 
     // Clear old seed data for this user
-    await Resume.deleteMany({ userId: user._id });
-    await JobApplication.deleteMany({ userId: user._id });
+    await Resume.deleteMany({ user: user._id });
+    await JobApplication.deleteMany({ user: user._id });
 
     // 2. Seed Resumes (Analyses)
     logger.info('Seeding Resumes...');
     await Resume.create([
       {
-        userId: user._id,
-        filename: 'frontend_engineer_resume.pdf',
-        fileUrl: 'https://example.com/resume1.pdf',
-        aiAnalysis: {
-          overallVerdict: 'Strong Match',
-          analysis: 'Excellent React and TypeScript experience. Strong component architecture skills.',
-          improvementSuggestions: ['Add more measurable metrics (e.g., improved performance by X%)'],
-          interviewQuestions: [
-            'Can you explain React Server Components?',
-            'How do you manage complex state in a large application?'
-          ],
-          advancedSearchQueries: ['Frontend Engineer AND "React" AND "TypeScript"'],
-        }
+        user: user._id,
+        resumeText: 'Frontend engineer with 5 years of React experience. Building fast SPAs.',
+        verdict: 'Strong',
+        analysis: {
+          strengths: ['Excellent React and TypeScript experience', 'Strong component architecture skills'],
+          improvements: ['Add more measurable metrics (e.g., improved performance by X%)']
+        },
+        interviewQuestions: [
+          'Can you explain React Server Components?',
+          'How do you manage complex state in a large application?'
+        ],
+        searchQueries: [{ query: 'Frontend Engineer AND "React" AND "TypeScript"', category: 'job' }],
       },
       {
-        userId: user._id,
-        filename: 'fullstack_resume.pdf',
-        fileUrl: 'https://example.com/resume2.pdf',
-        aiAnalysis: {
-          overallVerdict: 'Partial Match',
-          analysis: 'Good Node.js experience, but lacks heavy frontend state management examples.',
-          improvementSuggestions: ['Highlight your frontend work more prominently.'],
-          interviewQuestions: ['How would you scale a Node.js backend?'],
-          advancedSearchQueries: ['Full Stack Engineer AND "Node.js" AND "React"'],
-        }
+        user: user._id,
+        resumeText: 'Fullstack developer with Node.js and basic frontend knowledge.',
+        verdict: 'Partial',
+        analysis: {
+          strengths: ['Good Node.js experience'],
+          improvements: ['Highlight your frontend work more prominently', 'Add state management examples']
+        },
+        interviewQuestions: ['How would you scale a Node.js backend?'],
+        searchQueries: [{ query: 'Full Stack Engineer AND "Node.js" AND "React"', category: 'job' }],
       }
     ]);
 
@@ -79,7 +77,7 @@ async function seedDatabase() {
     ];
 
     await JobApplication.insertMany(
-      jobs.map(job => ({ ...job, userId: user._id }))
+      jobs.map(job => ({ ...job, user: user._id }))
     );
 
     logger.info('✅ Database seeded successfully!');

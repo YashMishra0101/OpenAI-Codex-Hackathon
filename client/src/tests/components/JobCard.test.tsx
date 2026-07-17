@@ -13,16 +13,15 @@ vi.mock('@/features/jobs/api/jobsApi', () => ({
 
 const mockJob: JobApplication = {
   _id: '123',
-  userId: 'user123',
   companyName: 'OpenAI',
   jobTitle: 'Frontend Engineer',
   status: 'Interview',
   location: 'San Francisco',
   salary: '$150k - $200k',
   url: 'https://openai.com/jobs',
-  notes: 'First round next week',
-  createdAt: '2023-10-01T00:00:00Z',
-  updatedAt: '2023-10-05T00:00:00Z',
+  notes: 'Test notes',
+  createdAt: '2023-01-01T00:00:00.000Z',
+  updatedAt: '2023-01-01T00:00:00.000Z',
 };
 
 describe('JobCard', () => {

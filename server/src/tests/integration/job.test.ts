@@ -1,8 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import app from '../../app.js';
-import User from '../../models/User.js';
-import JobApplication from '../../models/JobApplication.js';
+import { User } from '../../models/User.js';
+import { JobApplication } from '../../models/JobApplication.js';
 
 vi.mock('../../config/emailService.js', () => ({
   sendEmail: vi.fn().mockResolvedValue(true),

@@ -34,9 +34,10 @@ afterAll(async () => {
 
 afterEach(async () => {
   // Clear all collections after each test
-  const collections = mongoose.connection.collections;
-  for (const key in collections) {
-    const collection = collections[key];
-    await collection.deleteMany({});
+  const collections = Object.values(mongoose.connection.collections);
+  for (const collection of collections) {
+    if (collection) {
+      await collection.deleteMany({});
+    }
   }
 });

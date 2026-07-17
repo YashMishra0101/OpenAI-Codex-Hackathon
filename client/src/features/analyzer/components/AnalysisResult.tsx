@@ -3,12 +3,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { CheckCircle2, AlertTriangle } from 'lucide-react';
 import { InterviewQuestions } from './InterviewQuestions';
 import { SearchQueries } from './SearchQueries';
-import { useAnalyzeResume } from '../api/analyzerApi';
-
-type AnalyzeResponseData = ReturnType<typeof useAnalyzeResume> extends { mutateAsync: (...args: any) => Promise<infer R> } ? R['data'] : any;
+import { AnalyzeResumeResponse } from '../api/analyzerApi';
 
 interface AnalysisResultProps {
-  data: AnalyzeResponseData;
+  data: AnalyzeResumeResponse['data'];
 }
 
 export function AnalysisResult({ data }: AnalysisResultProps) {

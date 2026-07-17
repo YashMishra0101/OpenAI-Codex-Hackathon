@@ -1,6 +1,8 @@
 import { lazy, Suspense } from 'react';
-import { createBrowserRouter } from 'react-router-dom';
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { ProtectedRoute } from './ProtectedRoute';
+import { PublicRoute } from './PublicRoute';
+import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 const LoginPage = lazy(() => import('@/pages/auth/LoginPage').then((m) => ({ default: m.LoginPage })));
@@ -20,45 +22,45 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: (
-      <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold">AI Resume Checker &amp; Job Tracker</h1>
-          <p className="mt-2 text-muted-foreground">Landing Page — Phase 5</p>
-        </div>
-      </div>
+      <Navigate to="/jobs" replace />
     ),
   },
   {
-    path: '/login',
-    element: (
-      <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><LoadingSpinner /></div>}>
-        <LoginPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/register',
-    element: (
-      <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><LoadingSpinner /></div>}>
-        <RegisterPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/signup',
-    element: (
-      <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><LoadingSpinner /></div>}>
-        <RegisterPage />
-      </Suspense>
-    ),
-  },
-  {
-    path: '/verify-email',
-    element: (
-      <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><LoadingSpinner /></div>}>
-        <VerifyEmailPage />
-      </Suspense>
-    ),
+    element: <PublicRoute />,
+    children: [
+      {
+        path: '/login',
+        element: (
+          <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><LoadingSpinner /></div>}>
+            <LoginPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/register',
+        element: (
+          <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><LoadingSpinner /></div>}>
+            <RegisterPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/signup',
+        element: (
+          <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><LoadingSpinner /></div>}>
+            <RegisterPage />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/verify-email',
+        element: (
+          <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><LoadingSpinner /></div>}>
+            <VerifyEmailPage />
+          </Suspense>
+        ),
+      },
+    ]
   },
 
   // ── Protected routes — requires authentication ────────────────────────────
@@ -66,11 +68,12 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute />,
     children: [
       {
+        element: <DashboardLayout />,
+        children: [
+      {
         path: '/dashboard',
         element: (
-          <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-            <p className="text-muted-foreground">Dashboard — Phase 5</p>
-          </div>
+          <Navigate to="/jobs" replace />
         ),
       },
       {
@@ -84,9 +87,7 @@ export const router = createBrowserRouter([
       {
         path: '/dashboard/jobs',
         element: (
-          <div className="flex min-h-screen items-center justify-center bg-background text-foreground">
-            <p className="text-muted-foreground">Job Tracker — Phase 14</p>
-          </div>
+          <Navigate to="/jobs" replace />
         ),
       },
       {
@@ -120,6 +121,8 @@ export const router = createBrowserRouter([
             <JobTrackerPage />
           </Suspense>
         ),
+      },
+        ],
       },
     ],
   },

@@ -18,7 +18,7 @@ export function GoogleAuthButton({ isRegister = false }: GoogleAuthButtonProps) 
     
     try {
       setIsLoading(true);
-      await api.post('/api/v1/auth/google', { credential: response.credential });
+      await api.post('/auth/google', { credential: response.credential });
       toast.success(isRegister ? 'Account created successfully!' : 'Logged in successfully!');
       navigate('/dashboard');
     } catch (err: any) {
@@ -39,7 +39,7 @@ export function GoogleAuthButton({ isRegister = false }: GoogleAuthButtonProps) 
         onSuccess={handleSuccess}
         onError={() => toast.error('Google login failed')}
         useOneTap
-        theme="outline"
+        theme="filled_black"
         size="large"
         shape="rectangular"
         text={isRegister ? 'signup_with' : 'signin_with'}

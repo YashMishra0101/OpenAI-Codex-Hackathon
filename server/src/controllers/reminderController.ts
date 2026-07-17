@@ -5,10 +5,12 @@ import { agenda } from '../config/agenda.js';
 import { ApiError } from '../utils/ApiError.js';
 import logger from '../utils/logger.js';
 import { z } from 'zod';
+import { User } from '../models/User.js';
 
 const scheduleReminderSchema = z.object({
   body: z.object({
     date: z.string().datetime(), // ISO 8601
+    notes: z.string().optional(),
   }),
 });
 
@@ -26,20 +28,19 @@ export async function scheduleReminderHandler(req: Request, res: Response): Prom
 
   // 2. Fetch Job to ensure ownership and get details
   const job = await getJobById(userId, id);
-  const user = req.user!; // Has userId, email inside request object (augmented by auth middleware)
   
-  // Wait, req.user from JWT only has userId and email. Let's make sure it has email.
-  // Actually, req.user might just be { userId }. Let's look up the user's email if needed, or pass it from frontend?
-  // Our token payload: { userId, email? }. Let's assume it has email. If not, we might need a userService.getUser(userId).
-  // Actually, I can just require the email in the request, or query the DB.
-  // For safety, I'll pass the email in the request or query the User model.
+  // 3. Fetch User to get the correct verified email address (works for both Google and Email/Password users)
+  const user = await User.findById(userId);
+  if (!user || !user.email) {
+    throw new ApiError(HTTP.INTERNAL_SERVER_ERROR, 'Failed to fetch user email address for reminder.');
+  }
   
-  // 3. Schedule the Job in Agenda
+  // 4. Schedule the Job in Agenda
   await agenda.schedule(scheduledDate, 'send-interview-reminder', {
-    to: req.user!.email || 'user@example.com', // Will be replaced by actual user email lookup if needed
+    to: user.email,
     companyName: job.companyName,
     jobTitle: job.jobTitle,
-    notes: job.notes,
+    notes: validated.body.notes || job.notes,
   });
 
   logger.info('REMINDER_SCHEDULED', { userId, jobId: id, date: scheduledDate });

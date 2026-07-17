@@ -1,5 +1,5 @@
 import { useMutation } from '@tanstack/react-query';
-import { api } from '@/lib/axios';
+import api from '@/lib/axios';
 
 interface AnalyzeResumeVariables {
   resume: File;
@@ -20,7 +20,7 @@ interface AIResponse {
   }>;
 }
 
-interface AnalyzeResumeResponse {
+export interface AnalyzeResumeResponse {
   success: boolean;
   data: {
     _id: string;

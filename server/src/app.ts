@@ -7,8 +7,18 @@ import apiRouter from './routes/index.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import logger from './utils/logger.js';
 
+import * as Sentry from '@sentry/node';
+
 const app: Application = express();
 
+// ── 0. Sentry Initialization ─────────────────────────────────────────────────
+if (env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: env.SENTRY_DSN,
+    // Tracing
+    tracesSampleRate: env.NODE_ENV === 'production' ? 0.1 : 1.0, 
+  });
+}
 // ── 1. Security headers — must be registered before all other middleware ─────
 app.use(helmet());
 
@@ -51,10 +61,20 @@ app.use((req: Request, _res: Response, next: NextFunction): void => {
   next();
 });
 
-// ── 6. API routes ─────────────────────────────────────────────────────────────
+// ── 6. Health Check (UptimeRobot) ─────────────────────────────────────────────
+app.get('/health', (_req: Request, res: Response) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// ── 7. API routes ─────────────────────────────────────────────────────────────
 app.use('/api/v1', apiRouter);
 
-// ── 7. Global error handler — ALWAYS last ────────────────────────────────────
+// ── 8. Sentry Error Handler ──────────────────────────────────────────────────
+if (env.SENTRY_DSN) {
+  Sentry.setupExpressErrorHandler(app);
+}
+
+// ── 9. Global error handler — ALWAYS last ────────────────────────────────────
 app.use(errorHandler);
 
 export default app;

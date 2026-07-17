@@ -5,7 +5,6 @@ import { uploadImage } from '../middlewares/upload.js';
 import { asyncHandler } from '../utils/asyncHandler.js';
 import { ApiError } from '../utils/ApiError.js';
 import { HTTP } from '../constants/httpStatus.js';
-import { aiFeatureLimiter } from '../middlewares/rateLimiter.js';
 import multer from 'multer';
 import os from 'os';
 import path from 'path';
@@ -35,8 +34,7 @@ const router: Router = Router();
 
 router.use(authenticate);
 
-// POST /api/v1/resumes/analyze
-router.post('/analyze', aiFeatureLimiter, pdfUpload.single('resume'), asyncHandler(analyzeResumeHandler));
+router.post('/analyze', pdfUpload.single('resume'), asyncHandler(analyzeResumeHandler));
 
 // GET /api/v1/resumes
 router.get('/', asyncHandler(getResumeHistoryHandler));

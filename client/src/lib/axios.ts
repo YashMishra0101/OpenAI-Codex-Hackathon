@@ -50,8 +50,11 @@ api.interceptors.response.use(
         // Retry the original request with the new access token (also in a cookie)
         return await api(originalRequest);
       } catch {
-        // Refresh failed — session is fully expired, redirect to login
-        window.location.href = '/login';
+        // Refresh failed — session is fully expired, redirect to login if not already there
+        const publicPaths = ['/login', '/register', '/signup', '/verify-email'];
+        if (!publicPaths.includes(window.location.pathname)) {
+          window.location.href = '/login';
+        }
         return Promise.reject(error);
       }
     }

@@ -21,11 +21,15 @@
   --color-surface-raised:   hsl(240 5% 11%);    /* elevated card */
   --color-border:           hsl(240 4% 16%);    /* subtle divider */
   --color-input:            hsl(240 4% 14%);    /* form field bg */
+  --color-card:             var(--color-surface);
+  --color-popover:          var(--color-surface-raised);
 
   /* Text */
   --color-foreground:          hsl(0 0% 98%);   /* primary text */
   --color-muted-foreground:    hsl(240 5% 55%); /* secondary text */
   --color-placeholder:         hsl(240 5% 40%); /* placeholder text */
+  --color-card-foreground:     var(--color-foreground);
+  --color-popover-foreground:  var(--color-foreground);
 
   /* Brand — Indigo */
   --color-primary:             hsl(239 84% 67%);  /* #6366f1 */

@@ -7,7 +7,7 @@ import { HTTP } from '../constants/httpStatus.js';
 import { aiResponseSchema } from '../validations/resumeValidation.js';
 
 // Simple in-memory cache to prevent redundant LLM calls
-// In production, this would be Redis, but for the hackathon MVP, Map is sufficient.
+// In production this would be Redis, but for the hackathon MVP, Map is sufficient.
 const aiCache = new Map<string, string>();
 
 interface AIAnalysisParams {
@@ -21,20 +21,19 @@ interface AIAnalysisParams {
  */
 function buildPrompt(params: AIAnalysisParams): string {
   const { resumeText, jobDescription, searchPreferences } = params;
-  
-  let prompt = `You are a strict, senior technical recruiter and career coach.
-Analyze the following resume`;
+
+  let prompt = `You are a strict, senior technical recruiter and career coach.\nAnalyze the following resume`;
 
   if (jobDescription) {
     prompt += ` against the provided job description.`;
   }
   prompt += `\n\n`;
   prompt += `Resume Text:\n${resumeText}\n\n`;
-  
+
   if (jobDescription) {
     prompt += `Job Description:\n${jobDescription}\n\n`;
   }
-  
+
   if (searchPreferences) {
     prompt += `User Search Preferences:\n${searchPreferences}\n\n`;
   }
@@ -51,10 +50,10 @@ The JSON object MUST have this exact schema:
     "improvements": ["...", "..."]
   },
   "interviewQuestions": ["...", "..."], // Between 10 and 50 tailored questions
-  "searchQueries": [ // Generate exactly 10 advanced Google search queries (e.g. site:lever.co OR site:greenhouse.io "software engineer")
-    { "query": "...", "category": "job" }, // 8 queries of category "job"
-    { "query": "...", "category": "learning" }, // 1 query of category "learning"
-    { "query": "...", "category": "interview" } // 1 query of category "interview"
+  "searchQueries": [ // Generate exactly 10 advanced Google search queries
+    { "query": "...", "category": "job" },       // 8 queries of category "job"
+    { "query": "...", "category": "learning" },  // 1 query of category "learning"
+    { "query": "...", "category": "interview" }  // 1 query of category "interview"
   ]
 }
 `;
@@ -65,9 +64,9 @@ The JSON object MUST have this exact schema:
 export async function analyzeResume(params: AIAnalysisParams): Promise<any> {
   const prompt = buildPrompt(params);
 
-  // 1. Generate SHA-256 hash for cache key
+  // 1. SHA-256 cache key
   const hash = crypto.createHash('sha256').update(prompt).digest('hex');
-  
+
   if (aiCache.has(hash)) {
     logger.info('AI_CACHE_HIT', { hash });
     return JSON.parse(aiCache.get(hash)!);
@@ -75,61 +74,85 @@ export async function analyzeResume(params: AIAnalysisParams): Promise<any> {
 
   let resultString = '';
 
-  // 2. Try Primary Model: Gemini 3.5 Flash
-  try {
-    if (!geminiClient) throw new Error('Gemini client not initialized');
-    
-    logger.info('AI_PRIMARY_ATTEMPT', { provider: 'Gemini' });
-    const response = await geminiClient.models.generateContent({
-      model: 'gemini-1.5-flash', // Google GenAI SDK model name
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-      }
-    });
+  // 2. Try Gemini — rotate through available free-tier models
+  const geminiModels = [
+    'gemini-3.1-flash-lite',   // Confirmed working on free tier
+    'gemini-3.1-flash-image',
+    'gemini-2.0-flash-lite',
+    'gemini-2.0-flash',
+  ];
 
-    resultString = response.text || '';
-    
-  } catch (geminiError: any) {
-    logger.error('GEMINI_FAILURE_FALLING_BACK', { error: geminiError.message });
-    
-    // 3. Try Secondary Model: Groq Qwen (Fallback)
+  if (geminiClient && !process.env.SIMULATE_GEMINI_FAILURE) {
+    for (const modelName of geminiModels) {
+      try {
+        logger.info('AI_PRIMARY_ATTEMPT', { provider: 'Gemini', model: modelName });
+        const response = await geminiClient.models.generateContent({
+          model: modelName,
+          contents: prompt,
+        });
+        resultString = response.text || '';
+        if (resultString) {
+          logger.info('AI_PRIMARY_SUCCESS', { provider: 'Gemini', model: modelName });
+          break;
+        }
+      } catch (err: any) {
+        logger.warn('GEMINI_MODEL_FAILED', {
+          model: modelName,
+          status: err.status,
+          error: err.message?.substring(0, 120),
+        });
+        // 429 quota exhausted or 404 model unavailable — try next model
+      }
+    }
+  }
+
+  // 3. Groq fallback (if all Gemini models failed)
+  if (!resultString) {
     try {
       if (!groqClient) throw new Error('Groq client not initialized');
-      
+
       logger.info('AI_FALLBACK_ATTEMPT', { provider: 'Groq' });
       const completion = await groqClient.chat.completions.create({
         messages: [{ role: 'user', content: prompt }],
-        model: 'qwen-2.5-32b', // Accessible Groq model
+        model: 'llama-3.3-70b-versatile',
         response_format: { type: 'json_object' },
       });
 
       resultString = completion.choices[0]?.message?.content || '';
+      if (resultString) {
+        logger.info('AI_FALLBACK_SUCCESS', { provider: 'Groq' });
+      }
     } catch (groqError: any) {
       logger.error('GROQ_FAILURE_FATAL', { error: groqError.message });
-      throw new ApiError(HTTP.INTERNAL_SERVER_ERROR, 'AI Providers are currently unavailable.');
+      throw new ApiError(
+        HTTP.INTERNAL_SERVER_ERROR,
+        'AI Providers are currently unavailable. Please try again in a few minutes.',
+      );
     }
   }
 
   // 4. Clean and parse output
   try {
-    // Sometimes models return ```json ... ``` despite instructions. Strip it.
+    // Strip markdown code fences if the model added them despite instructions
     let cleaned = resultString.trim();
-    if (cleaned.startsWith('```json')) {
-      cleaned = cleaned.replace(/^```json/, '').replace(/```$/, '').trim();
+    if (cleaned.startsWith('```')) {
+      cleaned = cleaned.replace(/^```(?:json)?/, '').replace(/```$/, '').trim();
     }
-    
+
     const parsedData = JSON.parse(cleaned);
-    
-    // Validate against strict Zod schema (strips unknown properties and ensures correct counts/types)
+
+    // Validate against strict Zod schema
     const validatedData = aiResponseSchema.parse(parsedData);
-    
-    // 5. Save to Cache
+
+    // 5. Cache the validated result
     aiCache.set(hash, JSON.stringify(validatedData));
-    
+
     return validatedData;
   } catch (parseError: any) {
-    logger.error('AI_RESPONSE_PARSE_ERROR', { rawResponse: resultString, error: parseError.message });
+    logger.error('AI_RESPONSE_PARSE_ERROR', {
+      rawResponse: resultString.substring(0, 500),
+      error: parseError.message,
+    });
     throw new ApiError(HTTP.INTERNAL_SERVER_ERROR, 'Failed to parse AI analysis response.');
   }
 }

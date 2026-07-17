@@ -20,19 +20,16 @@ interface UserData {
   id: string;
   name: string;
   email: string;
-  socialLinks?: {
-    linkedin?: string;
-    github?: string;
-    portfolio?: string;
-  };
 }
 
 interface ProfileFormProps {
   initialData: UserData | null;
+  /** When true the form is read-only — Google users cannot edit name/email/password here. */
+  isGoogleUser?: boolean;
   onSuccess: (data: UserData) => void;
 }
 
-export function ProfileForm({ initialData, onSuccess }: ProfileFormProps) {
+export function ProfileForm({ initialData, isGoogleUser = false, onSuccess }: ProfileFormProps) {
   const [isLoading, setIsLoading] = useState(false);
 
   const form = useForm<UpdateProfileFormData>({
@@ -41,11 +38,6 @@ export function ProfileForm({ initialData, onSuccess }: ProfileFormProps) {
       name: initialData?.name || '',
       email: initialData?.email || '',
       password: '',
-      socialLinks: {
-        linkedin: initialData?.socialLinks?.linkedin || '',
-        github: initialData?.socialLinks?.github || '',
-        portfolio: initialData?.socialLinks?.portfolio || '',
-      },
     },
   });
 
@@ -55,11 +47,6 @@ export function ProfileForm({ initialData, onSuccess }: ProfileFormProps) {
         name: initialData.name,
         email: initialData.email,
         password: '',
-        socialLinks: {
-          linkedin: initialData.socialLinks?.linkedin || '',
-          github: initialData.socialLinks?.github || '',
-          portfolio: initialData.socialLinks?.portfolio || '',
-        },
       });
     }
   }, [initialData, form]);
@@ -67,11 +54,9 @@ export function ProfileForm({ initialData, onSuccess }: ProfileFormProps) {
   const onSubmit = async (data: UpdateProfileFormData) => {
     try {
       setIsLoading(true);
-      // Remove empty fields to avoid overriding with empty strings unless intentional,
-      // but the backend expects the DTO as is.
-      const res = await api.put('/api/v1/users/me', data);
+      const res = await api.put('/users/me', data);
       toast.success('Profile updated successfully');
-      form.setValue('password', ''); // Clear password field after update
+      form.setValue('password', '');
       onSuccess(res.data.data);
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to update profile');
@@ -80,6 +65,39 @@ export function ProfileForm({ initialData, onSuccess }: ProfileFormProps) {
     }
   };
 
+  // ── Google user — read-only view ────────────────────────────────────────────
+  if (isGoogleUser) {
+    return (
+      <div className="space-y-4">
+        <div className="space-y-1">
+          <p className="text-sm font-medium">Full Name</p>
+          <p className="rounded-md border border-input bg-muted/50 px-3 py-2 text-sm text-foreground">
+            {initialData?.name || '—'}
+          </p>
+        </div>
+        <div className="space-y-1">
+          <p className="text-sm font-medium">Email</p>
+          <p className="rounded-md border border-input bg-muted/50 px-3 py-2 text-sm text-foreground">
+            {initialData?.email || '—'}
+          </p>
+        </div>
+        <p className="text-xs text-muted-foreground pt-1">
+          To change your name or email, update them directly in your{' '}
+          <a
+            href="https://myaccount.google.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-primary underline underline-offset-2 hover:opacity-80"
+          >
+            Google account
+          </a>
+          .
+        </p>
+      </div>
+    );
+  }
+
+  // ── Email/password user — editable form ─────────────────────────────────────
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
@@ -96,7 +114,7 @@ export function ProfileForm({ initialData, onSuccess }: ProfileFormProps) {
             </FormItem>
           )}
         />
-        
+
         <FormField
           control={form.control}
           name="email"
@@ -124,51 +142,6 @@ export function ProfileForm({ initialData, onSuccess }: ProfileFormProps) {
             </FormItem>
           )}
         />
-
-        <div className="pt-4 border-t border-border">
-          <h4 className="text-sm font-medium mb-4">Social Links</h4>
-          <div className="space-y-4">
-            <FormField
-              control={form.control}
-              name="socialLinks.linkedin"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>LinkedIn URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://linkedin.com/in/username" disabled={isLoading} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="socialLinks.github"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>GitHub URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://github.com/username" disabled={isLoading} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="socialLinks.portfolio"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Portfolio URL</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://yourwebsite.com" disabled={isLoading} {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
 
         <Button type="submit" className="w-full" disabled={isLoading}>
           {isLoading ? (
