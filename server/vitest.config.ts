@@ -20,5 +20,6 @@ export default defineConfig({
       reporter: ['text', 'html'],
       exclude: ['node_modules/**', 'dist/**', 'src/tests/**'],
     },
+    fileParallelism: false,
   },
 });

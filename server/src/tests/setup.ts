@@ -28,8 +28,12 @@ beforeAll(async () => {
 
 afterAll(async () => {
   // Disconnect Mongoose and stop the in-memory DB
-  await mongoose.disconnect();
-  await mongoServer.stop();
+  if (mongoose.connection.readyState !== 0) {
+    await mongoose.disconnect();
+  }
+  if (mongoServer) {
+    await mongoServer.stop();
+  }
 });
 
 afterEach(async () => {
