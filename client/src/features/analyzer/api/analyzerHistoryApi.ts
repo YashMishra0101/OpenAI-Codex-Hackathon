@@ -16,6 +16,7 @@ export interface ResumeHistoryItem {
     query: string;
     category: 'job' | 'learning' | 'interview';
   }>;
+  questionGenerationCount: number;
   createdAt: string;
   updatedAt: string;
 }

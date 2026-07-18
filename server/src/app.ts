@@ -2,9 +2,11 @@ import express, { type Application, type Request, type Response, type NextFuncti
 import helmet from 'helmet';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
+import mongoSanitize from 'express-mongo-sanitize';
 import { env } from './config/env.js';
 import apiRouter from './routes/index.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { globalLimiter } from './middlewares/rateLimit.js';
 import logger from './utils/logger.js';
 
 import * as Sentry from '@sentry/node';
@@ -45,9 +47,12 @@ app.use(
   }),
 );
 
-// ── 3. Body parsing ───────────────────────────────────────────────────────────
+// ── 3. Body parsing & Sanitization ───────────────────────────────────────────
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
+// Sanitize user input to prevent NoSQL Injection (strips keys beginning with $)
+app.use(mongoSanitize());
 
 // ── 4. Cookie parsing ─────────────────────────────────────────────────────────
 app.use(cookieParser());
@@ -67,7 +72,8 @@ app.get('/health', (_req: Request, res: Response) => {
 });
 
 // ── 7. API routes ─────────────────────────────────────────────────────────────
-app.use('/api/v1', apiRouter);
+// Apply global rate limiting to all /api/v1/ routes
+app.use('/api/v1', globalLimiter, apiRouter);
 
 // ── 8. Sentry Error Handler ──────────────────────────────────────────────────
 if (env.SENTRY_DSN) {

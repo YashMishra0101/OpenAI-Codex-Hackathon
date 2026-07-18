@@ -17,10 +17,25 @@ interface AIAnalysisParams {
 }
 
 /**
+ * Basic sanitization to prevent prompt injection attempts.
+ * Strips markdown code fences and common system instruction override phrases.
+ */
+function sanitizeInput(text: string | undefined): string {
+  if (!text) return '';
+  return text
+    .replace(/```/g, '')
+    .replace(/Ignore all previous instructions/gi, '[REDACTED]')
+    .replace(/System instructions?:/gi, '[REDACTED]')
+    .trim();
+}
+
+/**
  * The system prompt instructs the AI to return exactly the structured JSON we need.
  */
 function buildPrompt(params: AIAnalysisParams): string {
-  const { resumeText, jobDescription, searchPreferences } = params;
+  const resumeText = sanitizeInput(params.resumeText);
+  const jobDescription = sanitizeInput(params.jobDescription);
+  const searchPreferences = sanitizeInput(params.searchPreferences);
 
   let prompt = `You are a strict, senior technical recruiter and career coach.\nAnalyze the following resume`;
 
@@ -162,7 +177,9 @@ export async function analyzeResume(params: AIAnalysisParams): Promise<any> {
 export async function generateInterviewQuestions(
   params: AIAnalysisParams & { numQuestions: number }
 ): Promise<string[]> {
-  const { resumeText, jobDescription, numQuestions } = params;
+  const resumeText = sanitizeInput(params.resumeText);
+  const jobDescription = sanitizeInput(params.jobDescription);
+  const { numQuestions } = params;
 
   let prompt = `You are a strict, senior technical recruiter.\nGenerate EXACTLY ${numQuestions} highly relevant interview questions based on the following resume`;
 

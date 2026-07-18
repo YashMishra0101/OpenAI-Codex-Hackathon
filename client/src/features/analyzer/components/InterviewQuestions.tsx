@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { HelpCircle, RefreshCw } from 'lucide-react';
+import { HelpCircle, RefreshCw, ChevronDown, MessageCircleQuestion } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useRegenerateQuestions } from '../api/analyzerApi';
 import toast from 'react-hot-toast';
@@ -43,76 +44,105 @@ export function InterviewQuestions({ resumeId, initialQuestions, initialCount }:
 
   const displayQuestions = questions.slice(0, visibleCount);
   const maxReached = generationCount >= 5;
+  const remaining = questions.length - visibleCount;
 
   return (
-    <Card className="shadow-sm flex flex-col">
-      <CardHeader className="border-b pb-4 bg-muted/20">
-        <CardTitle className="text-lg flex items-center gap-2">
-          <HelpCircle className="h-5 w-5 text-primary" /> Most Frequently Asked Interview Questions
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="pt-6 flex-1 flex flex-col">
-        <p className="text-sm text-muted-foreground mb-4">
-          These questions are personalized based on your uploaded resume and the provided job description.
-        </p>
+    <Card className="border-border/50">
+      <CardHeader className="pb-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <CardTitle className="text-lg flex items-center gap-2.5">
+            <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center">
+              <HelpCircle className="h-[18px] w-[18px] text-primary" />
+            </div>
+            Interview Questions
+            <Badge variant="secondary" className="text-xs px-2.5 py-0.5 font-normal">
+              {questions.length} total
+            </Badge>
+          </CardTitle>
 
-        <div className="bg-muted/30 p-4 rounded-lg border border-border mb-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex-1 space-y-2">
-              <label htmlFor="num-questions" className="text-sm font-medium">
-                Number of questions: <span className="font-bold text-primary">{numToGenerate}</span>
+          {/* Regenerate Controls */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <label htmlFor="num-questions" className="text-sm text-muted-foreground whitespace-nowrap">
+                Generate:
               </label>
-              <input
+              <select
                 id="num-questions"
-                type="range"
-                min="10"
-                max="50"
-                step="5"
                 value={numToGenerate}
                 onChange={(e) => setNumToGenerate(Number(e.target.value))}
-                className="w-full accent-primary"
                 disabled={isPending || maxReached}
-              />
-            </div>
-            <div className="flex flex-col gap-1 sm:text-right shrink-0">
-              <Button
-                onClick={handleRegenerate}
-                disabled={isPending || maxReached}
-                size="sm"
-                className="w-full sm:w-auto"
+                className="h-8 rounded-md border border-border/60 bg-background px-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/40"
               >
-                {isPending ? (
-                  <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <RefreshCw className="mr-2 h-4 w-4" />
-                )}
-                Regenerate
-              </Button>
-              <span className={`text-xs ${maxReached ? 'text-destructive font-semibold' : 'text-muted-foreground'}`}>
-                {generationCount}/5 uses
-              </span>
+                {[10, 15, 20, 25, 30, 35, 40, 45, 50].map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
             </div>
+            <Button
+              onClick={handleRegenerate}
+              disabled={isPending || maxReached}
+              size="sm"
+              variant="outline"
+              className="h-8 text-xs"
+            >
+              {isPending ? (
+                <RefreshCw className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+              ) : (
+                <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+              )}
+              Regenerate
+            </Button>
+            <Badge
+              variant={maxReached ? 'destructive' : 'outline'}
+              className="text-[10px] px-2 py-0.5 shrink-0"
+            >
+              {generationCount}/5
+            </Badge>
           </div>
-          {maxReached && (
-            <p className="text-xs text-destructive mt-3 bg-destructive/10 p-2 rounded">
-              You have reached the limit of 5 generations for this resume. Upload a new resume to generate more.
-            </p>
-          )}
         </div>
-        
-        <ul className="space-y-4 mb-6">
-          {displayQuestions.map((q, idx) => (
-            <li key={idx} className="bg-muted/30 p-4 rounded-lg text-sm flex gap-3 border border-border">
-              <span className="font-bold text-primary shrink-0">{idx + 1}.</span>
-              <span>{q}</span>
-            </li>
-          ))}
-        </ul>
 
-        {visibleCount < questions.length && (
-          <div className="mt-auto text-center pt-2">
-            <Button variant="outline" onClick={() => setVisibleCount((prev) => Math.min(prev + 10, questions.length))}>
-              Show More Questions ({questions.length - visibleCount} remaining)
+        {maxReached && (
+          <p className="text-sm text-error bg-error-subtle p-3 rounded-lg mt-3 flex items-center gap-2">
+            <span className="h-1 w-1 rounded-full bg-error shrink-0" />
+            Maximum generation limit reached. Upload a new resume to generate more questions.
+          </p>
+        )}
+      </CardHeader>
+
+      <CardContent className="space-y-3">
+        <p className="text-sm text-muted-foreground mb-5">
+          These questions are personalized based on your resume and the provided job description.
+        </p>
+
+        {/* Question List */}
+        <div className="space-y-2.5">
+          {displayQuestions.map((q, idx) => (
+            <div
+              key={idx}
+              className="group flex items-start gap-3 p-4 rounded-lg border border-border/40 bg-surface/40 hover:border-border hover:bg-surface-raised/50 transition-colors"
+            >
+              <span className="shrink-0 flex h-7 w-7 items-center justify-center rounded-md bg-primary/10 text-xs font-bold text-primary">
+                {idx + 1}
+              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm text-foreground leading-relaxed">{q}</p>
+              </div>
+              <MessageCircleQuestion className="h-4 w-4 text-muted-foreground/30 shrink-0 mt-0.5 group-hover:text-primary/40 transition-colors" />
+            </div>
+          ))}
+        </div>
+
+        {/* Show More */}
+        {remaining > 0 && (
+          <div className="pt-3 text-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setVisibleCount((prev) => Math.min(prev + 10, questions.length))}
+              className="text-xs text-muted-foreground hover:text-foreground"
+            >
+              <ChevronDown className="mr-1.5 h-3.5 w-3.5" />
+              Show more ({remaining} remaining)
             </Button>
           </div>
         )}
