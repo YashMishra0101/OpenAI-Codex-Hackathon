@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import request from 'supertest';
 import app from '../../app.js';
 import { User } from '../../models/User.js';
+import { PendingRegistration } from '../../models/PendingRegistration.js';
+import argon2 from 'argon2';
 
 // Mock the email service so we don't send emails during tests
 vi.mock('../../config/emailService.js', () => ({
@@ -31,17 +33,17 @@ describe('Auth API Integration Tests', () => {
       expect(res.body.success).toBe(true);
       expect(res.body.message).toMatch(/verify your email/);
 
-      // Verify user was created in DB
-      const user = await User.findOne({ email: testUser.email });
-      expect(user).toBeTruthy();
-      expect(user?.name).toBe(testUser.name);
+      // Verify pending registration was created
+      const pending = await PendingRegistration.findOne({ email: testUser.email });
+      expect(pending).toBeTruthy();
+      expect(pending?.name).toBe(testUser.name);
       // Password should be hashed
-      expect(user?.password).not.toBe(testUser.password);
+      expect(pending?.hashedPassword).not.toBe(testUser.password);
     });
 
     it('should fail if email is already registered', async () => {
-      // Create user first
-      await request(app).post('/api/v1/auth/register').send(testUser);
+      // Create pending registration first
+      await User.create({ name: testUser.name, email: testUser.email, password: 'ValidHash123!', isVerified: true, authProvider: 'email' });
 
       // Try to register again
       const res = await request(app)
@@ -90,8 +92,8 @@ describe('Auth API Integration Tests', () => {
   describe('POST /api/v1/auth/login', () => {
     beforeEach(async () => {
       // Seed a user and mark them as verified so they can login
-      const res = await request(app).post('/api/v1/auth/register').send(testUser);
-      await User.updateOne({ email: testUser.email }, { isVerified: true });
+      const hashedPassword = await argon2.hash(testUser.password);
+      await User.create({ name: testUser.name, email: testUser.email, password: hashedPassword, isVerified: true, authProvider: 'email' });
     });
 
     it('should login successfully with correct credentials', async () => {
@@ -139,8 +141,8 @@ describe('Auth API Integration Tests', () => {
     let refreshTokenCookie: string;
 
     beforeEach(async () => {
-      await request(app).post('/api/v1/auth/register').send(testUser);
-      await User.updateOne({ email: testUser.email }, { isVerified: true });
+      const hashedPassword = await argon2.hash(testUser.password);
+      await User.create({ name: testUser.name, email: testUser.email, password: hashedPassword, isVerified: true, authProvider: 'email' });
 
       const loginRes = await request(app)
         .post('/api/v1/auth/login')
@@ -178,8 +180,8 @@ describe('Auth API Integration Tests', () => {
 
   describe('POST /api/v1/auth/logout', () => {
     it('should clear the refresh token cookie', async () => {
-      await request(app).post('/api/v1/auth/register').send(testUser);
-      await User.updateOne({ email: testUser.email }, { isVerified: true });
+      const hashedPassword = await argon2.hash(testUser.password);
+      await User.create({ name: testUser.name, email: testUser.email, password: hashedPassword, isVerified: true, authProvider: 'email' });
       const loginRes = await request(app).post('/api/v1/auth/login').send({ email: testUser.email, password: testUser.password });
       
       const rawCookiesL = loginRes.headers['set-cookie'];
@@ -192,7 +194,7 @@ describe('Auth API Integration Tests', () => {
       const rawCookies = res.headers['set-cookie'];
       const cookies = (Array.isArray(rawCookies) ? rawCookies : [rawCookies]).filter(Boolean) as string[];
       expect(cookies).toBeDefined();
-      expect(cookies[0]).toMatch(/refreshToken=;/); // empty value
+      expect(cookies.some((c: string) => c.match(/refreshToken=;/))).toBe(true);
     });
   });
 });

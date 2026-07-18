@@ -4,6 +4,7 @@ import app from '../../app.js';
 import { User } from '../../models/User.js';
 import { Resume } from '../../models/Resume.js';
 import { Buffer } from 'node:buffer';
+import argon2 from 'argon2';
 
 vi.mock('../../config/emailService.js', () => ({
   sendEmail: vi.fn().mockResolvedValue(true),
@@ -20,11 +21,13 @@ vi.mock('pdf-parse', () => ({
 // Mock aiService
 vi.mock('../../services/aiService.js', () => ({
   analyzeResume: vi.fn().mockResolvedValue({
-    overallVerdict: 'Strong Match',
-    analysis: 'The resume shows strong engineering skills.',
-    improvementSuggestions: ['Add more metrics to your impact.'],
+    overallVerdict: 'Strong',
+    analysis: {
+      strengths: ['The resume shows strong engineering skills.'],
+      improvements: ['Add more metrics to your impact.'],
+    },
     interviewQuestions: ['Tell me about a time you optimized a query.'],
-    advancedSearchQueries: ['software engineer AND "react" AND "node.js"'],
+    searchQueries: [{ query: 'software engineer AND "react" AND "node.js"', category: 'Technical' }],
   }),
 }));
 
@@ -40,8 +43,8 @@ describe('Resume AI API Integration Tests', () => {
   beforeEach(async () => {
     vi.clearAllMocks();
 
-    await request(app).post('/api/v1/auth/register').send(testUser);
-    await User.updateOne({ email: testUser.email }, { isVerified: true });
+    const hashedPassword = await argon2.hash(testUser.password);
+    await User.create({ name: testUser.name, email: testUser.email, password: hashedPassword, isVerified: true, authProvider: 'email' });
     const login = await request(app).post('/api/v1/auth/login').send({ email: testUser.email, password: testUser.password });
     const rawCookies = login.headers['set-cookie'];
     const cookies = (Array.isArray(rawCookies) ? rawCookies : [rawCookies]).filter(Boolean) as string[];
@@ -50,17 +53,19 @@ describe('Resume AI API Integration Tests', () => {
 
   describe('POST /api/v1/resumes/analyze', () => {
     it('should analyze a resume successfully', async () => {
-      // Create a dummy pdf buffer
-      const dummyPdf = Buffer.from('dummy pdf content');
+      // Create a dummy pdf buffer with magic bytes
+      const dummyPdf = Buffer.from('%PDF-1.4 dummy pdf content');
 
       const res = await request(app)
         .post('/api/v1/resumes/analyze')
         .set('Cookie', cookie)
-        .attach('resume', dummyPdf, 'resume.pdf')
+        .attach('resume', dummyPdf, { filename: 'resume.pdf', contentType: 'application/pdf' })
         .field('jobDescription', 'Looking for a software engineer.')
         .field('searchPreferences', 'Remote only');
 
-      expect(res.status).toBe(400);
+      if (res.status !== 200) console.log(res.body);
+      expect(res.status).toBe(200);
+      expect(res.body.success).toBe(true);
     });
 
     it('should fail if no file is provided', async () => {
@@ -77,18 +82,18 @@ describe('Resume AI API Integration Tests', () => {
   describe('GET /api/v1/resumes', () => {
     it('should list all past analyses for the user', async () => {
       // Analyze one resume
-      const dummyPdf = Buffer.from('dummy pdf content');
+      const dummyPdf = Buffer.from('%PDF-1.4 dummy pdf content');
       await request(app)
         .post('/api/v1/resumes/analyze')
         .set('Cookie', cookie)
-        .attach('resume', dummyPdf, 'resume.pdf');
+        .attach('resume', dummyPdf, { filename: 'resume.pdf', contentType: 'application/pdf' });
 
       const res = await request(app)
         .get('/api/v1/resumes')
         .set('Cookie', cookie);
 
       expect(res.status).toBe(200);
-      expect(res.body.data.resumes.length).toBe(1);
+      expect(res.body.data.length).toBe(1);
     });
   });
 });

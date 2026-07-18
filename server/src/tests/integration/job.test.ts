@@ -3,6 +3,7 @@ import request from 'supertest';
 import app from '../../app.js';
 import { User } from '../../models/User.js';
 import { JobApplication } from '../../models/JobApplication.js';
+import argon2 from 'argon2';
 
 vi.mock('../../config/emailService.js', () => ({
   sendEmail: vi.fn().mockResolvedValue(true),
@@ -32,16 +33,16 @@ describe('Job API Integration Tests', () => {
     vi.clearAllMocks();
 
     // Register and Verify User A
-    await request(app).post('/api/v1/auth/register').send(testUserA);
-    await User.updateOne({ email: testUserA.email }, { isVerified: true });
+    const hashedPasswordA = await argon2.hash(testUserA.password);
+    await User.create({ name: testUserA.name, email: testUserA.email, password: hashedPasswordA, isVerified: true, authProvider: 'email' });
     const loginA = await request(app).post('/api/v1/auth/login').send({ email: testUserA.email, password: testUserA.password });
     const rawCookiesA = loginA.headers['set-cookie'];
     const cookiesA = (Array.isArray(rawCookiesA) ? rawCookiesA : [rawCookiesA]).filter(Boolean) as string[];
     cookieA = cookiesA.find(c => c.startsWith('accessToken='))!;
 
     // Register and Verify User B
-    await request(app).post('/api/v1/auth/register').send(testUserB);
-    await User.updateOne({ email: testUserB.email }, { isVerified: true });
+    const hashedPasswordB = await argon2.hash(testUserB.password);
+    await User.create({ name: testUserB.name, email: testUserB.email, password: hashedPasswordB, isVerified: true, authProvider: 'email' });
     const loginB = await request(app).post('/api/v1/auth/login').send({ email: testUserB.email, password: testUserB.password });
     const rawCookiesB = loginB.headers['set-cookie'];
     const cookiesB = (Array.isArray(rawCookiesB) ? rawCookiesB : [rawCookiesB]).filter(Boolean) as string[];
