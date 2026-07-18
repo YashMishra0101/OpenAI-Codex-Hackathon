@@ -1,6 +1,14 @@
 import { z } from 'zod';
 
-export const jobStatusEnum = z.enum(['Saved', 'Applied', 'Interview', 'Offer', 'Rejected']);
+export const jobStatusEnum = z.enum(['Saved', 'Applied', 'Interview', 'Offer', 'Rejected', 'OnHold', 'Withdrawn']);
+
+// Preprocessor that converts empty strings and null to undefined before
+// ISO datetime parsing. This is necessary because HTML date inputs submit
+// an empty string when left blank, which z.string().datetime() rejects.
+const optionalDatetime = z.preprocess(
+  (val) => (val === '' || val === null ? undefined : val),
+  z.string().datetime().optional().nullable(),
+);
 
 export const createJobSchema = z.object({
   body: z.object({
@@ -11,7 +19,7 @@ export const createJobSchema = z.object({
     location: z.string().max(100).optional(),
     salary: z.string().max(100).optional(),
     notes: z.string().max(2000).optional(),
-    appliedDate: z.string().datetime().optional().nullable(),
+    appliedDate: optionalDatetime,
   }),
 });
 
@@ -24,9 +32,10 @@ export const updateJobSchema = z.object({
     location: z.string().max(100).optional(),
     salary: z.string().max(100).optional(),
     notes: z.string().max(2000).optional(),
-    appliedDate: z.string().datetime().optional().nullable(),
+    appliedDate: optionalDatetime,
   }),
 });
 
 export type CreateJobInput = z.infer<typeof createJobSchema>['body'];
 export type UpdateJobInput = z.infer<typeof updateJobSchema>['body'];
+

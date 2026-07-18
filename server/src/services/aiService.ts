@@ -63,6 +63,7 @@ Based on your analysis, return a structured JSON response.
 Do not output markdown code blocks (like \`\`\`json). Return ONLY raw JSON.
 
 CRITICAL: For "searchQueries", you MUST generate authentic, complex "Google Dorks" (using operators like site:, intitle:, inurl:, filetype:, OR, exact match quotes ""). DO NOT generate simple keywords. These should be ready to paste directly into Google.
+Each query MUST be highly specific and relevant to the skills, technologies, and experience level in the resume above.
 
 The JSON object MUST have this exact schema:
 {
@@ -71,11 +72,14 @@ The JSON object MUST have this exact schema:
     "strengths": ["...", "..."],
     "improvements": ["...", "..."]
   },
-  "interviewQuestions": ["...", "..."], // Between 10 and 50 tailored questions
-  "searchQueries": [ // Generate exactly 15 authentic Google Dork search queries
-    { "query": "site:lever.co OR site:greenhouse.io intitle:\"Software Engineer\" \"React\"", "category": "job" }, // 9 queries of category "job"
-    { "query": "site:github.com \"frontend interview questions\" \"react\"", "category": "learning" },  // 3 queries of category "learning"
-    { "query": "site:reddit.com/r/cscareerquestions \"Google\" \"interview experience\" \"frontend\"", "category": "interview" }  // 3 queries of category "interview"
+  "interviewQuestions": ["...", "..."], // Exactly 30 tailored questions
+  "searchQueries": [ // Generate exactly 15 authentic Google Dork search queries — quality over quantity
+    // 8 queries of category "job" — help find relevant job openings based on resume skills & experience
+    { "query": "site:lever.co OR site:greenhouse.io intitle:\"Software Engineer\" \"React\"", "category": "job" },
+    // 4 queries of category "learning" — help find interview preparation, technical prep, coding resources
+    { "query": "site:github.com \"frontend interview questions\" \"react\"", "category": "learning" },
+    // 3 queries of category "interview" — help find real interview experiences, candidate stories, hiring process insights
+    { "query": "site:reddit.com/r/cscareerquestions \"Google\" \"interview experience\" \"frontend\"", "category": "interview" }
   ]
 }
 `;

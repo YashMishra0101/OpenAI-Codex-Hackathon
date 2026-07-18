@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Search, Copy, ExternalLink, Briefcase, BookOpen, MessageSquare, ChevronDown, Check } from 'lucide-react';
+import { Search, Copy, ExternalLink, Briefcase, BookOpen, MessageSquare, ChevronDown, Check, Lightbulb } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import toast from 'react-hot-toast';
@@ -155,6 +155,52 @@ export function SearchQueries({ queries }: SearchQueriesProps) {
           <code className="text-primary/80">intitle:</code>,{' '}
           <code className="text-primary/80">""</code>) to surface hidden job postings, technical resources, and interview experiences.
         </p>
+
+        {/* Distribution info note */}
+        <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground bg-muted/30 border border-border/40 rounded-lg px-4 py-2.5">
+          <span className="font-medium text-foreground">Default: 15 queries</span>
+          <span className="text-border">·</span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-2 w-2 rounded-full bg-info" />
+            8 Job Search
+          </span>
+          <span className="text-border">·</span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-2 w-2 rounded-full bg-accent" />
+            4 Interview Prep
+          </span>
+          <span className="text-border">·</span>
+          <span className="flex items-center gap-1">
+            <span className="inline-block h-2 w-2 rounded-full bg-warning" />
+            3 Interview Experiences
+          </span>
+        </div>
+
+        {/* ── Why use Google Dorks banner ── */}
+        <div className="rounded-lg border border-border/40 bg-gradient-to-br from-primary/5 via-accent/5 to-warning/5 px-4 py-3.5 space-y-2.5 relative overflow-hidden">
+          {/* Subtle top gradient line */}
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-primary/60 via-accent/50 to-warning/50" />
+
+          <div className="flex items-center gap-2">
+            <Lightbulb className="h-4 w-4 text-yellow-400 shrink-0 drop-shadow-[0_0_6px_rgba(250,204,21,0.5)]" />
+            <span className="text-sm font-semibold text-foreground">Why use these Google Dorks?</span>
+          </div>
+
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            These AI-generated queries are tailored to your resume and use advanced search operators to uncover{' '}
+            <span className="text-info font-semibold">hidden job opportunities</span>,{' '}
+            <span className="text-accent font-semibold">interview preparation resources</span>, and{' '}
+            <span className="text-warning font-semibold">real interview experiences</span>{' '}
+            that often don't appear in regular Google searches.
+          </p>
+
+          <div className="flex items-center gap-1.5">
+            <span className="inline-flex items-center rounded-full bg-yellow-400/10 border border-yellow-400/30 px-2 py-0.5 text-[10.5px] font-semibold text-yellow-400">
+              💡 Tip
+            </span>
+            <span className="text-xs text-muted-foreground">Copy a query and paste it directly into Google for best results.</span>
+          </div>
+        </div>
 
         {renderQueryGroup('job', displayJob)}
         {renderQueryGroup('learning', displayPrep)}

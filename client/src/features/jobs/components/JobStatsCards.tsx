@@ -1,9 +1,9 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { useJobStats, type JobStatus } from '../api/jobsApi';
-import { Bell, Send, Users, Trophy, XCircle, LayoutGrid } from 'lucide-react';
+import { Bell, Send, Users, Trophy, XCircle, LayoutGrid, PauseCircle, LogOut } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
-type FilterStatus = 'All' | JobStatus;
+type FilterStatus = 'All' | JobStatus | 'HasReminders';
 
 interface JobStatsCardsProps {
   activeFilter?: FilterStatus;
@@ -22,8 +22,8 @@ const STAT_ITEMS = [
   },
   {
     label: 'Reminder',
-    key: 'Saved' as const,
-    filterValue: 'Saved' as FilterStatus,
+    key: 'TotalReminders' as const,
+    filterValue: 'HasReminders' as FilterStatus,
     icon: Bell,
     accent: 'bg-muted text-muted-foreground',
     bar: 'bg-border',
@@ -65,6 +65,24 @@ const STAT_ITEMS = [
     bar: 'bg-red-500/70',
     activeRing: 'ring-red-500/40',
   },
+  {
+    label: 'On Hold',
+    key: 'OnHold' as const,
+    filterValue: 'OnHold' as FilterStatus,
+    icon: PauseCircle,
+    accent: 'bg-violet-500/10 text-violet-400',
+    bar: 'bg-violet-500/70',
+    activeRing: 'ring-violet-500/40',
+  },
+  {
+    label: 'Withdrawn',
+    key: 'Withdrawn' as const,
+    filterValue: 'Withdrawn' as FilterStatus,
+    icon: LogOut,
+    accent: 'bg-slate-500/10 text-slate-400',
+    bar: 'bg-slate-500/70',
+    activeRing: 'ring-slate-500/40',
+  },
 ] as const;
 
 type StatKey = typeof STAT_ITEMS[number]['key'];
@@ -79,12 +97,12 @@ export function JobStatsCards({ activeFilter, onFilterClick }: JobStatsCardsProp
   }
 
   const total = stats
-    ? stats.Saved + stats.Applied + stats.Interview + stats.Offer + stats.Rejected
+    ? stats.Saved + stats.Applied + stats.Interview + stats.Offer + stats.Rejected + (stats.OnHold ?? 0) + (stats.Withdrawn ?? 0)
     : 0;
 
   const getValue = (key: StatKey) => {
     if (key === 'total') return total;
-    return stats ? stats[key] : 0;
+    return stats ? (stats[key] ?? 0) : 0;
   };
 
   // Determine if a card is "active" based on the current filter
@@ -94,7 +112,7 @@ export function JobStatsCards({ activeFilter, onFilterClick }: JobStatsCardsProp
   };
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
       {STAT_ITEMS.map((item) => {
         const value = getValue(item.key);
         const active = isActive(item.filterValue);

@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { MailCheck, FileText, KanbanSquare, Search } from 'lucide-react';
+import { MailCheck } from 'lucide-react';
 
 export function ForgotPasswordPage() {
   const [isLoading, setIsLoading] = useState(false);

@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
 import api from '@/lib/axios';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
@@ -11,7 +10,6 @@ interface GoogleAuthButtonProps {
 
 export function GoogleAuthButton({ isRegister = false }: GoogleAuthButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate();
 
   const handleSuccess = async (response: CredentialResponse) => {
     if (!response.credential) return;

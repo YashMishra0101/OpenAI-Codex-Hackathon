@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
-import { UploadCloud, FileText, X, BrainCircuit, CheckCircle2, Sparkles, FileSearch } from 'lucide-react';
+import { UploadCloud, FileText, X, BrainCircuit, CheckCircle2, Sparkles, FileSearch, Info, Wifi, FileWarning, ScanText, HardDrive, RefreshCw } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -206,6 +206,81 @@ export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
                 {fileError}
               </p>
             )}
+          </div>
+
+          {/* ── Important Notes ── */}
+          <div className="rounded-lg border border-warning/20 bg-warning/5 px-4 py-4 space-y-3 relative overflow-hidden">
+            {/* Subtle top accent line */}
+            <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-warning/70 via-warning/30 to-transparent" />
+
+            <div className="flex items-center gap-2">
+              <Info className="h-4 w-4 text-warning shrink-0" />
+              <span className="text-sm font-semibold text-foreground">📌 Important Notes</span>
+            </div>
+
+            <ul className="space-y-2.5">
+              {[
+                {
+                  icon: Wifi,
+                  color: 'text-info',
+                  bg: 'bg-info/10',
+                  text: (
+                    <>
+                      Use a <span className="font-semibold text-foreground/80">stable internet connection</span> while uploading. A weak connection may interrupt the upload or AI analysis.
+                    </>
+                  ),
+                },
+                {
+                  icon: FileWarning,
+                  color: 'text-warning',
+                  bg: 'bg-warning/10',
+                  text: (
+                    <>
+                      If your <span className="font-semibold text-foreground/80">PDF filename contains numbers</span> (e.g.{' '}
+                      <code className="text-[10.5px] bg-muted/60 px-1 py-0.5 rounded">Resume123.pdf</code>), the upload may occasionally fail.{' '}
+                      Rename it using only letters (e.g. <code className="text-[10.5px] bg-muted/60 px-1 py-0.5 rounded">UserResume.pdf</code>) and try again.
+                    </>
+                  ),
+                },
+                {
+                  icon: ScanText,
+                  color: 'text-primary',
+                  bg: 'bg-primary/10',
+                  text: (
+                    <>
+                      Upload a <span className="font-semibold text-foreground/80">clear, text-based PDF</span> for best results. Scanned or image-only PDFs may produce less accurate feedback.
+                    </>
+                  ),
+                },
+                {
+                  icon: HardDrive,
+                  color: 'text-muted-foreground',
+                  bg: 'bg-muted/40',
+                  text: (
+                    <>
+                      Maximum file size: <span className="font-semibold text-foreground/80">10 MB</span>.
+                    </>
+                  ),
+                },
+                {
+                  icon: RefreshCw,
+                  color: 'text-success',
+                  bg: 'bg-success/10',
+                  text: (
+                    <>
+                      If the analysis fails, verify your internet connection, rename the PDF if necessary, and <span className="font-semibold text-foreground/80">upload again</span>.
+                    </>
+                  ),
+                },
+              ].map(({ icon: Icon, color, bg, text }, i) => (
+                <li key={i} className="flex items-start gap-2.5">
+                  <span className={`mt-0.5 shrink-0 flex h-5 w-5 items-center justify-center rounded-md ${bg}`}>
+                    <Icon className={`h-3 w-3 ${color}`} />
+                  </span>
+                  <span className="text-xs text-muted-foreground leading-relaxed">{text}</span>
+                </li>
+              ))}
+            </ul>
           </div>
 
           {/* ── Optional Fields ── */}

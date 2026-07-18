@@ -16,7 +16,9 @@ export async function createJob(userId: string, data: CreateJobInput): Promise<I
 
 export async function getJobs(userId: string, status?: string) {
   const query: any = { user: userId };
-  if (status) {
+  if (status === 'HasReminders') {
+    query.reminderCount = { $gt: 0 };
+  } else if (status) {
     query.status = status;
   }
   
@@ -55,21 +57,28 @@ export async function deleteJob(userId: string, jobId: string): Promise<void> {
 export async function getJobDashboardStats(userId: string) {
   const stats = await JobApplication.aggregate([
     { $match: { user: new mongoose.Types.ObjectId(userId) } },
-    { $group: { _id: '$status', count: { $sum: 1 } } }
+    { $group: { _id: '$status', count: { $sum: 1 }, totalReminders: { $sum: '$reminderCount' } } }
   ]);
   
-  // Initialize default structure
+  // Initialize with all known statuses so the API always returns a complete object
   const defaultStats = {
     Saved: 0,
     Applied: 0,
     Interview: 0,
     Offer: 0,
     Rejected: 0,
+    OnHold: 0,
+    Withdrawn: 0,
+    TotalReminders: 0,
   };
   
   stats.forEach((stat) => {
     if (stat._id && stat._id in defaultStats) {
       defaultStats[stat._id as keyof typeof defaultStats] = stat.count;
+    }
+    // Aggregate the total reminders across all status buckets
+    if (stat.totalReminders) {
+      defaultStats.TotalReminders += stat.totalReminders;
     }
   });
   

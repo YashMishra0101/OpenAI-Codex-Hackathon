@@ -23,11 +23,12 @@ function htmlEscape(str: string): string {
 
 // Define Jobs
 agenda.define('send-interview-reminder', async (job: any) => {
-  const { to, companyName, jobTitle, notes } = job.attrs.data as {
+  const { to, companyName, jobTitle, notes, jobId } = job.attrs.data as {
     to: string;
     companyName: string;
     jobTitle: string;
     notes?: string;
+    jobId?: string;
   };
 
   logger.info(`Processing reminder job for ${to} (${companyName})`);
@@ -46,11 +47,26 @@ agenda.define('send-interview-reminder', async (job: any) => {
     </div>
   `;
 
-  await sendEmail({
+  const sent = await sendEmail({
     to,
     subject: `Reminder: Upcoming Interview with ${safeCompany}`,
     html,
   });
+
+  if (sent) {
+    // Remove the Agenda job document — reminder is a one-shot, not recurring
+    await job.remove();
+    logger.info('REMINDER_EMAIL_SENT_AND_CLEANED', { to, jobId });
+
+    // Decrement reminderCount on the JobApplication if we have a jobId
+    if (jobId) {
+      const { JobApplication } = await import('../models/JobApplication.js');
+      await JobApplication.findByIdAndUpdate(jobId, { $inc: { reminderCount: -1 } });
+    }
+  } else {
+    logger.error('REMINDER_EMAIL_FAILED', { to, jobId });
+    // Do NOT remove — Agenda will retry on the next run
+  }
 });
 
 // Start Agenda

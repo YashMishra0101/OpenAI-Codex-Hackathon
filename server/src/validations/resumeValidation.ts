@@ -27,10 +27,10 @@ export const aiResponseSchema = z.object({
         const learningCount = queries.filter((q) => q.category === 'learning').length;
         const interviewCount = queries.filter((q) => q.category === 'interview').length;
         
-        return jobCount === 9 && learningCount === 3 && interviewCount === 3;
+        return jobCount === 8 && learningCount === 4 && interviewCount === 3;
       },
       {
-        message: 'Search queries must be exactly 9 job, 3 learning, and 3 interview category.',
+        message: 'Search queries must be exactly 8 job, 4 learning (interview prep), and 3 interview experience category.',
       }
     ),
 });

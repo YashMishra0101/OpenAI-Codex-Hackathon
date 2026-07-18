@@ -12,7 +12,11 @@ interface InterviewQuestionsProps {
   initialCount: number;
 }
 
-export function InterviewQuestions({ resumeId, initialQuestions, initialCount }: InterviewQuestionsProps) {
+export function InterviewQuestions({
+  resumeId,
+  initialQuestions,
+  initialCount,
+}: InterviewQuestionsProps) {
   const [questions, setQuestions] = useState(initialQuestions);
   const [visibleCount, setVisibleCount] = useState(10);
   const [numToGenerate, setNumToGenerate] = useState(30);
@@ -38,7 +42,7 @@ export function InterviewQuestions({ resumeId, initialQuestions, initialCount }:
         onError: (err: any) => {
           toast.error(err.response?.data?.message || 'Failed to regenerate questions');
         },
-      }
+      },
     );
   };
 
@@ -61,43 +65,55 @@ export function InterviewQuestions({ resumeId, initialQuestions, initialCount }:
           </CardTitle>
 
           {/* Regenerate Controls */}
-          <div className="flex items-center gap-3">
+          <div className="flex flex-col items-end gap-1">
             <div className="flex items-center gap-2">
-              <label htmlFor="num-questions" className="text-sm text-muted-foreground whitespace-nowrap">
-                Generate:
-              </label>
-              <select
-                id="num-questions"
-                value={numToGenerate}
-                onChange={(e) => setNumToGenerate(Number(e.target.value))}
+              <div className="flex items-center gap-2">
+                <label
+                  htmlFor="num-questions"
+                  className="text-sm text-muted-foreground whitespace-nowrap"
+                >
+                  Generate:
+                </label>
+                <select
+                  id="num-questions"
+                  value={numToGenerate}
+                  onChange={(e) => setNumToGenerate(Number(e.target.value))}
+                  disabled={isPending || maxReached}
+                  className="h-8 rounded-md border border-border/60 bg-background px-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/40"
+                >
+                  {[10, 15, 20, 25, 30, 35, 40, 45, 50].map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <Button
+                onClick={handleRegenerate}
                 disabled={isPending || maxReached}
-                className="h-8 rounded-md border border-border/60 bg-background px-2 text-xs focus:outline-none focus:ring-2 focus:ring-primary/40"
+                size="sm"
+                variant="outline"
+                className="h-8 text-xs"
               >
-                {[10, 15, 20, 25, 30, 35, 40, 45, 50].map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
+                {isPending ? (
+                  <RefreshCw className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
+                )}
+                Regenerate
+              </Button>
+              <Badge
+                variant={maxReached ? 'destructive' : 'outline'}
+                className="text-[10px] px-2 py-0.5 shrink-0"
+              >
+                {generationCount}/5
+              </Badge>
             </div>
-            <Button
-              onClick={handleRegenerate}
-              disabled={isPending || maxReached}
-              size="sm"
-              variant="outline"
-              className="h-8 text-xs"
-            >
-              {isPending ? (
-                <RefreshCw className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-              ) : (
-                <RefreshCw className="mr-1.5 h-3.5 w-3.5" />
-              )}
-              Regenerate
-            </Button>
-            <Badge
-              variant={maxReached ? 'destructive' : 'outline'}
-              className="text-[10px] px-2 py-0.5 shrink-0"
-            >
-              {generationCount}/5
-            </Badge>
+            <p className="text-[11.5px] text-muted-foreground pl-2 mt-1.5">
+              {maxReached
+                ? 'Limit reached — upload a new resume to regenerate'
+                : `Default: 30 · Range: 10–50 · ${5 - generationCount} generation${5 - generationCount === 1 ? '' : 's'} remaining`}
+            </p>
           </div>
         </div>
 

@@ -9,7 +9,12 @@ import {
   updateJobHandler,
   deleteJobHandler
 } from '../controllers/jobController.js';
-import { scheduleReminderHandler } from '../controllers/reminderController.js';
+import {
+  scheduleReminderHandler,
+  getRemindersHandler,
+  deleteReminderHandler,
+  updateReminderHandler,
+} from '../controllers/reminderController.js';
 
 const router = Router();
 
@@ -36,5 +41,14 @@ router.delete('/:id', asyncHandler(deleteJobHandler));
 
 // POST /api/v1/jobs/:id/reminders
 router.post('/:id/reminders', asyncHandler(scheduleReminderHandler));
+
+// GET /api/v1/jobs/:id/reminders
+router.get('/:id/reminders', asyncHandler(getRemindersHandler));
+
+// PUT /api/v1/jobs/:id/reminders/:reminderId
+router.put('/:id/reminders/:reminderId', asyncHandler(updateReminderHandler));
+
+// DELETE /api/v1/jobs/:id/reminders/:reminderId
+router.delete('/:id/reminders/:reminderId', asyncHandler(deleteReminderHandler));
 
 export default router;

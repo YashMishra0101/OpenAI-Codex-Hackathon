@@ -14,7 +14,6 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-  DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { JobApplication, useDeleteJob } from '../api/jobsApi';
@@ -30,11 +29,13 @@ const STATUS_CONFIG: Record<
   string,
   { badge: string; dot: string; label: string }
 > = {
-  Saved:     { badge: 'bg-muted/60 text-muted-foreground border-border/60',           dot: 'bg-muted-foreground',  label: 'Reminder' },
-  Applied:   { badge: 'bg-blue-500/10 text-blue-400 border-blue-500/25',              dot: 'bg-blue-400',          label: 'Applied' },
-  Interview: { badge: 'bg-amber-500/10 text-amber-400 border-amber-500/25',           dot: 'bg-amber-400',         label: 'Interview' },
-  Offer:     { badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',     dot: 'bg-emerald-400',       label: 'Offer' },
-  Rejected:  { badge: 'bg-red-500/10 text-red-400 border-red-500/25',                 dot: 'bg-red-400',           label: 'Rejected' },
+  Saved:     { badge: 'bg-muted/60 text-muted-foreground border-border/60',             dot: 'bg-muted-foreground',    label: 'Reminder'   },
+  Applied:   { badge: 'bg-blue-500/10 text-blue-400 border-blue-500/25',                dot: 'bg-blue-400',            label: 'Applied'    },
+  Interview: { badge: 'bg-amber-500/10 text-amber-400 border-amber-500/25',             dot: 'bg-amber-400',           label: 'Interview'  },
+  Offer:     { badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',       dot: 'bg-emerald-400',         label: 'Offer'      },
+  Rejected:  { badge: 'bg-red-500/10 text-red-400 border-red-500/25',                   dot: 'bg-red-400',             label: 'Rejected'   },
+  OnHold:    { badge: 'bg-violet-500/10 text-violet-400 border-violet-500/25',          dot: 'bg-violet-400',          label: 'On Hold'    },
+  Withdrawn: { badge: 'bg-slate-500/10 text-slate-400 border-slate-500/25',             dot: 'bg-slate-400',           label: 'Withdrawn'  },
 };
 
 function formatDate(dateStr?: string) {
@@ -142,7 +143,7 @@ export function JobCard({ job, onEdit, onSetReminder }: JobCardProps) {
           <Button
             variant="ghost"
             size="icon"
-            className="h-8 w-8 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+            className="h-8 w-8 shrink-0 text-muted-foreground hover:text-foreground"
             aria-label="Job options"
           >
             <MoreVertical className="h-4 w-4" />
@@ -156,7 +157,7 @@ export function JobCard({ job, onEdit, onSetReminder }: JobCardProps) {
           {onSetReminder && (
             <DropdownMenuItem onClick={() => onSetReminder(job)}>
               <Bell className="mr-2 h-4 w-4" />
-              Set Reminder
+              Reminder
             </DropdownMenuItem>
           )}
           {job.url && (
@@ -167,7 +168,6 @@ export function JobCard({ job, onEdit, onSetReminder }: JobCardProps) {
               </a>
             </DropdownMenuItem>
           )}
-          <DropdownMenuSeparator />
           <DropdownMenuItem
             onClick={handleDelete}
             className="text-destructive focus:bg-destructive/10 focus:text-destructive"

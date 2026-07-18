@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export type JobStatus = 'Saved' | 'Applied' | 'Interview' | 'Offer' | 'Rejected';
+export type JobStatus = 'Saved' | 'Applied' | 'Interview' | 'Offer' | 'Rejected' | 'OnHold' | 'Withdrawn';
 
 export interface IJobApplication extends Document {
   user: mongoose.Types.ObjectId;
@@ -37,7 +37,7 @@ const jobApplicationSchema = new Schema<IJobApplication>(
     },
     status: {
       type: String,
-      enum: ['Saved', 'Applied', 'Interview', 'Offer', 'Rejected'],
+      enum: ['Saved', 'Applied', 'Interview', 'Offer', 'Rejected', 'OnHold', 'Withdrawn'],
       default: 'Saved',
     },
     url: {

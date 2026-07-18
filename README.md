@@ -39,8 +39,8 @@ Job seekers today juggle multiple **disconnected tools**, one for **resume feedb
 
 This platform brings everything together:
 
-- **Upload your resume** → Get instant AI-powered ATS scoring, keyword analysis, personalized interview questions, and Google Dorks, advanced search queries that help you discover relevant job postings across the web
-- **Track your applications** → Monitor status, set email reminders and view dashboard stats
+- **Upload your resume** → Get instant AI-powered ATS scoring, keyword analysis, personalized interview questions, and Google Dorks (advanced search queries) that help you discover relevant job postings across the web.
+- **Track your applications** → Monitor status, set email reminders, and view application funnel analytics.
 
 ---
 
@@ -52,10 +52,10 @@ Upload your resume (PDF) and optionally paste a job description — the AI retur
 
 | Section                                    | What You Get                                                                                              |
 | ------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| **Match Analysis**                         | Strong / Partial / Weak verdict with missing keywords & issues                                            |
+| **Match Analysis**                         | Strong / Partial / Weak verdict with missing keywords & strengths                                         |
 | **Improvement Suggestions**                | Actionable, specific tips to strengthen your resume                                                       |
 | **Interview Questions**                    | 10–50 personalized questions based on your resume + JD                                                    |
-| **Advanced Search Queries (Google Dorks)** | 8 job-search + 1 learning-material + 1 interview-experience query by default; copy or open them in Google |
+| **Advanced Search Queries (Google Dorks)** | 15 highly targeted queries (8 job search, 4 interview prep, 3 interview experiences)                      |
 | **Analysis History**                       | All past analyses saved — revisit anytime                                                                 |
 | **Works without JD**                       | Analyze your resume on its own, no job description required                                               |
 
@@ -68,22 +68,19 @@ Upload your resume (PDF) and optionally paste a job description — the AI retur
 Keep every application organized in one powerful dashboard:
 
 - Track company, role, status, applied date, job URL, and notes
-- **9 granular status stages:**
+- **6 granular status stages:**
 
   | Status              | Icon |
   | ------------------- | ---- |
   | Applied             | 📝   |
-  | Viewed              | 👀   |
-  | Interview Scheduled | 📞   |
-  | Technical Round     | 💻   |
-  | HR Round            | 👔   |
+  | Interview           | 📞   |
   | Offer               | ✅   |
   | Rejected            | ❌   |
   | On Hold             | ⏸️   |
   | Withdrawn           | 🚫   |
 
-- **Email reminders** — set a reminder for any interview (24h before, 1h before, or custom)
-- **Dashboard stats** — total apps, monthly activity, interview rate, offer rate, rejection rate
+- **Email reminders** — set a persistent reminder for any application (24h before, 1h before, or custom time).
+- **Dashboard stats** — visually tracks your application funnel across all 6 statuses, plus total active reminders.
 
 ---
 
@@ -98,7 +95,6 @@ Keep every application organized in one powerful dashboard:
 
 - Update name, email, and password
 - Upload / change profile picture (JPG/PNG, max 2MB, stored on Cloudinary)
-- Add optional social links: **LinkedIn**, **GitHub**, **Portfolio**
 
 ---
 
@@ -234,9 +230,6 @@ The monorepo setup lets `client/` and `server/` share a single Git repo, unified
 | ------------------- | ------------------------------ | ------------------------------------------------- |
 | Backend API         | Supertest                      | Auth flow, resume upload, job CRUD                |
 | Frontend Components | Vitest + React Testing Library | Form validation, protected routes, key components |
-| Edge Cases          | Vitest                         | Empty PDFs, API failures, large files             |
-
-> A dedicated test suite — even lean and well-targeted — sets this apart from the majority of portfolio projects.
 
 ---
 

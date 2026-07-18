@@ -74,6 +74,15 @@ export function AnalysisResult({ data: initialData }: AnalysisResultProps) {
             <p className="text-sm text-foreground/70 max-w-xl leading-relaxed">
               {verdict.description}
             </p>
+            {/* ── Scan success indicator ── */}
+            <div className="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success/10 px-3 py-1">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+              </span>
+              <CheckCircle2 className="h-3.5 w-3.5 text-success" />
+              <span className="text-xs font-medium text-success tracking-wide">Resume Scan Completed</span>
+            </div>
           </div>
         </CardContent>
       </Card>

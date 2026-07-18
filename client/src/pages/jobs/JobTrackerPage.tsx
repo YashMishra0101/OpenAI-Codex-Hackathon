@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Plus, List, KanbanSquare, Search, Briefcase } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
-type FilterStatus = 'All' | JobStatus;
+type FilterStatus = 'All' | JobStatus | 'HasReminders';
 
 export function JobTrackerPage() {
   const { data: jobs, isLoading, isError } = useJobs();
@@ -75,6 +75,9 @@ export function JobTrackerPage() {
     Interview: 'Interview',
     Offer: 'Offer',
     Rejected: 'Rejected',
+    OnHold: 'On Hold',
+    Withdrawn: 'Withdrawn',
+    HasReminders: 'Jobs with Reminders',
   };
 
   return (

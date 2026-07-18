@@ -18,11 +18,13 @@ interface JobKanbanBoardProps {
 }
 
 const COLUMNS = [
-  { id: 'Saved',     label: 'Saved',     dot: 'bg-slate-400',    header: 'border-slate-500/30 bg-slate-500/8',   count: 'bg-slate-500/20 text-slate-300'   },
-  { id: 'Applied',   label: 'Applied',   dot: 'bg-blue-400',     header: 'border-blue-500/30 bg-blue-500/8',    count: 'bg-blue-500/20 text-blue-300'     },
-  { id: 'Interview', label: 'Interview', dot: 'bg-amber-400',    header: 'border-amber-500/30 bg-amber-500/8',  count: 'bg-amber-500/20 text-amber-300'   },
+  { id: 'Saved',     label: 'Saved',     dot: 'bg-slate-400',    header: 'border-slate-500/30 bg-slate-500/8',     count: 'bg-slate-500/20 text-slate-300'     },
+  { id: 'Applied',   label: 'Applied',   dot: 'bg-blue-400',     header: 'border-blue-500/30 bg-blue-500/8',      count: 'bg-blue-500/20 text-blue-300'       },
+  { id: 'Interview', label: 'Interview', dot: 'bg-amber-400',    header: 'border-amber-500/30 bg-amber-500/8',    count: 'bg-amber-500/20 text-amber-300'     },
   { id: 'Offer',     label: 'Offer',     dot: 'bg-emerald-400',  header: 'border-emerald-500/30 bg-emerald-500/8', count: 'bg-emerald-500/20 text-emerald-300' },
-  { id: 'Rejected',  label: 'Rejected',  dot: 'bg-red-400',      header: 'border-red-500/30 bg-red-500/8',      count: 'bg-red-500/20 text-red-300'       },
+  { id: 'Rejected',  label: 'Rejected',  dot: 'bg-red-400',      header: 'border-red-500/30 bg-red-500/8',        count: 'bg-red-500/20 text-red-300'         },
+  { id: 'OnHold',    label: 'On Hold',   dot: 'bg-violet-400',   header: 'border-violet-500/30 bg-violet-500/8',  count: 'bg-violet-500/20 text-violet-300'   },
+  { id: 'Withdrawn', label: 'Withdrawn', dot: 'bg-slate-500',    header: 'border-slate-600/30 bg-slate-600/8',    count: 'bg-slate-600/20 text-slate-400'     },
 ];
 
 // ── Single job row inside a status section ───────────────────────────────────

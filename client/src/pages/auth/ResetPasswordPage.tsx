@@ -16,7 +16,7 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { KeyRound, ShieldAlert, FileText, KanbanSquare, Search } from 'lucide-react';
+import { KeyRound, ShieldAlert } from 'lucide-react';
 
 export function ResetPasswordPage() {
   const [searchParams] = useSearchParams();

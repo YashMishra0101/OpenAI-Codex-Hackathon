@@ -18,6 +18,8 @@ const BAR_CONFIG: Record<string, { fill: string; label: string }> = {
   Interview: { fill: 'hsl(38 92% 50%)',   label: 'Interview' },
   Offer:     { fill: 'hsl(160 84% 39%)',  label: 'Offer'     },
   Rejected:  { fill: 'hsl(0 84% 60%)',    label: 'Rejected'  },
+  'On Hold': { fill: 'hsl(262 83% 58%)',  label: 'On Hold'   },
+  Withdrawn: { fill: 'hsl(215 14% 34%)',  label: 'Withdrawn' },
 };
 
 function CustomTooltip({ active, payload, label }: any) {
@@ -30,7 +32,8 @@ function CustomTooltip({ active, payload, label }: any) {
         <span style={{ color: cfg?.fill }} className="font-bold">
           {payload[0].value}
         </span>{' '}
-        application{payload[0].value !== 1 ? 's' : ''}
+        {label === 'Reminder' ? 'reminder' : 'application'}
+        {payload[0].value !== 1 ? 's' : ''}
       </p>
     </div>
   );
@@ -40,16 +43,18 @@ export function JobAnalyticsChart() {
   const { data: stats, isLoading, isError } = useJobStats();
 
   const total = stats
-    ? stats.Saved + stats.Applied + stats.Interview + stats.Offer + stats.Rejected
+    ? stats.Saved + stats.Applied + stats.Interview + stats.Offer + stats.Rejected + (stats.OnHold ?? 0) + (stats.Withdrawn ?? 0)
     : 0;
 
   const chartData = stats
     ? [
-        { name: 'Reminder',  count: stats.Saved     },
+        { name: 'Reminder',  count: stats.TotalReminders ?? 0 },
         { name: 'Applied',   count: stats.Applied   },
         { name: 'Interview', count: stats.Interview },
         { name: 'Offer',     count: stats.Offer     },
         { name: 'Rejected',  count: stats.Rejected  },
+        { name: 'On Hold',   count: stats.OnHold ?? 0 },
+        { name: 'Withdrawn', count: stats.Withdrawn ?? 0 },
       ]
     : [];
 

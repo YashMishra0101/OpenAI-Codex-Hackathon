@@ -34,10 +34,11 @@ import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 const jobFormSchema = z.object({
   companyName: z.string().min(1, 'Company name is required').max(100),
   jobTitle: z.string().min(1, 'Job title is required').max(100),
-  status: z.enum(['Saved', 'Applied', 'Interview', 'Offer', 'Rejected']),
+  status: z.enum(['Saved', 'Applied', 'Interview', 'Offer', 'Rejected', 'OnHold', 'Withdrawn']),
   url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
   location: z.string().max(100).optional(),
   salary: z.string().max(100).optional(),
+  // Empty string is valid from the date input — we normalise it to undefined on submit
   appliedDate: z.string().optional(),
   notes: z.string().max(2000).optional(),
 });
@@ -56,6 +57,8 @@ const STATUS_OPTIONS = [
   { value: 'Interview', label: 'Interview' },
   { value: 'Offer',     label: 'Offer' },
   { value: 'Rejected',  label: 'Rejected' },
+  { value: 'OnHold',    label: 'On Hold' },
+  { value: 'Withdrawn', label: 'Withdrawn' },
 ] as const;
 
 export function JobFormDialog({ open, onOpenChange, job }: JobFormDialogProps) {
@@ -106,24 +109,45 @@ export function JobFormDialog({ open, onOpenChange, job }: JobFormDialogProps) {
   }, [job, open, form]);
 
   const onSubmit = (values: JobFormValues) => {
+    // ── Key fix for the "Add Job" intermittent failure bug ──────────────────
+    // HTML date inputs submit an empty string '' when left blank.
+    // The backend Zod schema uses .datetime() which rejects '' — it expects
+    // a valid ISO 8601 string or undefined. We normalise here on the client
+    // so the server never receives an invalid appliedDate value.
+    const payload = {
+      ...values,
+      appliedDate: values.appliedDate
+        ? new Date(values.appliedDate).toISOString()
+        : undefined,
+    };
+
+    const handleError = (err: any) => {
+      // Surface the specific API error message instead of a generic fallback
+      const message =
+        err?.response?.data?.message ||
+        err?.response?.data?.errors?.[0]?.message ||
+        (isEditMode ? 'Failed to update job' : 'Failed to add job');
+      toast.error(message);
+    };
+
     if (isEditMode && job) {
       updateMutation.mutate(
-        { id: job._id, data: values },
+        { id: job._id, data: payload },
         {
           onSuccess: () => {
             toast.success('Job application updated');
             onOpenChange(false);
           },
-          onError: () => toast.error('Failed to update job'),
+          onError: handleError,
         }
       );
     } else {
-      createMutation.mutate(values, {
+      createMutation.mutate(payload, {
         onSuccess: () => {
           toast.success('Job application added');
           onOpenChange(false);
         },
-        onError: () => toast.error('Failed to add job'),
+        onError: handleError,
       });
     }
   };
@@ -243,7 +267,10 @@ export function JobFormDialog({ open, onOpenChange, job }: JobFormDialogProps) {
                 name="appliedDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Applied Date</FormLabel>
+                    <FormLabel>
+                      Applied Date{' '}
+                      <span className="text-muted-foreground font-normal">(optional)</span>
+                    </FormLabel>
                     <FormControl>
                       <Input type="date" {...field} />
                     </FormControl>

@@ -28,7 +28,7 @@ export function Navbar() {
     { name: 'Job Tracker', path: '/jobs', protected: true },
   ];
 
-  const handleProtectedNavigation = (e: React.MouseEvent<HTMLAnchorElement>, path: string, isProtected?: boolean) => {
+  const handleProtectedNavigation = (e: React.MouseEvent<HTMLAnchorElement>, _path: string, isProtected?: boolean) => {
     if (isProtected && !isAuthenticated) {
       e.preventDefault();
       toast.error('Please log in or create an account to use this feature');
