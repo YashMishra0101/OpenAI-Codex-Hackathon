@@ -30,7 +30,21 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-call': 'warn',
       '@typescript-eslint/no-unsafe-argument': 'warn',
       '@typescript-eslint/no-unsafe-return': 'warn',
+      // async event handlers in React (e.g. onSubmit) are valid patterns
+      '@typescript-eslint/no-misused-promises': ['warn', { checksVoidReturn: { attributes: false } }],
+      '@typescript-eslint/no-unnecessary-type-assertion': 'warn',
     },
+  },
+  {
+    files: ['**/*.test.tsx', '**/*.test.ts', 'src/tests/**/*.ts', 'src/tests/**/*.tsx'],
+    rules: {
+      '@typescript-eslint/no-unsafe-assignment': 'off',
+      '@typescript-eslint/no-unsafe-member-access': 'off',
+      '@typescript-eslint/no-unsafe-call': 'off',
+      '@typescript-eslint/no-unsafe-argument': 'off',
+      '@typescript-eslint/no-explicit-any': 'off',
+      '@typescript-eslint/no-unused-vars': 'off',
+    }
   },
   {
     ignores: ['dist/**', 'node_modules/**', 'eslint.config.js', 'vite.config.ts'],

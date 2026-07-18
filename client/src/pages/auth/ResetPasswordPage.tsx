@@ -43,7 +43,7 @@ export function ResetPasswordPage() {
         password: data.password,
       });
       toast.success('Password reset successfully! You can now log in.');
-      navigate('/login');
+      void navigate('/login');
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to reset password. The link may be invalid or expired.');
     } finally {
