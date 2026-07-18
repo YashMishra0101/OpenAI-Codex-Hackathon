@@ -33,7 +33,7 @@ describe('JobCard', () => {
     expect(screen.getByText('Interview')).toBeInTheDocument();
     expect(screen.getByText('San Francisco')).toBeInTheDocument();
     expect(screen.getByText('$150k - $200k')).toBeInTheDocument();
-    expect(screen.getByText(/Updated/i)).toBeInTheDocument();
+    expect(screen.getByText('Jan 1, 2023')).toBeInTheDocument();
   });
 
   it('calls onEdit when edit menu item is clicked', async () => {
@@ -58,7 +58,7 @@ describe('JobCard', () => {
 
     await user.click(screen.getByRole('button'));
     
-    const reminderItem = await screen.findByText('Set Reminder');
+    const reminderItem = await screen.findByText('Reminder');
     await user.click(reminderItem);
     
     expect(handleSetReminder).toHaveBeenCalledWith(mockJob);

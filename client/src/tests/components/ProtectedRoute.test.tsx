@@ -13,6 +13,11 @@ vi.mock('react-router-dom', async () => {
   };
 });
 
+// Mock the AuthContext hook
+vi.mock('@/features/auth/context/AuthContext', () => ({
+  useAuth: vi.fn(() => ({ isAuthenticated: false, isLoading: false })),
+}));
+
 describe('ProtectedRoute', () => {
   it('redirects to /login when unauthenticated (scaffold behavior)', () => {
     // Currently useIsAuthenticated is hardcoded to false

@@ -14,7 +14,7 @@ describe('LoginForm', () => {
     renderWithRouter(<LoginForm onSubmit={vi.fn()} />);
     
     expect(screen.getByLabelText(/Email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Password/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^Password$/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Sign In/i })).toBeInTheDocument();
   });
 
@@ -56,7 +56,7 @@ describe('LoginForm', () => {
     renderWithRouter(<LoginForm onSubmit={handleSubmit} />);
     
     await user.type(screen.getByLabelText(/Email/i), 'test@example.com');
-    await user.type(screen.getByLabelText(/Password/i), 'ValidPassword123!');
+    await user.type(screen.getByLabelText(/^Password$/i), 'ValidPassword123!');
     
     await user.click(screen.getByRole('button', { name: /Sign In/i }));
     
@@ -73,6 +73,6 @@ describe('LoginForm', () => {
     
     expect(screen.getByRole('button', { name: /Signing in.../i })).toBeDisabled();
     expect(screen.getByLabelText(/Email/i)).toBeDisabled();
-    expect(screen.getByLabelText(/Password/i)).toBeDisabled();
+    expect(screen.getByLabelText(/^Password$/i)).toBeDisabled();
   });
 });
