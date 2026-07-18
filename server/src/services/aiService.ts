@@ -158,7 +158,7 @@ export async function analyzeResume(params: AIAnalysisParams): Promise<any> {
         throw new Error(`OpenRouter API error: ${response.status}`);
       }
 
-      const completion = await response.json();
+      const completion = await response.json() as any;
       resultString = completion.choices?.[0]?.message?.content || '';
       
       if (resultString) {
@@ -283,7 +283,7 @@ The JSON object MUST have this exact schema:
         throw new Error(`OpenRouter API error: ${response.status}`);
       }
 
-      const completion = await response.json();
+      const completion = await response.json() as any;
       resultString = completion.choices?.[0]?.message?.content || '';
     } catch (err: any) {
       logger.error('OPENROUTER_QUESTIONS_FAILURE', { error: err.message });
