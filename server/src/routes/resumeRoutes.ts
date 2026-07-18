@@ -61,7 +61,7 @@ async function validatePdfMagicBytes(
       return next(new ApiError(HTTP.BAD_REQUEST, 'Uploaded file is not a valid PDF.'));
     }
     return next();
-  } catch (_err) {
+  } catch {
     await fs.unlink(req.file.path).catch(() => {});
     return next(new ApiError(HTTP.BAD_REQUEST, 'Failed to validate uploaded file.'));
   }

@@ -256,7 +256,7 @@ The JSON object MUST have this exact schema:
         });
         resultString = response.text || '';
         if (resultString) break;
-      } catch (_err) {
+      } catch {
         // next model
       }
     }
