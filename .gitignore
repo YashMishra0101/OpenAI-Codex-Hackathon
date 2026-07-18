@@ -44,6 +44,6 @@ Thumbs.db
 *.sln
 *.sw?
 
-# AI assistant local instructions/tooling
+# Project tooling
 .codex/
 

@@ -24,10 +24,10 @@ router.get('/health', (_req: Request, res: Response): void => {
   });
 });
 
-// Feature routers — mounted as each phase completes
-router.use('/auth', authRoutes);          // ✔ Phase 3/4
-router.use('/users', userRoutes);         // ✔ Phase 7
-router.use('/resumes', resumeRoutes);     // ✔ Phase 8/9
+// Feature routers
+router.use('/auth', authRoutes);
+router.use('/users', userRoutes);
+router.use('/resumes', resumeRoutes);
 router.use('/jobs', jobRoutes);
 
 export default router;

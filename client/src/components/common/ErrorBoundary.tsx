@@ -31,8 +31,8 @@ interface ErrorBoundaryState {
  *     <AIResumeChecker />
  *   </ErrorBoundary>
  *
- * In Phase 12, Sentry.captureException will be added to componentDidCatch
- * for production error tracking.
+ * Sentry.captureException can be wired into componentDidCatch
+ * for production error tracking when the DSN is configured.
  */
 export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
   constructor(props: ErrorBoundaryProps) {
@@ -45,7 +45,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   }
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
-    // TODO (Phase 19): Sentry.captureException(error, { extra: info });
+    // TODO: wire Sentry.captureException(error, { extra: info }) when DSN is configured
     console.error('[ErrorBoundary] Caught error:', error.message, info.componentStack);
   }
 
