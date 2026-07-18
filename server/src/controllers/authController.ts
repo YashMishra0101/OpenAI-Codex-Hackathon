@@ -25,7 +25,7 @@ import type {
 const cookieBase: CookieOptions = {
   httpOnly: true,                              // Not readable by client JS — XSS protection
   secure: env.NODE_ENV === 'production',       // HTTPS-only in production
-  sameSite: 'lax',                             // Allows cross-site redirects (e.g. Google Auth)
+  sameSite: env.NODE_ENV === 'production' ? 'none' : 'lax', // MUST be 'none' for cross-site (Vercel -> Render)
   path: '/',
 };
 
