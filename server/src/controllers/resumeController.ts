@@ -20,7 +20,7 @@ export async function analyzeResumeHandler(req: Request, res: Response): Promise
     pdfPath: req.file.path,
     jobDescription,
     searchPreferences,
-  });
+  }) as { _id: unknown };
 
   logger.info('RESUME_ANALYSIS_COMPLETED', { userId, resumeId: resume._id });
 

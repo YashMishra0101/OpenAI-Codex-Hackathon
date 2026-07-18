@@ -28,14 +28,14 @@ export async function sendEmail({
 }): Promise<boolean> {
   try {
     if (transporter) {
-      const info = await transporter.sendMail({
+      const info: nodemailer.SentMessageInfo = await transporter.sendMail({
         from: `"AI Resume Checker & Job Tracker" <${env.SMTP_USER}>`,
         to,
         subject,
         html,
       });
 
-      logger.info(`Email sent to ${to} (Message-ID: ${info.messageId})`);
+      logger.info(`Email sent to ${to} (Message-ID: ${String(info.messageId)})`);
       return true;
     } else {
       // MOCK MODE

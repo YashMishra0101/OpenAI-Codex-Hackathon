@@ -85,7 +85,7 @@ export async function updateProfile(userId: string, dto: UpdateProfileDto): Prom
  * Falls back to URL-based extraction if public_id is not available (for
  * images uploaded before this field was introduced).
  */
-async function deleteImageFromCloudinary(imageUrl: string, publicId?: string | null) {
+async function deleteImageFromCloudinary(imageUrl: string, publicId?: string | null): Promise<void> {
   if (!imageUrl && !publicId) return;
 
   try {
@@ -102,8 +102,8 @@ async function deleteImageFromCloudinary(imageUrl: string, publicId?: string | n
       await cloudinary.uploader.destroy(idToDelete);
       logger.info('CLOUDINARY_IMAGE_DELETED', { publicId: idToDelete });
     }
-  } catch (error: any) {
-    logger.error('CLOUDINARY_DELETE_ERROR', { error: error.message, imageUrl });
+  } catch (error: unknown) {
+    logger.error('CLOUDINARY_DELETE_ERROR', { error: error instanceof Error ? error.message : String(error), imageUrl });
   }
 }
 
@@ -124,15 +124,15 @@ export async function updateProfileImage(userId: string, filePath: string): Prom
         { quality: 'auto', fetch_format: 'auto' },
       ],
     });
-  } catch (err: any) {
-    logger.error('CLOUDINARY_UPLOAD_ERROR', { error: err.message, userId });
+  } catch (err: unknown) {
+    logger.error('CLOUDINARY_UPLOAD_ERROR', { error: err instanceof Error ? err.message : String(err), userId });
     throw new ApiError(HTTP.INTERNAL_SERVER_ERROR, 'Failed to upload image to cloud storage');
   } finally {
     // ALWAYS clean up the temporary file, whether upload succeeds or fails
     try {
       await fs.unlink(filePath);
-    } catch (cleanupErr: any) {
-      logger.error('FILE_CLEANUP_ERROR', { error: cleanupErr.message, filePath });
+    } catch (cleanupErr: unknown) {
+      logger.error('FILE_CLEANUP_ERROR', { error: cleanupErr instanceof Error ? cleanupErr.message : String(cleanupErr), filePath });
     }
   }
 

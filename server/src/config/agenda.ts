@@ -1,4 +1,4 @@
-import { Agenda } from 'agenda';
+import { Agenda, Job } from 'agenda';
 import { env } from './env.js';
 import logger from '../utils/logger.js';
 import { sendEmail } from './emailService.js';
@@ -22,7 +22,13 @@ function htmlEscape(str: string): string {
 }
 
 // Define Jobs
-agenda.define('send-interview-reminder', async (job: any) => {
+agenda.define('send-interview-reminder', async (job: Job<{
+  to: string;
+  companyName: string;
+  jobTitle: string;
+  notes?: string;
+  jobId?: string;
+}>) => {
   const { to, companyName, jobTitle, notes, jobId } = job.attrs.data as {
     to: string;
     companyName: string;
@@ -55,7 +61,7 @@ agenda.define('send-interview-reminder', async (job: any) => {
 
   if (sent) {
     // Remove the Agenda job document — reminder is a one-shot, not recurring
-    await job.remove();
+    await (job.remove() as Promise<void>);
     logger.info('REMINDER_EMAIL_SENT_AND_CLEANED', { to, jobId });
 
     // Decrement reminderCount on the JobApplication if we have a jobId
@@ -70,7 +76,7 @@ agenda.define('send-interview-reminder', async (job: any) => {
 });
 
 // Start Agenda
-export async function startAgenda() {
+export async function startAgenda(): Promise<void> {
   try {
     await agenda.start();
     logger.info('Agenda background job processor started successfully.');
@@ -80,7 +86,8 @@ export async function startAgenda() {
 }
 
 // Graceful shutdown
-process.on('SIGTERM', async () => {
-  await agenda.stop();
-  process.exit(0);
+process.on('SIGTERM', () => {
+  void agenda.stop().then(() => {
+    process.exit(0);
+  });
 });

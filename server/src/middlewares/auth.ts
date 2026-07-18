@@ -21,11 +21,11 @@ import type { AccessTokenPayload } from '../types/auth.js';
  *
  * The Axios interceptor in the frontend handles the 401 → token refresh flow.
  */
-export async function authenticate(
+export function authenticate(
   req: Request,
   _res: Response,
   next: NextFunction,
-): Promise<void> {
+): void {
   const token = req.cookies['accessToken'] as string | undefined;
 
   if (!token) {

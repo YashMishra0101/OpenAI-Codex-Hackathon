@@ -52,8 +52,9 @@ mongoose.connection.on('disconnected', () => {
   logger.warn('MongoDB disconnected');
 });
 
-process.on('SIGINT', async () => {
-  await mongoose.connection.close();
-  logger.info('MongoDB connection closed (SIGINT)');
-  process.exit(0);
+process.on('SIGINT', () => {
+  void mongoose.connection.close().then(() => {
+    logger.info('MongoDB connection closed (SIGINT)');
+    process.exit(0);
+  });
 });

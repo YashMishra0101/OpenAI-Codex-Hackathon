@@ -61,7 +61,7 @@ async function validatePdfMagicBytes(
       return next(new ApiError(HTTP.BAD_REQUEST, 'Uploaded file is not a valid PDF.'));
     }
     return next();
-  } catch (err: any) {
+  } catch (_err) {
     await fs.unlink(req.file.path).catch(() => {});
     return next(new ApiError(HTTP.BAD_REQUEST, 'Failed to validate uploaded file.'));
   }
@@ -89,8 +89,9 @@ function validateAnalyzeBody(req: Request, _res: Response, next: NextFunction): 
   try {
     analyzeBodySchema.parse(req.body);
     next();
-  } catch (err: any) {
-    next(new ApiError(HTTP.UNPROCESSABLE_ENTITY, err.errors?.[0]?.message ?? 'Invalid input fields.'));
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : 'Invalid input fields.';
+    next(new ApiError(HTTP.UNPROCESSABLE_ENTITY, msg));
   }
 }
 

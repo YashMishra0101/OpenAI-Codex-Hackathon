@@ -18,7 +18,7 @@ interface AnalyzeResumeInput {
   searchPreferences?: string;
 }
 
-export async function processAndAnalyzeResume(input: AnalyzeResumeInput) {
+export async function processAndAnalyzeResume(input: AnalyzeResumeInput): Promise<unknown> {
   const { userId, pdfPath, jobDescription, searchPreferences } = input;
   
   let resumeText = '';
@@ -33,8 +33,8 @@ export async function processAndAnalyzeResume(input: AnalyzeResumeInput) {
     // Always clean up the temporary PDF file to prevent OOM / disk leaks
     try {
       await fs.unlink(pdfPath);
-    } catch (cleanupErr: any) {
-      logger.error('FILE_CLEANUP_ERROR', { error: cleanupErr.message, pdfPath });
+    } catch (cleanupErr: unknown) {
+      logger.error('FILE_CLEANUP_ERROR', { error: cleanupErr instanceof Error ? cleanupErr.message : String(cleanupErr), pdfPath });
     }
   }
 

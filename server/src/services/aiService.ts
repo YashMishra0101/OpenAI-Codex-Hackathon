@@ -4,6 +4,12 @@ import logger from '../utils/logger.js';
 import { ApiError } from '../utils/ApiError.js';
 import { HTTP } from '../constants/httpStatus.js';
 import { aiResponseSchema } from '../validations/resumeValidation.js';
+import type { z } from 'zod';
+
+// Shape of an OpenRouter chat completion response (only fields we use)
+interface OpenRouterCompletion {
+  choices?: Array<{ message?: { content?: string } }>;
+}
 
 /**
  * Bounded in-memory LRU cache for AI responses.
@@ -74,11 +80,11 @@ The JSON object MUST have this exact schema:
   "interviewQuestions": ["...", "..."], // Exactly 30 tailored questions
   "searchQueries": [ // Generate exactly 15 authentic Google Dork search queries — quality over quantity
     // 8 queries of category "job" — help find relevant job openings based on resume skills & experience
-    { "query": "site:lever.co OR site:greenhouse.io intitle:\"Software Engineer\" \"React\"", "category": "job" },
+    { "query": "site:lever.co OR site:greenhouse.io intitle:'Software Engineer' 'React'", "category": "job" },
     // 4 queries of category "learning" — help find interview preparation, technical prep, coding resources
-    { "query": "site:github.com \"frontend interview questions\" \"react\"", "category": "learning" },
+    { "query": "site:github.com 'frontend interview questions' 'react'", "category": "learning" },
     // 3 queries of category "interview" — help find real interview experiences, candidate stories, hiring process insights
-    { "query": "site:reddit.com/r/cscareerquestions \"Google\" \"interview experience\" \"frontend\"", "category": "interview" }
+    { "query": "site:reddit.com/r/cscareerquestions 'Google' 'interview experience' 'frontend'", "category": "interview" }
   ]
 }
 `;
@@ -86,7 +92,7 @@ The JSON object MUST have this exact schema:
   return prompt;
 }
 
-export async function analyzeResume(params: AIAnalysisParams): Promise<any> {
+export async function analyzeResume(params: AIAnalysisParams): Promise<z.infer<typeof aiResponseSchema>> {
   const prompt = buildPrompt(params);
 
   // 1. SHA-256 cache key
@@ -120,11 +126,11 @@ export async function analyzeResume(params: AIAnalysisParams): Promise<any> {
           logger.info('AI_PRIMARY_SUCCESS', { provider: 'Gemini', model: modelName });
           break;
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         logger.warn('GEMINI_MODEL_FAILED', {
           model: modelName,
-          status: err.status,
-          error: err.message?.substring(0, 120),
+          status: err instanceof Error ? (err as NodeJS.ErrnoException).code : 'unknown',
+          error: err instanceof Error ? err.message.substring(0, 120) : String(err),
         });
         // 429 quota exhausted or 404 model unavailable — try next model
       }
@@ -158,14 +164,14 @@ export async function analyzeResume(params: AIAnalysisParams): Promise<any> {
         throw new Error(`OpenRouter API error: ${response.status}`);
       }
 
-      const completion = await response.json() as any;
-      resultString = completion.choices?.[0]?.message?.content || '';
+      const completion = await response.json() as OpenRouterCompletion;
+      resultString = completion.choices?.[0]?.message?.content ?? '';
       
       if (resultString) {
         logger.info('AI_FALLBACK_SUCCESS', { provider: 'OpenRouter' });
       }
-    } catch (fallbackError: any) {
-      logger.error('OPENROUTER_FAILURE_FATAL', { error: fallbackError.message });
+    } catch (fallbackError: unknown) {
+      logger.error('OPENROUTER_FAILURE_FATAL', { error: fallbackError instanceof Error ? fallbackError.message : String(fallbackError) });
       throw new ApiError(
         HTTP.INTERNAL_SERVER_ERROR,
         'AI Providers are currently unavailable. Please try again in a few minutes.',
@@ -190,10 +196,10 @@ export async function analyzeResume(params: AIAnalysisParams): Promise<any> {
     setCacheEntry(hash, JSON.stringify(validatedData));
 
     return validatedData;
-  } catch (parseError: any) {
+  } catch (parseError: unknown) {
     logger.error('AI_RESPONSE_PARSE_ERROR', {
       rawResponse: resultString.substring(0, 500),
-      error: parseError.message,
+      error: parseError instanceof Error ? parseError.message : String(parseError),
     });
     throw new ApiError(HTTP.INTERNAL_SERVER_ERROR, 'Failed to parse AI analysis response.');
   }
@@ -250,7 +256,7 @@ The JSON object MUST have this exact schema:
         });
         resultString = response.text || '';
         if (resultString) break;
-      } catch (err) {
+      } catch (_err) {
         // next model
       }
     }
@@ -283,10 +289,10 @@ The JSON object MUST have this exact schema:
         throw new Error(`OpenRouter API error: ${response.status}`);
       }
 
-      const completion = await response.json() as any;
-      resultString = completion.choices?.[0]?.message?.content || '';
-    } catch (err: any) {
-      logger.error('OPENROUTER_QUESTIONS_FAILURE', { error: err.message });
+      const completion = await response.json() as OpenRouterCompletion;
+      resultString = completion.choices?.[0]?.message?.content ?? '';
+    } catch (err: unknown) {
+      logger.error('OPENROUTER_QUESTIONS_FAILURE', { error: err instanceof Error ? err.message : String(err) });
       throw new ApiError(HTTP.INTERNAL_SERVER_ERROR, 'AI Providers are currently unavailable.');
     }
   }
@@ -303,7 +309,8 @@ The JSON object MUST have this exact schema:
     
     setCacheEntry(hash, JSON.stringify(validatedData));
     return validatedData.interviewQuestions;
-  } catch (parseError: any) {
+  } catch (parseError: unknown) {
+    logger.error('AI_PARSE_QUESTIONS_ERROR', { error: parseError instanceof Error ? parseError.message : String(parseError) });
     throw new ApiError(HTTP.INTERNAL_SERVER_ERROR, 'Failed to parse AI generated questions.');
   }
 }
