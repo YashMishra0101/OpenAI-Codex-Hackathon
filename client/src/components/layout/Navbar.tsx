@@ -44,7 +44,7 @@ export function Navbar() {
       await logout();
       toast.success('Logged out successfully');
       void navigate('/');
-    } catch (_err) {
+    } catch {
       toast.error('Failed to logout');
     }
   };
