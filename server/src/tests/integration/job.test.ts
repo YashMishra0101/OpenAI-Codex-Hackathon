@@ -15,8 +15,8 @@ describe('Job API Integration Tests', () => {
   const testUserA = { name: 'User A', email: 'usera@example.com', password: 'Password123!' };
   const testUserB = { name: 'User B', email: 'userb@example.com', password: 'Password123!' };
 
-  let tokenA: string;
-  let tokenB: string;
+  let cookieA: string;
+  let cookieB: string;
 
   beforeEach(async () => {
     vi.clearAllMocks();
@@ -25,13 +25,17 @@ describe('Job API Integration Tests', () => {
     await request(app).post('/api/v1/auth/register').send(testUserA);
     await User.updateOne({ email: testUserA.email }, { isVerified: true });
     const loginA = await request(app).post('/api/v1/auth/login').send({ email: testUserA.email, password: testUserA.password });
-    tokenA = loginA.body.data.accessToken;
+    const rawCookiesA = loginA.headers['set-cookie'];
+    const cookiesA = (Array.isArray(rawCookiesA) ? rawCookiesA : [rawCookiesA]).filter(Boolean) as string[];
+    cookieA = cookiesA.find(c => c.startsWith('accessToken='))!;
 
     // Register and Verify User B
     await request(app).post('/api/v1/auth/register').send(testUserB);
     await User.updateOne({ email: testUserB.email }, { isVerified: true });
     const loginB = await request(app).post('/api/v1/auth/login').send({ email: testUserB.email, password: testUserB.password });
-    tokenB = loginB.body.data.accessToken;
+    const rawCookiesB = loginB.headers['set-cookie'];
+    const cookiesB = (Array.isArray(rawCookiesB) ? rawCookiesB : [rawCookiesB]).filter(Boolean) as string[];
+    cookieB = cookiesB.find(c => c.startsWith('accessToken='))!;
   });
 
   describe('Job CRUD Operations', () => {
@@ -44,7 +48,7 @@ describe('Job API Integration Tests', () => {
     it('should create a job application', async () => {
       const res = await request(app)
         .post('/api/v1/jobs')
-        .set('Authorization', `Bearer ${tokenA}`)
+        .set('Cookie', cookieA)
         .send(jobPayload);
 
       expect(res.status).toBe(201);
@@ -56,20 +60,20 @@ describe('Job API Integration Tests', () => {
     });
 
     it('should list all jobs for the authenticated user', async () => {
-      await request(app).post('/api/v1/jobs').set('Authorization', `Bearer ${tokenA}`).send(jobPayload);
-      await request(app).post('/api/v1/jobs').set('Authorization', `Bearer ${tokenA}`).send({ ...jobPayload, companyName: 'Apple' });
-      await request(app).post('/api/v1/jobs').set('Authorization', `Bearer ${tokenB}`).send({ ...jobPayload, companyName: 'Meta' });
+      await request(app).post('/api/v1/jobs').set('Cookie', cookieA).send(jobPayload);
+      await request(app).post('/api/v1/jobs').set('Cookie', cookieA).send({ ...jobPayload, companyName: 'Apple' });
+      await request(app).post('/api/v1/jobs').set('Cookie', cookieB).send({ ...jobPayload, companyName: 'Meta' });
 
       const resA = await request(app)
         .get('/api/v1/jobs')
-        .set('Authorization', `Bearer ${tokenA}`);
+        .set('Cookie', cookieA);
 
       expect(resA.status).toBe(200);
       expect(resA.body.data.length).toBe(2);
 
       const resB = await request(app)
         .get('/api/v1/jobs')
-        .set('Authorization', `Bearer ${tokenB}`);
+        .set('Cookie', cookieB);
 
       expect(resB.status).toBe(200);
       expect(resB.body.data.length).toBe(1);
@@ -77,24 +81,24 @@ describe('Job API Integration Tests', () => {
     });
 
     it('should prevent User B from reading User A\'s job (IDOR Protection)', async () => {
-      const createRes = await request(app).post('/api/v1/jobs').set('Authorization', `Bearer ${tokenA}`).send(jobPayload);
+      const createRes = await request(app).post('/api/v1/jobs').set('Cookie', cookieA).send(jobPayload);
       const jobId = createRes.body.data._id;
 
       const res = await request(app)
         .get(`/api/v1/jobs/${jobId}`)
-        .set('Authorization', `Bearer ${tokenB}`);
+        .set('Cookie', cookieB);
 
       expect(res.status).toBe(404);
       expect(res.body.message).toMatch(/not found/i);
     });
 
     it('should update a job application', async () => {
-      const createRes = await request(app).post('/api/v1/jobs').set('Authorization', `Bearer ${tokenA}`).send(jobPayload);
+      const createRes = await request(app).post('/api/v1/jobs').set('Cookie', cookieA).send(jobPayload);
       const jobId = createRes.body.data._id;
 
       const updateRes = await request(app)
         .put(`/api/v1/jobs/${jobId}`)
-        .set('Authorization', `Bearer ${tokenA}`)
+        .set('Cookie', cookieA)
         .send({ status: 'Interview' });
 
       expect(updateRes.status).toBe(200);
@@ -102,12 +106,12 @@ describe('Job API Integration Tests', () => {
     });
 
     it('should prevent User B from deleting User A\'s job', async () => {
-      const createRes = await request(app).post('/api/v1/jobs').set('Authorization', `Bearer ${tokenA}`).send(jobPayload);
+      const createRes = await request(app).post('/api/v1/jobs').set('Cookie', cookieA).send(jobPayload);
       const jobId = createRes.body.data._id;
 
       const deleteRes = await request(app)
         .delete(`/api/v1/jobs/${jobId}`)
-        .set('Authorization', `Bearer ${tokenB}`);
+        .set('Cookie', cookieB);
 
       expect(deleteRes.status).toBe(404);
       
@@ -116,13 +120,13 @@ describe('Job API Integration Tests', () => {
     });
 
     it('should calculate job stats correctly', async () => {
-      await request(app).post('/api/v1/jobs').set('Authorization', `Bearer ${tokenA}`).send({ companyName: '1', jobTitle: 'A', status: 'Applied' });
-      await request(app).post('/api/v1/jobs').set('Authorization', `Bearer ${tokenA}`).send({ companyName: '2', jobTitle: 'B', status: 'Interview' });
-      await request(app).post('/api/v1/jobs').set('Authorization', `Bearer ${tokenA}`).send({ companyName: '3', jobTitle: 'C', status: 'Interview' });
+      await request(app).post('/api/v1/jobs').set('Cookie', cookieA).send({ companyName: '1', jobTitle: 'A', status: 'Applied' });
+      await request(app).post('/api/v1/jobs').set('Cookie', cookieA).send({ companyName: '2', jobTitle: 'B', status: 'Interview' });
+      await request(app).post('/api/v1/jobs').set('Cookie', cookieA).send({ companyName: '3', jobTitle: 'C', status: 'Interview' });
       
       const res = await request(app)
         .get('/api/v1/jobs/stats')
-        .set('Authorization', `Bearer ${tokenA}`);
+        .set('Cookie', cookieA);
 
       expect(res.status).toBe(200);
       expect(res.body.data.Applied).toBe(1);
