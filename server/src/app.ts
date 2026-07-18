@@ -31,11 +31,22 @@ const allowedOrigins = ['http://localhost:5173', env.CLIENT_URL].filter(
   (o): o is string => Boolean(o),
 );
 
+const isAllowedDevOrigin = (origin: string): boolean => {
+  if (env.NODE_ENV !== 'development') return false;
+
+  try {
+    const url = new URL(origin);
+    return ['localhost', '127.0.0.1'].includes(url.hostname);
+  } catch {
+    return false;
+  }
+};
+
 app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (Postman, curl, mobile apps)
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin) || isAllowedDevOrigin(origin)) {
         callback(null, true);
       } else {
         callback(new Error(`CORS: origin "${origin}" is not allowed`));
@@ -57,8 +68,8 @@ app.use(cookieParser());
 // ── 5. Rate Limiting ──────────────────────────────────────────────────────────
 // Three tiers of rate limiting, applied from most specific to least.
 
-// Tier 1: Strict auth limiter — protects against brute-force and email spam.
-// Applies to: login, register, forgot-password, resend-verification, Google auth.
+// Tier 1: Strict auth limiter — protects against brute-force on login/register/etc.
+// Applies to: login, register, forgot-password, Google auth.
 const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 10,                   // 10 attempts per window per IP
@@ -70,6 +81,21 @@ const authLimiter = rateLimit({
     message: 'Too many requests from this IP. Please try again in 15 minutes.',
   },
   skip: () => env.NODE_ENV === 'test', // Don't rate-limit during tests
+});
+
+// Tier 1b: Resend-verification limiter — stricter than general auth.
+// 3 resends per 15 minutes per IP is generous for real users but blocks spam.
+const resendLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 3,                    // 3 resend attempts per window per IP
+  standardHeaders: 'draft-7',
+  legacyHeaders: false,
+  message: {
+    success: false,
+    statusCode: 429,
+    message: 'Too many resend attempts. Please wait 15 minutes before trying again.',
+  },
+  skip: () => env.NODE_ENV === 'test',
 });
 
 // Tier 2: AI analysis limiter — protects AI API quota from abuse.
@@ -109,7 +135,7 @@ app.use('/api/v1', generalLimiter);
 app.use('/api/v1/auth/login', authLimiter);
 app.use('/api/v1/auth/register', authLimiter);
 app.use('/api/v1/auth/forgot-password', authLimiter);
-app.use('/api/v1/auth/resend-verification', authLimiter);
+app.use('/api/v1/auth/resend-verification', resendLimiter); // Own stricter limiter
 app.use('/api/v1/auth/google', authLimiter);
 
 // Apply AI limiter to the resume analysis endpoint

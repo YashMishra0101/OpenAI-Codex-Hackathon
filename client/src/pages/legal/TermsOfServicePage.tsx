@@ -209,9 +209,9 @@ export function TermsOfServicePage() {
               </p>
               <ul className="list-disc pl-6 space-y-2 marker:text-muted-foreground">
                 <li>
-                  <span className="font-medium text-foreground">Google Gemini and Groq</span> — AI
+                  <span className="font-medium text-foreground">Google Gemini and OpenRouter</span> — AI
                   providers used for resume analysis, interview question generation, and search query
-                  generation. Groq serves as an automatic fallback when the primary provider is
+                  generation. OpenRouter serves as an automatic fallback when the primary provider is
                   unavailable.
                 </li>
                 <li>

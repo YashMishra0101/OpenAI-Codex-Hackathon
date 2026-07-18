@@ -1,6 +1,5 @@
 import crypto from 'crypto';
 import { geminiClient } from '../config/gemini.js';
-import { groqClient } from '../config/groq.js';
 import logger from '../utils/logger.js';
 import { ApiError } from '../utils/ApiError.js';
 import { HTTP } from '../constants/httpStatus.js';
@@ -132,24 +131,41 @@ export async function analyzeResume(params: AIAnalysisParams): Promise<any> {
     }
   }
 
-  // 3. Groq fallback (if all Gemini models failed)
+  // 3. OpenRouter fallback (if all Gemini models failed)
   if (!resultString) {
     try {
-      if (!groqClient) throw new Error('Groq client not initialized');
+      if (!process.env.OPENROUTER_API_KEY) {
+        throw new Error('OPENROUTER_API_KEY not initialized');
+      }
 
-      logger.info('AI_FALLBACK_ATTEMPT', { provider: 'Groq' });
-      const completion = await groqClient.chat.completions.create({
-        messages: [{ role: 'user', content: prompt }],
-        model: 'llama-3.3-70b-versatile',
-        response_format: { type: 'json_object' },
+      logger.info('AI_FALLBACK_ATTEMPT', { provider: 'OpenRouter' });
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://github.com/YashMishra0101/OpenAI-Codex-Hackathon',
+          'X-Title': 'CodexAI Resume Analyzer'
+        },
+        body: JSON.stringify({
+          model: 'meta-llama/llama-3.3-70b-instruct:free',
+          response_format: { type: 'json_object' },
+          messages: [{ role: 'user', content: prompt }]
+        })
       });
 
-      resultString = completion.choices[0]?.message?.content || '';
-      if (resultString) {
-        logger.info('AI_FALLBACK_SUCCESS', { provider: 'Groq' });
+      if (!response.ok) {
+        throw new Error(`OpenRouter API error: ${response.status}`);
       }
-    } catch (groqError: any) {
-      logger.error('GROQ_FAILURE_FATAL', { error: groqError.message });
+
+      const completion = await response.json();
+      resultString = completion.choices?.[0]?.message?.content || '';
+      
+      if (resultString) {
+        logger.info('AI_FALLBACK_SUCCESS', { provider: 'OpenRouter' });
+      }
+    } catch (fallbackError: any) {
+      logger.error('OPENROUTER_FAILURE_FATAL', { error: fallbackError.message });
       throw new ApiError(
         HTTP.INTERNAL_SERVER_ERROR,
         'AI Providers are currently unavailable. Please try again in a few minutes.',
@@ -240,16 +256,37 @@ The JSON object MUST have this exact schema:
     }
   }
 
+  // 3. OpenRouter fallback for interview questions
   if (!resultString) {
     try {
-      if (!groqClient) throw new Error('Groq client not initialized');
-      const completion = await groqClient.chat.completions.create({
-        messages: [{ role: 'user', content: prompt }],
-        model: 'llama-3.3-70b-versatile',
-        response_format: { type: 'json_object' },
+      if (!process.env.OPENROUTER_API_KEY) {
+        throw new Error('OPENROUTER_API_KEY not initialized');
+      }
+
+      logger.info('AI_FALLBACK_ATTEMPT_QUESTIONS', { provider: 'OpenRouter' });
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'https://github.com/YashMishra0101/OpenAI-Codex-Hackathon',
+          'X-Title': 'CodexAI Resume Analyzer'
+        },
+        body: JSON.stringify({
+          model: 'meta-llama/llama-3.3-70b-instruct:free',
+          response_format: { type: 'json_object' },
+          messages: [{ role: 'user', content: prompt }]
+        })
       });
-      resultString = completion.choices[0]?.message?.content || '';
+
+      if (!response.ok) {
+        throw new Error(`OpenRouter API error: ${response.status}`);
+      }
+
+      const completion = await response.json();
+      resultString = completion.choices?.[0]?.message?.content || '';
     } catch (err: any) {
+      logger.error('OPENROUTER_QUESTIONS_FAILURE', { error: err.message });
       throw new ApiError(HTTP.INTERNAL_SERVER_ERROR, 'AI Providers are currently unavailable.');
     }
   }

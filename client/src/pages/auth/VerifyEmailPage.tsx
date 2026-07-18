@@ -4,19 +4,24 @@ import toast from 'react-hot-toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import { MailCheck, XCircle, FileText, KanbanSquare, Search } from 'lucide-react';
+import { MailCheck, MailX, ArrowRight, RefreshCw, MailOpen } from 'lucide-react';
 import api from '@/lib/axios';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/features/auth/context/AuthContext';
+
+type VerifyStatus = 'loading' | 'success' | 'error';
 
 export function VerifyEmailPage() {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
-  
-  const [status, setStatus] = useState<'loading' | 'success' | 'error'>(
-    token ? 'loading' : 'error'
-  );
-  
+  const { login } = useAuth();
+
+  const [status, setStatus] = useState<VerifyStatus>(token ? 'loading' : 'error');
+  const [errorType, setErrorType] = useState<'invalid' | 'expired' | 'no-token' | 'unknown'>('no-token');
   const [email, setEmail] = useState('');
+  const [emailError, setEmailError] = useState('');
   const [isResending, setIsResending] = useState(false);
+  const [resendSuccess, setResendSuccess] = useState(false);
   const verifyAttempted = useRef(false);
 
   useEffect(() => {
@@ -24,147 +29,228 @@ export function VerifyEmailPage() {
     verifyAttempted.current = true;
 
     api.post('/auth/verify-email', { token })
-      .then(() => {
+      .then((res) => {
+        // Automatically log the user in using the session returned from the API
+        if (res.data?.data?.user) {
+          login(res.data.data.user);
+        }
         setStatus('success');
       })
       .catch((err) => {
         setStatus('error');
-        toast.error(err.response?.data?.message || 'Verification failed');
+        const msg: string = (err.response?.data?.message ?? '').toLowerCase();
+        // Backend now sends distinct messages:
+        // 'Verification link has expired. Please request a new one.'
+        // 'Invalid verification link. Please request a new one.'
+        if (msg.includes('expired')) {
+          setErrorType('expired');
+        } else if (msg.includes('invalid')) {
+          setErrorType('invalid');
+        } else if (token) {
+          setErrorType('unknown');
+        } else {
+          setErrorType('no-token');
+        }
       });
   }, [token]);
 
+  const validateEmail = (value: string) => {
+    if (!value) return 'Please enter your email address.';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return 'Please enter a valid email address.';
+    return '';
+  };
+
   const handleResend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email) return;
-    
+    const error = validateEmail(email);
+    if (error) {
+      setEmailError(error);
+      return;
+    }
+    setEmailError('');
+
     try {
       setIsResending(true);
       await api.post('/auth/resend-verification', { email });
-      toast.success('Verification email sent (if account exists).');
+      setResendSuccess(true);
+      toast.success('Verification email sent! Check your inbox.');
       setEmail('');
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to resend');
+      toast.error(err.response?.data?.message || 'Something went wrong. Please try again.');
     } finally {
       setIsResending(false);
     }
   };
 
+  /* ── Per-state content ─────────────────────────────────────────────────── */
+
+  const stateContent = {
+    loading: {
+      icon: (
+        <div className="w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center">
+          <LoadingSpinner size="lg" />
+        </div>
+      ),
+      title: 'Verifying your email…',
+      description: 'Please hold on while we confirm your email address. This should only take a moment.',
+    },
+    success: {
+      icon: (
+        <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+          <MailCheck className="w-8 h-8 text-emerald-400" />
+        </div>
+      ),
+      title: 'Email verified!',
+      description: 'Your email address has been successfully verified. You\'re all set — welcome to CodexAI.',
+    },
+    error: {
+      icon: (
+        <div className="w-16 h-16 rounded-2xl bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+          <MailX className="w-8 h-8 text-red-400" />
+        </div>
+      ),
+      title:
+        errorType === 'expired'
+          ? 'Link has expired'
+          : errorType === 'invalid'
+            ? 'Invalid verification link'
+            : errorType === 'no-token'
+              ? 'No verification link'
+              : 'Verification failed',
+      description:
+        errorType === 'expired'
+          ? 'Your verification link has expired. Verification links are valid for 24 hours. Enter your email below to get a fresh one.'
+          : errorType === 'invalid'
+            ? 'This verification link doesn\'t look right — it may have been modified or already used. Enter your email below to request a new one.'
+            : errorType === 'no-token'
+              ? 'No verification token was found. If you signed up recently, enter your email below to resend the verification link.'
+              : 'Something unexpected happened while verifying your email. Enter your email below and we\'ll send you a fresh link.',
+    },
+  };
+
+  const { icon, title, description } = stateContent[status];
+
   return (
-    <div className="container relative min-h-screen flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
-      <Link
-        to="/login"
-        className="absolute right-4 top-4 md:right-8 md:top-8 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
-      >
-        Sign in
-      </Link>
-      
-      {/* Left side branding (hidden on mobile) */}
-      <div className="relative hidden h-full flex-col bg-muted p-10 text-white lg:flex dark:border-r">
-        <div className="absolute inset-0 bg-zinc-900" />
-        <div className="relative z-20 flex items-center gap-2 font-bold text-lg text-primary">
-          <div className="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center">
-            <span className="text-primary font-bold">C</span>
-          </div>
-          <span className="text-white">Codex<span className="text-primary">AI</span></span>
-        </div>
-        
-        <div className="relative z-20 mt-auto space-y-10">
-          <div className="space-y-4">
-            <div className="inline-flex items-center rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
-              <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
-              Welcome to CodexAI
-            </div>
-            <h2 className="text-3xl lg:text-4xl font-bold tracking-tight text-white leading-[1.2]">
-              The <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-emerald-300">AI-powered</span> <br />
-              resume analysis &<br />
-              job tracking system.
-            </h2>
-            <p className="text-zinc-400 text-base max-w-sm">
-              Everything you need to land your next role, unified in one elegant workspace.
-            </p>
-          </div>
-          
-          <div className="space-y-5">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/20">
-                <FileText className="w-5 h-5 text-primary" />
-              </div>
-              <span className="text-base font-medium text-zinc-300">AI Resume Checker</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/20">
-                <KanbanSquare className="w-5 h-5 text-primary" />
-              </div>
-              <span className="text-base font-medium text-zinc-300">Smart Job Tracker</span>
-            </div>
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0 border border-primary/20">
-                <Search className="w-5 h-5 text-primary" />
-              </div>
-              <span className="text-base font-medium text-zinc-300">Advanced Google Dorks</span>
-            </div>
-          </div>
-        </div>
-      </div>
+    <div className="flex-1 flex flex-col bg-surface/30">
+      <div className="flex-1 flex items-center justify-center px-4 py-10">
+        <div className="w-full max-w-[480px]">
 
-      {/* Right side form */}
-      <div className="lg:p-8 flex items-center justify-center w-full h-full">
-        <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
-          
-          <div className="flex flex-col space-y-2 text-center items-center">
-            {status === 'loading' && <LoadingSpinner size="lg" className="mb-4" />}
-            {status === 'success' && <MailCheck className="h-12 w-12 text-primary mb-2" />}
-            {status === 'error' && <XCircle className="h-12 w-12 text-destructive mb-2" />}
-            
-            <h1 className="text-2xl font-semibold tracking-tight">
-              Email Verification
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              {status === 'loading' && 'Verifying your email address, please wait...'}
-              {status === 'success' && 'Your email has been successfully verified!'}
-              {status === 'error' && (token ? 'The verification link is invalid or expired.' : 'No verification token provided.')}
-            </p>
-          </div>
-          
-          <div className="grid gap-6">
+          {/* Card */}
+          <div className="rounded-2xl border border-border/60 bg-surface/80 shadow-lg shadow-black/20 p-8 flex flex-col items-center text-center gap-5">
+
+            {/* Icon */}
+            {icon}
+
+            {/* Heading + description */}
+            <div className="space-y-2">
+              <h1 className="text-2xl font-bold tracking-tight">{title}</h1>
+              <p className="text-sm text-muted-foreground leading-relaxed">{description}</p>
+            </div>
+
+            {/* ── SUCCESS ── */}
             {status === 'success' && (
-              <Button asChild className="w-full">
-                <Link to="/login">Proceed to Login</Link>
-              </Button>
+              <div className="w-full flex flex-col gap-3 pt-1">
+                <Button asChild className="w-full h-10 text-sm font-medium">
+                  <Link to="/analyzer">
+                    Continue to Resume Checker
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
             )}
 
+            {/* ── ERROR — resend form ── */}
             {status === 'error' && (
-              <form onSubmit={handleResend} className="space-y-4">
-                <div className="space-y-2">
-                  <Input
-                    type="email"
-                    placeholder="m@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                    disabled={isResending}
-                  />
-                </div>
-                <Button type="submit" className="w-full" disabled={isResending}>
-                  {isResending ? (
-                    <>
-                      <LoadingSpinner size="sm" className="mr-2" />
-                      Sending...
-                    </>
-                  ) : (
-                    'Resend Verification Email'
-                  )}
-                </Button>
-              </form>
+              <div className="w-full flex flex-col gap-4 pt-1">
+                {resendSuccess ? (
+                  /* Post-resend success state */
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="flex items-center gap-2.5 w-full rounded-lg border border-emerald-500/30 bg-emerald-500/10 px-3 py-2.5 text-sm font-medium text-emerald-400">
+                      <MailOpen className="h-4 w-4 shrink-0" />
+                      <span>Email sent! Check your inbox and spam folder.</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setResendSuccess(false)}
+                      className="text-xs text-muted-foreground hover:text-foreground transition-colors underline underline-offset-4"
+                    >
+                      Didn't receive it? Try again
+                    </button>
+                  </div>
+                ) : (
+                  /* Resend form */
+                  <form onSubmit={handleResend} className="w-full flex flex-col gap-3" noValidate>
+                    <div className="flex flex-col gap-1.5 text-left">
+                      <label htmlFor="resend-email" className="text-sm font-medium">
+                        Email address
+                      </label>
+                      <Input
+                        id="resend-email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={email}
+                        onChange={(e) => {
+                          setEmail(e.target.value);
+                          if (emailError) setEmailError('');
+                        }}
+                        disabled={isResending}
+                        className={cn('h-10 text-sm', emailError && 'border-red-500/70 focus-visible:ring-red-500/40')}
+                        autoComplete="email"
+                      />
+                      {emailError && (
+                        <p className="text-xs text-red-400">{emailError}</p>
+                      )}
+                    </div>
+                    <Button
+                      type="submit"
+                      className="w-full h-10 text-sm font-medium"
+                      disabled={isResending}
+                    >
+                      {isResending ? (
+                        <>
+                          <LoadingSpinner size="sm" className="mr-2" />
+                          Sending email…
+                        </>
+                      ) : (
+                        <>
+                          <RefreshCw className="mr-2 h-4 w-4" />
+                          Resend Verification Email
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                )}
+              </div>
             )}
+
+            {/* Divider */}
+            <div className="w-full border-t border-border/40" />
+
+            {/* Footer links */}
+            <div className="flex flex-col items-center gap-1.5 w-full">
+              {status === 'error' && (
+                <p className="text-sm text-muted-foreground">
+                  Already verified?{' '}
+                  <Link
+                    to="/login"
+                    className="font-medium text-primary hover:text-primary-hover transition-colors"
+                  >
+                    Sign in
+                  </Link>
+                </p>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Need help?{' '}
+                <a
+                  href="mailto:support@codexai.com"
+                  className="underline underline-offset-4 hover:text-foreground transition-colors"
+                >
+                  Contact support
+                </a>
+              </p>
+            </div>
           </div>
-          
-          <p className="px-8 text-center text-sm text-muted-foreground">
-            Having trouble?{' '}
-            <a href="mailto:support@codexai.com" className="underline underline-offset-4 hover:text-primary">
-              Contact Support
-            </a>
-          </p>
+
         </div>
       </div>
     </div>

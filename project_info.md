@@ -25,7 +25,7 @@ This project goes beyond a typical MERN stack application. Here are the key diff
 
 | Feature | Technology | What It Does |
 |---------|------------|--------------|
-| **AI Integration** | Google Gemini 3.5 Flash + Groq API | Intelligent resume analysis with AI provider fallback for reliability |
+| **AI Integration** | Google Gemini 3.5 Flash + OpenRouter | Intelligent resume analysis with AI provider fallback for reliability |
 | **Type Safety** | TypeScript (strict mode) + Zod | Compile-time contracts plus runtime validation at every untrusted boundary |
 | **System Design** | Scalable Architecture | Modular folder structure, clean code patterns, and database design best practices |
 | **Performance & Cost** | SHA-256 Caching | Hashes inputs to bypass redundant API calls, dropping latency from ~5s down to ~50ms and saving free-tier tokens |
@@ -44,7 +44,7 @@ This project goes beyond a typical MERN stack application. Here are the key diff
 | **Frontend** | TypeScript, React 19, React Compiler, Vite, TailwindCSS 4, shadcn/ui, React Router v7 (library mode), TanStack Query, Axios, React Hook Form, Zod, React Hot Toast, Phosphor Icons |
 | **Backend** | TypeScript, Node.js, Express, JWT, argon2, Multer, pdf-parse, Agenda.js |
 | **Testing** | Vitest, React Testing Library (Frontend), Supertest (Backend API) |
-| **AI** | Google Gemini 3.5 Flash API free tier (primary) + Groq API free tier (fallback) |
+| **AI** | Google Gemini 3.5 Flash API free tier (primary) + OpenRouter free tier (fallback) |
 | **Database** | MongoDB Atlas + Mongoose (ODM) |
 | **Storage** | Cloudinary |
 | **Email** | Nodemailer + Gmail |
@@ -92,7 +92,7 @@ After signup or login, users can manage their profile:
 3. **Caching Check (Performance/Cost Optimization):** The backend generates a SHA-256 hash of the extracted resume text + job description + search preferences. It checks MongoDB:
    - *If an identical hash exists* → Instantly returns the previous analysis results (~50ms, Free).
    - *If no match* → Proceeds to the AI API.
-4. AI analyzes the resume using Gemini 3.5 Flash API with Groq Qwen 3.6 27B as an automatic fallback.
+4. AI analyzes the resume using Gemini 3.5 Flash API with OpenRouter Llama 3.3 70B as an automatic fallback.
 5. Analysis results are **saved to the database** — users can view their past analyses anytime.
 
 ### Analysis Results
@@ -170,7 +170,7 @@ Stateless authentication using secure JSON Web Tokens. argon2 provides highly se
 Multer handles file uploads via diskStorage. `pdf-parse` extracts text efficiently without a full rendering engine. `Agenda.js` provides robust cron job persistence in MongoDB.
 
 ### 🤖 AI & Data
-**Google Gemini 3.5 Flash API (Primary) + Groq API (Fallback)**
+**Google Gemini 3.5 Flash API (Primary) + OpenRouter API (Fallback)**
 Implements an automatic fallback pattern. Every AI response is treated as `unknown` and strictly validated against Zod schemas before being used.
 
 ### ☁️ Infrastructure

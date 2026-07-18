@@ -23,7 +23,7 @@
 <br/>
 [![License](https://img.shields.io/badge/License-MIT-22C55E?style=for-the-badge)](./LICENSE)
 [![Gemini AI](https://img.shields.io/badge/Gemini_3.5_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://aistudio.google.com/)
-[![Groq](https://img.shields.io/badge/Groq_Qwen_3.6-27B-F55036?style=for-the-badge&logo=groq&logoColor=white)](https://groq.com/)
+[![OpenRouter](https://img.shields.io/badge/OpenRouter_Llama_3.3-362D59?style=for-the-badge&logo=openrouter&logoColor=white)](https://openrouter.ai/)
 
 🧑‍💻 Production grade platform 🚧 Actively under development ⭐ Star the repo to follow the journey
 
@@ -68,7 +68,7 @@ Upload your resume (PDF) and optionally paste a job description — the AI retur
 Keep every application organized in one powerful dashboard:
 
 - Track company, role, status, applied date, job URL, and notes
-- **6 granular status stages:**
+- **7 granular status stages:**
 
   | Status              | Icon |
   | ------------------- | ---- |
@@ -78,9 +78,9 @@ Keep every application organized in one powerful dashboard:
   | Rejected            | ❌   |
   | On Hold             | ⏸️   |
   | Withdrawn           | 🚫   |
+  | Email Reminders     | ⏰   |
 
-- **Email reminders** — set a persistent reminder for any application (24h before, 1h before, or custom time).
-- **Dashboard stats** — visually tracks your application funnel across all 6 statuses, plus total active reminders.
+- **Dashboard stats** — visually tracks your application funnel across all 7 statuses, plus total active reminders.
 
 ---
 
@@ -107,7 +107,7 @@ Keep every application organized in one powerful dashboard:
 | **Language**        | TypeScript in strict mode across the client and server                                                                                                                   |
 | **Frontend**        | TypeScript, React 19, React Compiler, Vite 8, TailwindCSS 4, shadcn/ui, React Router v7, TanStack Query v5, React Hook Form, Zod, Axios, React Hot Toast, Phosphor Icons |
 | **Backend**         | TypeScript, Node.js, Express, JWT (Access + Refresh tokens), argon2, Multer, pdf-parse, Agenda.js                                                                        |
-| **AI**              | Google Gemini 3.5 Flash free tier (`gemini-3.5-flash`) — Primary · Groq Qwen 3.6 27B free tier (`qwen/qwen3.6-27b`) — Fallback                                           |
+| **AI**              | Google Gemini 3.5 Flash free tier (`gemini-3.5-flash`) — Primary · OpenRouter Llama 3.3 70B Instruct free tier (`meta-llama/llama-3.3-70b-instruct:free`) — Fallback                                           |
 | **Database**        | MongoDB Atlas + Mongoose (ODM)                                                                                                                                           |
 | **Storage**         | Cloudinary (profile images + resume PDFs)                                                                                                                                |
 | **Email**           | Nodemailer + Gmail (500 emails/day free)                                                                                                                                 |
@@ -140,7 +140,7 @@ Keep every application organized in one powerful dashboard:
      ▼             ▼                ▼                ▼
 MongoDB         Gemini 3.5      Cloudinary        Nodemailer
 Atlas           Flash API       (Storage)         (Gmail)
-(Primary DB)    + Groq Qwen 3.6 27B
+(Primary DB)    + OpenRouter Llama 3.3
                 (AI Fallback)
 ```
 
@@ -185,11 +185,11 @@ Before every AI call, the backend generates a `SHA-256` hash of `(resumeText + j
 </details>
 
 <details>
-<summary><strong>🤖 Why Dual AI Providers (Gemini + Groq)?</strong></summary>
+<summary><strong>🤖 Why Dual AI Providers (Gemini + OpenRouter)?</strong></summary>
 
 Gemini 3.5 Flash is the primary provider — excellent structured JSON output, strong reasoning, and Google's infrastructure reliability. However, AI APIs can experience rate limits or downtime.
 
-`aiService.ts` implements an **automatic fallback pattern**: try Gemini 3.5 Flash → if it fails/times out → retry with Groq Qwen 3.6 27B → return the result from whichever succeeds. Both provider responses are validated with Zod and normalized to one inferred TypeScript contract, so the rest of the application is unaware of which provider was used.
+`aiService.ts` implements an **automatic fallback pattern**: try Gemini 3.5 Flash → if it fails/times out → retry with OpenRouter's Llama 3.3 70B Instruct (free tier) → return the result from whichever succeeds. Both provider responses are validated with Zod and normalized to one inferred TypeScript contract, so the rest of the application is unaware of which provider was used.
 
 </details>
 

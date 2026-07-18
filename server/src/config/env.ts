@@ -35,7 +35,7 @@ const envSchema = z.object({
 
   // ── AI — optional at startup; validated when feature is used ─────────────
   GEMINI_API_KEY: z.string().optional(),
-  GROQ_API_KEY: z.string().optional(),
+  OPENROUTER_API_KEY: z.string().optional(),
 
   // ── Cloudinary — optional at startup; validated when feature is used ──────
   CLOUDINARY_CLOUD_NAME: z.string().optional(),

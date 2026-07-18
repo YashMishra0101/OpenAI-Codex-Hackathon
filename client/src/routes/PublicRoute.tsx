@@ -21,7 +21,7 @@ export function PublicRoute() {
 
   // If they are logged in, send them to the main app
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    return <Navigate to="/analyzer" replace />;
   }
 
   // Otherwise, let them see the public pages (login, register)

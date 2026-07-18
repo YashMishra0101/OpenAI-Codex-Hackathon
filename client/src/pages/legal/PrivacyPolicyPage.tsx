@@ -81,11 +81,6 @@ export function PrivacyPolicyPage() {
                   you use the job tracker, we store the company names, job titles, application
                   statuses, dates, notes, and any reminder schedules you create.
                 </li>
-                <li>
-                  <span className="font-medium text-foreground">Social links</span> — You may
-                  optionally add your LinkedIn, GitHub, and portfolio website URLs to your profile.
-                  These are stored only if you choose to provide them.
-                </li>
               </ul>
             </div>
           </section>
@@ -161,10 +156,10 @@ export function PrivacyPolicyPage() {
               </p>
               <ul className="list-disc pl-6 space-y-2.5 marker:text-muted-foreground">
                 <li>
-                  <span className="font-medium text-foreground">Google Gemini (primary) and Groq
+                  <span className="font-medium text-foreground">Google Gemini (primary) and OpenRouter
                   (fallback)</span> — Your extracted resume text, job descriptions, and search
                   preferences are sent to these AI providers for the purpose of generating analysis
-                  results and interview questions. Groq is used automatically if the primary
+                  results and interview questions. OpenRouter is used automatically if the primary
                   provider is unavailable.
                 </li>
                 <li>

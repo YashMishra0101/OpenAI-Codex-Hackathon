@@ -29,7 +29,12 @@ vi.mock('../../services/aiService.js', () => ({
 }));
 
 describe('Resume AI API Integration Tests', () => {
-  const testUser = { name: 'User A', email: 'usera@example.com', password: 'Password123!' };
+  const testUser = {
+    name: 'User A',
+    email: 'usera@example.com',
+    password: 'Password123!',
+    confirmPassword: 'Password123!',
+  };
   let cookie: string;
 
   beforeEach(async () => {

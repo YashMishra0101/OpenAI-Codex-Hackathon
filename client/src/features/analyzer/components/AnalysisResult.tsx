@@ -27,7 +27,8 @@ const VERDICT_CONFIG = {
     color: 'text-success',
     bg: 'bg-success-subtle',
     border: 'border-success/20',
-    description: 'Your resume aligns well with the requirements. Focus on the improvements below to make it even stronger.',
+    description:
+      'Your resume aligns well with the requirements. Focus on the improvements below to make it even stronger.',
   },
   Partial: {
     icon: ShieldAlert,
@@ -36,7 +37,8 @@ const VERDICT_CONFIG = {
     color: 'text-warning',
     bg: 'bg-warning-subtle',
     border: 'border-warning/20',
-    description: 'Your resume covers some key areas but has notable gaps. Review the suggestions below to strengthen your application.',
+    description:
+      'Your resume covers some key areas but has notable gaps. Review the suggestions below to strengthen your application.',
   },
   Weak: {
     icon: ShieldX,
@@ -45,7 +47,8 @@ const VERDICT_CONFIG = {
     color: 'text-error',
     bg: 'bg-error-subtle',
     border: 'border-error/20',
-    description: 'Significant improvements are needed. Follow the recommendations below to better align your resume with the role.',
+    description:
+      'Significant improvements are needed. Follow the recommendations below to better align your resume with the role.',
   },
 };
 
@@ -74,19 +77,61 @@ export function AnalysisResult({ data: initialData }: AnalysisResultProps) {
             <p className="text-sm text-foreground/70 max-w-xl leading-relaxed">
               {verdict.description}
             </p>
-            {/* ── Scan success indicator ── */}
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success/10 px-3 py-1">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
-              </span>
-              <CheckCircle2 className="h-3.5 w-3.5 text-success" />
-              <span className="text-xs font-medium text-success tracking-wide">Resume Scan Completed</span>
+            {/* ── Completion Status Indicators ── */}
+            <div className="flex flex-wrap justify-center items-center gap-2 pt-2">
+              {/* Feedback */}
+              {data.analysis &&
+                (data.analysis.strengths?.length > 0 ||
+                  data.analysis.improvements?.length > 0) && (
+                  <div className="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success/10 px-3 py-1 shadow-sm opacity-90 hover:opacity-100 transition-opacity">
+                    <span className="relative flex h-2 w-2">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
+                      <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+                    </span>
+                    <span className="text-xs font-medium text-success tracking-wide">
+                      Resume Feedback Generated
+                    </span>
+                  </div>
+                )}
+
+              {/* Interview Questions */}
+              {data.interviewQuestions && data.interviewQuestions.length > 0 && (
+                <div className="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success/10 px-3 py-1 shadow-sm opacity-90 hover:opacity-100 transition-opacity">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+                  </span>
+                  <span className="text-xs font-medium text-success tracking-wide">
+                    Interview Questions Generated
+                  </span>
+                </div>
+              )}
+
+              {/* Search Queries */}
+              {data.searchQueries && data.searchQueries.length > 0 && (
+                <div className="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success/10 px-3 py-1 shadow-sm opacity-90 hover:opacity-100 transition-opacity">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
+                  </span>
+                  <span className="text-xs font-medium text-success tracking-wide">
+                    Google Dork Queries Generated
+                  </span>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
       </Card>
-
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+          <Sparkles className="h-[18px] w-[18px] text-primary" />
+        </div>
+        <h3 className="text-lg font-semibold text-foreground tracking-tight">
+          AI-Generated Insights
+        </h3>
+        <div className="flex-1 h-px bg-border/50" />
+      </div>
       {/* ── Strengths & Improvements ── */}
       <div className="grid md:grid-cols-2 gap-8">
         {/* Strengths Card */}
@@ -148,16 +193,6 @@ export function AnalysisResult({ data: initialData }: AnalysisResultProps) {
 
       {/* ── AI-Generated Insights ── */}
       <div className="space-y-8">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-            <Sparkles className="h-[18px] w-[18px] text-primary" />
-          </div>
-          <h3 className="text-lg font-semibold text-foreground tracking-tight">
-            AI-Generated Insights
-          </h3>
-          <div className="flex-1 h-px bg-border/50" />
-        </div>
-
         {/* Interview Questions — Full Width */}
         <InterviewQuestions
           resumeId={data._id}

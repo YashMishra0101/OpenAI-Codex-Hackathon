@@ -1,5 +1,26 @@
 import { z } from 'zod';
 
+const PASSWORD_MIN_LENGTH = 8;
+const strongPasswordMessage =
+  'Use 8+ characters with uppercase, lowercase, number, and special character.';
+
+const passwordRequirements = [
+  (value: string) => value.length >= PASSWORD_MIN_LENGTH,
+  (value: string) => /[A-Z]/.test(value),
+  (value: string) => /[a-z]/.test(value),
+  (value: string) => /[0-9]/.test(value),
+  (value: string) => /[^A-Za-z0-9]/.test(value),
+];
+
+const strongPasswordSchema = z
+  .string({ required_error: 'Password is required' })
+  .min(PASSWORD_MIN_LENGTH, strongPasswordMessage)
+  .max(72, 'Password must be 72 characters or fewer')
+  .refine(
+    (value) => passwordRequirements.every((requirement) => requirement(value)),
+    strongPasswordMessage,
+  );
+
 // ── Register ─────────────────────────────────────────────────────────────────
 export const registerSchema = z.object({
   name: z
@@ -12,10 +33,13 @@ export const registerSchema = z.object({
     .email('Please provide a valid email address')
     .toLowerCase()
     .trim(),
-  password: z
-    .string({ required_error: 'Password is required' })
-    .min(8, 'Password must be at least 8 characters')
-    .max(72, 'Password must be 72 characters or fewer'),
+  password: strongPasswordSchema,
+  confirmPassword: z
+    .string({ required_error: 'Please confirm your password' })
+    .min(1, 'Please confirm your password'),
+}).refine((data) => data.password === data.confirmPassword, {
+  message: "Passwords don't match",
+  path: ['confirmPassword'],
 });
 
 // ── Login ─────────────────────────────────────────────────────────────────────
@@ -52,10 +76,7 @@ export const forgotPasswordSchema = z.object({
 
 export const resetPasswordSchema = z.object({
   token: z.string({ required_error: 'Reset token is required' }).min(1),
-  password: z
-    .string({ required_error: 'Password is required' })
-    .min(8, 'Password must be at least 8 characters')
-    .max(72, 'Password must be 72 characters or fewer'),
+  password: strongPasswordSchema,
 });
 
 // ── Google OAuth ──────────────────────────────────────────────────────────────

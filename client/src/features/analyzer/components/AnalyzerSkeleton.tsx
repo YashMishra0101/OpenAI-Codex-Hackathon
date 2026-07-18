@@ -42,7 +42,7 @@ export function AnalyzerSkeleton() {
   return (
     <div className="space-y-8">
       {/* ── AI Processing Hero ── */}
-      <div className="text-center space-y-6 py-4">
+      <div className="text-center space-y-6">
         {/* Animated AI icon */}
         <div className="relative inline-flex items-center justify-center">
           <div className="absolute inset-0 w-20 h-20 rounded-2xl bg-primary/10 animate-ping" style={{ animationDuration: '2s' }} />
@@ -55,7 +55,7 @@ export function AnalyzerSkeleton() {
           <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
             Analyzing Your Resume
           </h2>
-          <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-md mx-auto">
+          <p className="text-muted-foreground mt-2 text-sm sm:text-base max-w-5xl mx-auto">
             Our AI is reviewing your resume and preparing personalized insights. This typically takes 5–10 seconds.
           </p>
         </div>

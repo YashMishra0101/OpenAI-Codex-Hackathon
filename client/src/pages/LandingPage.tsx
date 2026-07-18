@@ -40,7 +40,7 @@ const FEATURES = [
     color: 'text-accent',
     bgColor: 'bg-accent/10',
     bullets: [
-      '9 granular status stages',
+      '6 granular status stages',
       'Email reminders for interviews',
       'Notes and job URL tracking',
     ],
@@ -100,7 +100,7 @@ const TECH_STACK: TechItem[] = [
   { name: 'JWT + argon2', category: 'Backend' },
   { name: 'Agenda.js', category: 'Backend' },
   { name: 'Gemini 3.5 Flash', category: 'AI' },
-  { name: 'Groq (Fallback)', category: 'AI' },
+  { name: 'OpenRouter (Fallback)', category: 'AI' },
   { name: 'MongoDB Atlas', category: 'Database' },
   { name: 'Mongoose', category: 'Database' },
   { name: 'Cloudinary', category: 'Storage' },

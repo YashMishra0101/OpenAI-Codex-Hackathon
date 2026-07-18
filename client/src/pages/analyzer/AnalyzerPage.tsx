@@ -70,7 +70,7 @@ export function AnalyzerPage() {
 
   return (
     <div className="min-h-full bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-8">
         {analysisData ? (
           <div className="space-y-6">
             {/* ── Action Bar ── */}

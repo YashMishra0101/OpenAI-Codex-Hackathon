@@ -14,7 +14,7 @@ export function LoginPage() {
       setIsLoading(true);
       await api.post('/auth/login', data);
       toast.success('Logged in successfully!');
-      window.location.href = '/dashboard';
+      window.location.href = '/analyzer';
     } catch (err: any) {
       toast.error(err.response?.data?.message || 'Failed to login');
     } finally {

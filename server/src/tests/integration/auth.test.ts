@@ -13,6 +13,7 @@ describe('Auth API Integration Tests', () => {
     name: 'Test User',
     email: 'test@example.com',
     password: 'Password123!',
+    confirmPassword: 'Password123!',
   };
 
   beforeEach(async () => {
@@ -50,6 +51,39 @@ describe('Auth API Integration Tests', () => {
       expect(res.status).toBe(409); // Conflict
       expect(res.body.success).toBe(false);
       expect(res.body.message).toMatch(/already exists/);
+    });
+
+    it('should fail if passwords do not match', async () => {
+      const res = await request(app)
+        .post('/api/v1/auth/register')
+        .send({ ...testUser, confirmPassword: 'Different123!' });
+
+      expect(res.status).toBe(422);
+      expect(res.body.success).toBe(false);
+      expect(res.body.errors).toContainEqual(
+        expect.objectContaining({
+          field: 'confirmPassword',
+          message: "Passwords don't match",
+        }),
+      );
+    });
+
+    it('should fail if password does not meet strength requirements', async () => {
+      const weakPassword = 'password123';
+      const res = await request(app)
+        .post('/api/v1/auth/register')
+        .send({ ...testUser, password: weakPassword, confirmPassword: weakPassword });
+
+      expect(res.status).toBe(422);
+      expect(res.body.success).toBe(false);
+      expect(res.body.errors).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            field: 'password',
+            message: expect.stringMatching(/uppercase, lowercase, number, and special character/i),
+          }),
+        ]),
+      );
     });
   });
 

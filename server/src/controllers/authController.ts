@@ -112,12 +112,14 @@ export const authController = {
 
   /**
    * POST /api/v1/auth/verify-email
-   * Marks the account as verified using the token from the verification link.
+   * Activates the account, creates a session, and returns the authenticated user.
+   * After this call the client has valid auth cookies and is fully logged in.
    */
   verifyEmail: asyncHandler(async (req: Request, res: Response): Promise<void> => {
     const dto = req.body as VerifyEmailDto;
-    await authService.verifyEmail(dto);
-    res.status(HTTP.OK).json(new ApiResponse(HTTP.OK, MSG.EMAIL_VERIFIED, null));
+    const { user, accessToken, refreshToken } = await authService.verifyEmail(dto);
+    setAuthCookies(res, accessToken, refreshToken);
+    res.status(HTTP.OK).json(new ApiResponse(HTTP.OK, MSG.EMAIL_VERIFIED, { user }));
   }),
 
   /**

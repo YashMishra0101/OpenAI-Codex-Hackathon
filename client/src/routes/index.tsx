@@ -119,7 +119,7 @@ export const router = createBrowserRouter([
             children: [
               {
                 path: '/dashboard',
-                element: <Navigate to="/jobs" replace />,
+                element: <Navigate to="/analyzer" replace />,
               },
               {
                 path: '/dashboard/resume-checker',

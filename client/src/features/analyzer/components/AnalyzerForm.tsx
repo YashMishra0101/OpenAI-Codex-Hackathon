@@ -124,7 +124,7 @@ export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
   const currentStep = resumeFile ? 1 : 0;
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8">
+    <div className="w-full space-y-8">
       {/* ── Hero Header ── */}
       <div className="text-center space-y-4">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 border border-primary/20 mx-auto">
@@ -132,7 +132,7 @@ export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
         </div>
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">AI Resume Analyzer</h1>
-          <p className="text-muted-foreground mt-2 max-w-xl mx-auto text-sm sm:text-base leading-relaxed">
+          <p className="text-muted-foreground mt-2 max-w-5xl mx-auto text-sm sm:text-base leading-relaxed">
             Upload your resume and get instant AI-powered feedback, personalized interview questions, and advanced job search queries.
           </p>
         </div>

@@ -196,9 +196,9 @@ export function SearchQueries({ queries }: SearchQueriesProps) {
 
           <div className="flex items-center gap-1.5">
             <span className="inline-flex items-center rounded-full bg-yellow-400/10 border border-yellow-400/30 px-2 py-0.5 text-[10.5px] font-semibold text-yellow-400">
-              💡 Tip
+              📝 Note
             </span>
-            <span className="text-xs text-muted-foreground">Copy a query and paste it directly into Google for best results.</span>
+            <span className="text-xs text-muted-foreground">Please copy the generated query and paste it into Google to view the search results.</span>
           </div>
         </div>
 

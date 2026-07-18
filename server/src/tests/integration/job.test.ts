@@ -12,8 +12,18 @@ vi.mock('../../config/agenda.js', () => ({
 }));
 
 describe('Job API Integration Tests', () => {
-  const testUserA = { name: 'User A', email: 'usera@example.com', password: 'Password123!' };
-  const testUserB = { name: 'User B', email: 'userb@example.com', password: 'Password123!' };
+  const testUserA = {
+    name: 'User A',
+    email: 'usera@example.com',
+    password: 'Password123!',
+    confirmPassword: 'Password123!',
+  };
+  const testUserB = {
+    name: 'User B',
+    email: 'userb@example.com',
+    password: 'Password123!',
+    confirmPassword: 'Password123!',
+  };
 
   let cookieA: string;
   let cookieB: string;

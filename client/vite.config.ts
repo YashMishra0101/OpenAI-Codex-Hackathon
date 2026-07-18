@@ -26,6 +26,7 @@ export default defineConfig({
 
   server: {
     port: 5173,
+    strictPort: true,
     // Proxy /api requests to Express in development — avoids CORS in dev
     proxy: {
       '/api': {
