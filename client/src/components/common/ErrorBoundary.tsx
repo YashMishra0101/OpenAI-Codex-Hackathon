@@ -38,7 +38,6 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
   constructor(props: ErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false, error: null };
-    this.reset = this.reset.bind(this);
   }
 
   static getDerivedStateFromError(error: Error): ErrorBoundaryState {
@@ -50,9 +49,9 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     console.error('[ErrorBoundary] Caught error:', error.message, info.componentStack);
   }
 
-  reset(): void {
+  reset = (): void => {
     this.setState({ hasError: false, error: null });
-  }
+  };
 
   render(): ReactNode {
     const { hasError, error } = this.state;

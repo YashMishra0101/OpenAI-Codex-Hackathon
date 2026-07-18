@@ -32,7 +32,7 @@ export function Navbar() {
     if (isProtected && !isAuthenticated) {
       e.preventDefault();
       toast.error('Please log in or create an account to use this feature');
-      navigate('/login');
+      void navigate('/login');
       if (isOpen) setIsOpen(false);
     } else {
       if (isOpen) setIsOpen(false);
@@ -43,8 +43,8 @@ export function Navbar() {
     try {
       await logout();
       toast.success('Logged out successfully');
-      navigate('/');
-    } catch (err: any) {
+      void navigate('/');
+    } catch (_err) {
       toast.error('Failed to logout');
     }
   };
@@ -225,7 +225,7 @@ export function Navbar() {
                 <button
                   onClick={() => {
                     setIsOpen(false);
-                    handleLogout();
+                    void handleLogout();
                   }}
                   className="flex items-center w-full text-left px-3 py-2.5 rounded-md text-base font-medium text-destructive hover:bg-destructive/10 transition-colors"
                 >

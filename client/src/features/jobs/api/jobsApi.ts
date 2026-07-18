@@ -79,8 +79,8 @@ export function useCreateJob() {
       return response.data.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
-      queryClient.invalidateQueries({ queryKey: ['jobStats'] });
+      void queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      void queryClient.invalidateQueries({ queryKey: ['jobStats'] });
     },
   });
 }
@@ -93,8 +93,8 @@ export function useUpdateJob() {
       return response.data.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
-      queryClient.invalidateQueries({ queryKey: ['jobStats'] });
+      void queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      void queryClient.invalidateQueries({ queryKey: ['jobStats'] });
     },
   });
 }
@@ -107,8 +107,8 @@ export function useDeleteJob() {
       return response.data.data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
-      queryClient.invalidateQueries({ queryKey: ['jobStats'] });
+      void queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      void queryClient.invalidateQueries({ queryKey: ['jobStats'] });
     },
   });
 }
@@ -122,10 +122,10 @@ export function useScheduleReminder() {
     },
     onSuccess: (_data, variables) => {
       // Invalidate jobs so reminderCount on cards updates immediately
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
-      queryClient.invalidateQueries({ queryKey: ['jobStats'] });
+      void queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      void queryClient.invalidateQueries({ queryKey: ['jobStats'] });
       // Invalidate reminders list for this job
-      queryClient.invalidateQueries({ queryKey: ['reminders', variables.id] });
+      void queryClient.invalidateQueries({ queryKey: ['reminders', variables.id] });
     },
   });
 }
@@ -139,9 +139,9 @@ export function useUpdateReminder() {
     },
     onSuccess: (_data, variables) => {
       // Invalidate both lists and job stats to instantly reflect changes
-      queryClient.invalidateQueries({ queryKey: ['reminders', variables.jobId] });
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
-      queryClient.invalidateQueries({ queryKey: ['jobStats'] });
+      void queryClient.invalidateQueries({ queryKey: ['reminders', variables.jobId] });
+      void queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      void queryClient.invalidateQueries({ queryKey: ['jobStats'] });
     },
   });
 }
@@ -155,9 +155,9 @@ export function useDeleteReminder() {
     },
     onSuccess: (_data, variables) => {
       // Update reminder list and job card counts
-      queryClient.invalidateQueries({ queryKey: ['reminders', variables.jobId] });
-      queryClient.invalidateQueries({ queryKey: ['jobs'] });
-      queryClient.invalidateQueries({ queryKey: ['jobStats'] });
+      void queryClient.invalidateQueries({ queryKey: ['reminders', variables.jobId] });
+      void queryClient.invalidateQueries({ queryKey: ['jobs'] });
+      void queryClient.invalidateQueries({ queryKey: ['jobStats'] });
     },
   });
 }
