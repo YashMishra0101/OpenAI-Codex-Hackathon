@@ -22,9 +22,17 @@ export async function scheduleReminderHandler(req: Request, res: Response): Prom
   // 1. Validate payload
   const validated = scheduleReminderSchema.parse({ body: req.body });
   const scheduledDate = new Date(validated.body.date);
-  
-  if (scheduledDate.getTime() < Date.now()) {
+  const now = Date.now();
+
+  if (scheduledDate.getTime() < now) {
     throw new ApiError(HTTP.BAD_REQUEST, 'Cannot schedule a reminder in the past.');
+  }
+
+  // Prevent far-future reminders that would persist in MongoDB indefinitely.
+  // 1 year is a generous maximum for any job interview workflow.
+  const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
+  if (scheduledDate.getTime() > now + ONE_YEAR_MS) {
+    throw new ApiError(HTTP.BAD_REQUEST, 'Reminder cannot be scheduled more than 1 year in the future.');
   }
 
   // 2. Fetch Job to ensure ownership and get details

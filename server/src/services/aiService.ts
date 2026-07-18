@@ -6,9 +6,29 @@ import { ApiError } from '../utils/ApiError.js';
 import { HTTP } from '../constants/httpStatus.js';
 import { aiResponseSchema } from '../validations/resumeValidation.js';
 
-// Simple in-memory cache to prevent redundant LLM calls
-// In production this would be Redis, but for the hackathon MVP, Map is sufficient.
+/**
+ * Bounded in-memory LRU cache for AI responses.
+ *
+ * Eviction strategy: when the cache reaches MAX_CACHE_SIZE, the oldest entry
+ * (first key in insertion order, per Map's guaranteed iteration order) is
+ * removed before inserting the new one. This bounds memory usage to roughly
+ * MAX_CACHE_SIZE × (avg response size ~10KB) ≈ 1MB maximum.
+ *
+ * In a production Redis deployment this would be replaced with a TTL-based
+ * distributed cache, but for this scale a bounded Map is correct.
+ */
+const MAX_CACHE_SIZE = 100;
 const aiCache = new Map<string, string>();
+
+function setCacheEntry(key: string, value: string): void {
+  // If at capacity, evict the oldest entry (first key in insertion order)
+  if (aiCache.size >= MAX_CACHE_SIZE) {
+    const oldestKey = aiCache.keys().next().value;
+    if (oldestKey !== undefined) aiCache.delete(oldestKey);
+  }
+  aiCache.set(key, value);
+}
+
 
 interface AIAnalysisParams {
   resumeText: string;
@@ -17,25 +37,10 @@ interface AIAnalysisParams {
 }
 
 /**
- * Basic sanitization to prevent prompt injection attempts.
- * Strips markdown code fences and common system instruction override phrases.
- */
-function sanitizeInput(text: string | undefined): string {
-  if (!text) return '';
-  return text
-    .replace(/```/g, '')
-    .replace(/Ignore all previous instructions/gi, '[REDACTED]')
-    .replace(/System instructions?:/gi, '[REDACTED]')
-    .trim();
-}
-
-/**
  * The system prompt instructs the AI to return exactly the structured JSON we need.
  */
 function buildPrompt(params: AIAnalysisParams): string {
-  const resumeText = sanitizeInput(params.resumeText);
-  const jobDescription = sanitizeInput(params.jobDescription);
-  const searchPreferences = sanitizeInput(params.searchPreferences);
+  const { resumeText, jobDescription, searchPreferences } = params;
 
   let prompt = `You are a strict, senior technical recruiter and career coach.\nAnalyze the following resume`;
 
@@ -99,7 +104,7 @@ export async function analyzeResume(params: AIAnalysisParams): Promise<any> {
     'gemini-2.0-flash',
   ];
 
-  if (geminiClient && !process.env.SIMULATE_GEMINI_FAILURE) {
+  if (geminiClient) {
     for (const modelName of geminiModels) {
       try {
         logger.info('AI_PRIMARY_ATTEMPT', { provider: 'Gemini', model: modelName });
@@ -162,7 +167,7 @@ export async function analyzeResume(params: AIAnalysisParams): Promise<any> {
     const validatedData = aiResponseSchema.parse(parsedData);
 
     // 5. Cache the validated result
-    aiCache.set(hash, JSON.stringify(validatedData));
+    setCacheEntry(hash, JSON.stringify(validatedData));
 
     return validatedData;
   } catch (parseError: any) {
@@ -177,9 +182,7 @@ export async function analyzeResume(params: AIAnalysisParams): Promise<any> {
 export async function generateInterviewQuestions(
   params: AIAnalysisParams & { numQuestions: number }
 ): Promise<string[]> {
-  const resumeText = sanitizeInput(params.resumeText);
-  const jobDescription = sanitizeInput(params.jobDescription);
-  const { numQuestions } = params;
+  const { resumeText, jobDescription, numQuestions } = params;
 
   let prompt = `You are a strict, senior technical recruiter.\nGenerate EXACTLY ${numQuestions} highly relevant interview questions based on the following resume`;
 
@@ -218,7 +221,7 @@ The JSON object MUST have this exact schema:
     'gemini-2.0-flash',
   ];
 
-  if (geminiClient && !process.env.SIMULATE_GEMINI_FAILURE) {
+  if (geminiClient) {
     for (const modelName of geminiModels) {
       try {
         const response = await geminiClient.models.generateContent({
@@ -254,12 +257,10 @@ The JSON object MUST have this exact schema:
     }
     const parsedData = JSON.parse(cleaned);
     
-    // We import aiQuestionsResponseSchema at the top of the file, let's just do dynamic import or define it inline here.
-    // Wait, I should import it at the top of the file. I will do that in the next step.
     const { aiQuestionsResponseSchema } = await import('../validations/resumeValidation.js');
     const validatedData = aiQuestionsResponseSchema.parse(parsedData);
     
-    aiCache.set(hash, JSON.stringify(validatedData));
+    setCacheEntry(hash, JSON.stringify(validatedData));
     return validatedData.interviewQuestions;
   } catch (parseError: any) {
     throw new ApiError(HTTP.INTERNAL_SERVER_ERROR, 'Failed to parse AI generated questions.');

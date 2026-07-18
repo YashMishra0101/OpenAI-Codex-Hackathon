@@ -52,7 +52,27 @@ export async function updateProfile(userId: string, dto: UpdateProfileDto): Prom
   }
 
   if (dto.name) user.name = dto.name;
-  if (dto.password) user.password = await argon2.hash(dto.password);
+
+  // Password change requires verification of the current password to prevent
+  // account takeover via a stolen session cookie.
+  if (dto.password) {
+    if (!dto.currentPassword) {
+      throw new ApiError(HTTP.BAD_REQUEST, 'Current password is required to set a new password');
+    }
+
+    if (!user.password) {
+      // OAuth-only accounts have no password to verify against
+      throw new ApiError(HTTP.BAD_REQUEST, 'Password cannot be changed for accounts signed in with Google');
+    }
+
+    const isCurrentPasswordValid = await argon2.verify(user.password, dto.currentPassword);
+    if (!isCurrentPasswordValid) {
+      logger.warn('USER_PASSWORD_CHANGE_FAILED', { userId, reason: 'wrong_current_password' });
+      throw new ApiError(HTTP.UNAUTHORIZED, 'Current password is incorrect');
+    }
+
+    user.password = await argon2.hash(dto.password);
+  }
 
   await user.save();
   logger.info('USER_PROFILE_UPDATED', { userId });
@@ -61,19 +81,26 @@ export async function updateProfile(userId: string, dto: UpdateProfileDto): Prom
 }
 
 /**
- * Helper to delete an image from Cloudinary by extracting its public_id.
+ * Helper to delete an image from Cloudinary by its stored public_id.
+ * Falls back to URL-based extraction if public_id is not available (for
+ * images uploaded before this field was introduced).
  */
-async function deleteImageFromCloudinary(imageUrl: string) {
-  if (!imageUrl || !imageUrl.includes('res.cloudinary.com')) return;
+async function deleteImageFromCloudinary(imageUrl: string, publicId?: string | null) {
+  if (!imageUrl && !publicId) return;
 
   try {
-    const parts = imageUrl.split('/');
-    const folderAndFile = parts.slice(-2).join('/');
-    const publicId = folderAndFile.split('.')[0];
-    
-    if (publicId) {
-      await cloudinary.uploader.destroy(publicId);
-      logger.info('CLOUDINARY_IMAGE_DELETED', { publicId });
+    let idToDelete = publicId;
+
+    // Fallback: extract public_id from URL for legacy records without stored public_id
+    if (!idToDelete && imageUrl && imageUrl.includes('res.cloudinary.com')) {
+      const parts = imageUrl.split('/');
+      const folderAndFile = parts.slice(-2).join('/');
+      idToDelete = folderAndFile.split('.')[0] ?? null;
+    }
+
+    if (idToDelete) {
+      await cloudinary.uploader.destroy(idToDelete);
+      logger.info('CLOUDINARY_IMAGE_DELETED', { publicId: idToDelete });
     }
   } catch (error: any) {
     logger.error('CLOUDINARY_DELETE_ERROR', { error: error.message, imageUrl });
@@ -86,7 +113,7 @@ async function deleteImageFromCloudinary(imageUrl: string) {
  */
 export async function updateProfileImage(userId: string, filePath: string): Promise<SafeUser> {
   let uploadResult;
-  const oldUser = await User.findById(userId);
+  const oldUser = await User.findById(userId).select('+profileImagePublicId');
 
   try {
     // Upload image to Cloudinary (folder 'profiles' groups them together)
@@ -109,9 +136,13 @@ export async function updateProfileImage(userId: string, filePath: string): Prom
     }
   }
 
+  // Store both the secure URL and the public_id for reliable future deletion
   const user = await User.findByIdAndUpdate(
     userId,
-    { profileImage: uploadResult.secure_url },
+    {
+      profileImage: uploadResult.secure_url,
+      profileImagePublicId: uploadResult.public_id,
+    },
     { new: true }
   );
 
@@ -119,9 +150,9 @@ export async function updateProfileImage(userId: string, filePath: string): Prom
     throw new ApiError(HTTP.NOT_FOUND, 'User not found');
   }
 
-  // Delete old image if it existed and belonged to Cloudinary
+  // Delete old image using stored public_id (preferred) or URL fallback
   if (oldUser && oldUser.profileImage) {
-    await deleteImageFromCloudinary(oldUser.profileImage);
+    await deleteImageFromCloudinary(oldUser.profileImage, oldUser.profileImagePublicId);
   }
 
   logger.info('USER_PROFILE_IMAGE_UPDATED', { userId, imageUrl: uploadResult.secure_url });
@@ -133,18 +164,18 @@ export async function updateProfileImage(userId: string, filePath: string): Prom
  * Removes the user's profile image.
  */
 export async function removeProfileImage(userId: string): Promise<SafeUser> {
-  const oldUser = await User.findById(userId);
+  const oldUser = await User.findById(userId).select('+profileImagePublicId');
   if (!oldUser) {
     throw new ApiError(HTTP.NOT_FOUND, 'User not found');
   }
 
   if (oldUser.profileImage) {
-    await deleteImageFromCloudinary(oldUser.profileImage);
+    await deleteImageFromCloudinary(oldUser.profileImage, oldUser.profileImagePublicId);
   }
 
   const user = await User.findByIdAndUpdate(
     userId,
-    { profileImage: '' },
+    { profileImage: '', $unset: { profileImagePublicId: 1 } },
     { new: true }
   );
 

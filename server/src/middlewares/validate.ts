@@ -1,11 +1,15 @@
 import type { Request, Response, NextFunction } from 'express';
-import type { AnyZodObject } from 'zod';
+import type { AnyZodObject, ZodEffects } from 'zod';
 import { ZodError } from 'zod';
 import { ApiError } from '../utils/ApiError.js';
 import { HTTP } from '../constants/httpStatus.js';
 import { MSG } from '../constants/messages.js';
 
 type ValidateTarget = 'body' | 'query' | 'params';
+
+// ZodEffects is returned by .refine() / .transform() — widening to accept both
+// AnyZodObject and ZodEffects ensures schemas with cross-field validation work.
+type AnySchema = AnyZodObject | ZodEffects<any>;
 
 /**
  * Zod validation middleware factory.
@@ -21,7 +25,7 @@ type ValidateTarget = 'body' | 'query' | 'params';
  * schema if unknown keys must be preserved.
  */
 export const validate =
-  (schema: AnyZodObject, target: ValidateTarget = 'body') =>
+  (schema: AnySchema, target: ValidateTarget = 'body') =>
   (req: Request, _res: Response, next: NextFunction): void => {
     try {
       schema.parse(req[target]);
@@ -38,3 +42,4 @@ export const validate =
       }
     }
   };
+

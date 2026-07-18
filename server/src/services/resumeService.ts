@@ -6,6 +6,11 @@ import { analyzeResume } from './aiService.js';
 import logger from '../utils/logger.js';
 import { Resume } from '../models/Resume.js';
 
+// Maximum characters of resume text sent to the AI and stored in MongoDB.
+// A typical 2-page resume is ~3,000–5,000 chars. 15,000 chars covers even the
+// longest legitimate resumes while preventing BSON overflow and AI token burn.
+const MAX_RESUME_TEXT_CHARS = 15_000;
+
 interface AnalyzeResumeInput {
   userId: string;
   pdfPath: string;
@@ -36,6 +41,17 @@ export async function processAndAnalyzeResume(input: AnalyzeResumeInput) {
   // Reject extremely small PDFs which likely failed to parse or are just images
   if (resumeText.trim().length < 50) {
     throw new ApiError(HTTP.BAD_REQUEST, 'Extracted text is too short. Please upload a valid text-based PDF resume.');
+  }
+
+  // Truncate oversized text to prevent BSON limit violations, AI token overrun,
+  // and prompt injection through excessively long resume content.
+  if (resumeText.length > MAX_RESUME_TEXT_CHARS) {
+    logger.warn('RESUME_TEXT_TRUNCATED', {
+      userId,
+      originalLength: resumeText.length,
+      truncatedTo: MAX_RESUME_TEXT_CHARS,
+    });
+    resumeText = resumeText.slice(0, MAX_RESUME_TEXT_CHARS);
   }
 
   const analysisResult = await analyzeResume({

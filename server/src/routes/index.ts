@@ -21,7 +21,6 @@ router.get('/health', (_req: Request, res: Response): void => {
     success: true,
     message: 'Server is healthy',
     timestamp: new Date().toISOString(),
-    environment: process.env['NODE_ENV'] ?? 'unknown',
   });
 });
 
