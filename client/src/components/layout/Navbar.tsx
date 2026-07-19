@@ -43,7 +43,7 @@ export function Navbar() {
     try {
       // Navigate to a public route first. This unmounts ProtectedRoute 
       // BEFORE we clear the user state, preventing duplicate error toasts.
-      void navigate('/');
+      navigate('/');
       
       await logout();
       authToast.success('Logged out successfully');

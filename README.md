@@ -6,14 +6,14 @@
 >
 > The OpenAI Codex Hackathon is hosted on [namasteDev.com](https://namastedev.com) and organized by **Akshay Saini**.
 
-[![Vercel](https://img.shields.io/badge/Frontend-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
-[![Render](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render&logoColor=black)](https://render.com/)
-[![Vite](https://img.shields.io/badge/Bundler-Vite_8-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![pnpm](https://img.shields.io/badge/Managed_with-pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white)](https://pnpm.io/)
+[![Vercel](https://img.shields.io/badge/Frontend-Vercel-000000?logo=vercel&logoColor=white&style=for-the-badge)](https://vercel.com/)
+[![Render](https://img.shields.io/badge/Backend-Render-46E3B7?logo=render&logoColor=black&style=for-the-badge)](https://render.com/)
+[![Vite](https://img.shields.io/badge/Bundler-Vite_8-646CFF?logo=vite&logoColor=white&style=for-the-badge)](https://vitejs.dev/)
+[![pnpm](https://img.shields.io/badge/Managed_with-pnpm-F69220?logo=pnpm&logoColor=white&style=for-the-badge)](https://pnpm.io/)
 <br/>
-[![Monorepo](https://img.shields.io/badge/Architecture-Monorepo-8B5CF6?style=for-the-badge&logo=turborepo&logoColor=white)](https://pnpm.io/workspaces)
-[![GitHub Actions](https://img.shields.io/badge/CI/CD-GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)](https://github.com/features/actions)
-[![Sentry](https://img.shields.io/badge/Monitoring-Sentry-362D59?style=for-the-badge&logo=sentry&logoColor=white)](https://sentry.io/)
+[![Monorepo](https://img.shields.io/badge/Architecture-Monorepo-8B5CF6?logo=turborepo&logoColor=white&style=for-the-badge)](https://pnpm.io/workspaces)
+[![GitHub Actions](https://img.shields.io/badge/CI/CD-GitHub_Actions-2088FF?logo=githubactions&logoColor=white&style=for-the-badge)](https://github.com/features/actions)
+[![Sentry](https://img.shields.io/badge/Monitoring-Sentry-362D59?logo=sentry&logoColor=white&style=for-the-badge)](https://sentry.io/)
 <br/>
 [![shadcn/ui](https://img.shields.io/badge/shadcn%2Fui-000000?style=for-the-badge&logo=shadcnui&logoColor=white)](https://ui.shadcn.com/)
 [![React](https://img.shields.io/badge/React_19-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
@@ -50,14 +50,14 @@ This platform brings everything together:
 
 Upload your resume (PDF) and optionally paste a job description — the AI returns a full structured analysis:
 
-| Section                                    | What You Get                                                                                              |
-| ------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
-| **Match Analysis**                         | Strong / Partial / Weak verdict with missing keywords & strengths                                         |
-| **Improvement Suggestions**                | Actionable, specific tips to strengthen your resume                                                       |
-| **Interview Questions**                    | 10–50 personalized questions based on your resume + JD                                                    |
-| **Advanced Search Queries (Google Dorks)** | 15 highly targeted queries (8 job search, 4 interview prep, 3 interview experiences)                      |
-| **Analysis History**                       | All past analyses saved — revisit anytime                                                                 |
-| **Works without JD**                       | Analyze your resume on its own, no job description required                                               |
+| Section                                    | What You Get                                                                         |
+| ------------------------------------------ | ------------------------------------------------------------------------------------ |
+| **Match Analysis**                         | Strong / Partial / Weak verdict with missing keywords & strengths                    |
+| **Improvement Suggestions**                | Actionable, specific tips to strengthen your resume                                  |
+| **Interview Questions**                    | 10–50 personalized questions based on your resume + JD                               |
+| **Advanced Search Queries (Google Dorks)** | 15 highly targeted queries (8 job search, 4 interview prep, 3 interview experiences) |
+| **Analysis History**                       | All past analyses saved — revisit anytime                                            |
+| **Works without JD**                       | Analyze your resume on its own, no job description required                          |
 
 **What are Google Dorks?** Advanced search queries using operators like `site:`, `"exact phrase"`, and `after:` to surface results normal searches miss. The AI generates these targeted queries from your resume and job preferences so you discover relevant opportunities faster.
 
@@ -70,15 +70,15 @@ Keep every application organized in one powerful dashboard:
 - Track company, role, status, applied date, job URL, and notes
 - **7 granular status stages:**
 
-  | Status              | Icon |
-  | ------------------- | ---- |
-  | Applied             | 📝   |
-  | Interview           | 📞   |
-  | Offer               | ✅   |
-  | Rejected            | ❌   |
-  | On Hold             | ⏸️   |
-  | Withdrawn           | 🚫   |
-  | Email Reminders     | ⏰   |
+  | Status          | Icon |
+  | --------------- | ---- |
+  | Applied         | 📝   |
+  | Interview       | 📞   |
+  | Offer           | ✅   |
+  | Rejected        | ❌   |
+  | On Hold         | ⏸️   |
+  | Withdrawn       | 🚫   |
+  | Email Reminders | ⏰   |
 
 - **Dashboard stats** — visually tracks your application funnel across all 7 statuses, plus total active reminders.
 
@@ -107,7 +107,7 @@ Keep every application organized in one powerful dashboard:
 | **Language**        | TypeScript in strict mode across the client and server                                                                                                                   |
 | **Frontend**        | TypeScript, React 19, React Compiler, Vite 8, TailwindCSS 4, shadcn/ui, React Router v7, TanStack Query v5, React Hook Form, Zod, Axios, React Hot Toast, Phosphor Icons |
 | **Backend**         | TypeScript, Node.js, Express, JWT (Access + Refresh tokens), argon2, Multer, pdf-parse, Agenda.js                                                                        |
-| **AI**              | Google Gemini Free Tier (`gemini-3.1-flash-lite` & others) — Primary · OpenRouter Llama 3.3 70B Instruct free tier (`meta-llama/llama-3.3-70b-instruct:free`) — Fallback                                           |
+| **AI**              | Google Gemini Free Tier (`gemini-3.1-flash-lite` & others) — Primary · OpenRouter Llama 3.3 70B Instruct free tier (`meta-llama/llama-3.3-70b-instruct:free`) — Fallback |
 | **Database**        | MongoDB Atlas + Mongoose (ODM)                                                                                                                                           |
 | **Storage**         | Cloudinary (profile images + resume PDFs)                                                                                                                                |
 | **Email**           | Nodemailer + Gmail (500 emails/day free)                                                                                                                                 |
@@ -190,6 +190,7 @@ Before every AI call, the backend generates a `SHA-256` hash of `(resumeText + j
 The backend implements an **automatic fallback pattern** for AI providers to maximize reliability since both services are operating on their free tiers.
 
 When analyzing a resume, it attempts to use these models in the following order:
+
 1. `gemini-3.1-flash-lite` (Primary)
 2. `gemini-3.1-flash-image`
 3. `gemini-2.0-flash-lite`
@@ -273,9 +274,9 @@ I'm actively open to **Software Engineering** and **Full Stack Developer** roles
 
 <div align="center">
 
-[![GitHub](https://img.shields.io/badge/GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/YashMishra0101)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/yash-mishra-356280223/)
-[![X](https://img.shields.io/badge/X-000000?style=for-the-badge&logo=x&logoColor=white)](https://x.com/YashRKMishra1)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?logo=github&logoColor=white&style=for-the-badge)](https://github.com/YashMishra0101)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?logo=linkedin&logoColor=white&style=for-the-badge)](https://www.linkedin.com/in/yash-mishra-356280223/)
+[![X](https://img.shields.io/badge/X-000000?logo=x&logoColor=white&style=for-the-badge)](https://x.com/YashRKMishra1)
 
 </div>
 
