@@ -8,6 +8,14 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { toast } from 'react-hot-toast';
 
@@ -38,18 +46,24 @@ function JobRow({
   onSetReminder: (j: JobApplication) => void;
 }) {
   const deleteMutation = useDeleteJob();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
-  const handleDelete = () => {
-    if (window.confirm('Delete this application? This cannot be undone.')) {
-      deleteMutation.mutate(job._id, {
-        onSuccess: () => toast.success('Job deleted'),
-        onError: () => toast.error('Failed to delete'),
-      });
-    }
+  const handleDeleteConfirm = () => {
+    deleteMutation.mutate(job._id, {
+      onSuccess: () => {
+        toast.success('Job deleted');
+        setShowDeleteDialog(false);
+      },
+      onError: () => {
+        toast.error('Failed to delete');
+        setShowDeleteDialog(false);
+      },
+    });
   };
 
   return (
-    <div className="flex items-center gap-4 px-4 py-3 border-b border-border/50 last:border-b-0 hover:bg-muted/30 transition-colors group">
+    <>
+      <div className="flex items-center gap-4 px-4 py-3 border-b border-border/50 last:border-b-0 hover:bg-muted/30 transition-colors group">
       {/* Company initial */}
       <div className="h-9 w-9 shrink-0 rounded-full bg-primary/10 text-primary flex items-center justify-center text-sm font-bold uppercase select-none">
         {job.companyName?.[0] ?? '?'}
@@ -95,9 +109,8 @@ function JobRow({
           <DropdownMenuItem onClick={() => onSetReminder(job)}>
             <Bell className="mr-2 h-4 w-4" /> Set Reminder
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
           <DropdownMenuItem
-            onClick={handleDelete}
+            onClick={() => setShowDeleteDialog(true)}
             className="text-destructive focus:bg-destructive focus:text-destructive-foreground"
           >
             <Trash2 className="mr-2 h-4 w-4" /> Delete
@@ -105,6 +118,26 @@ function JobRow({
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Delete Job Application?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. Are you sure you want to delete this job application?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0 pt-2">
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)} disabled={deleteMutation.isPending}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm} disabled={deleteMutation.isPending}>
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

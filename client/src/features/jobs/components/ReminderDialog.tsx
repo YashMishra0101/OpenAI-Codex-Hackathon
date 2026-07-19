@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useScheduleReminder, useGetReminders, useDeleteReminder, useUpdateReminder, JobApplication, PendingReminder } from '../api/jobsApi';
+import { authToast } from '@/lib/toast';
 import { Clock, Calendar as CalendarIcon, CheckCircle2, Trash2, BellRing, Edit2, X } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
@@ -33,10 +34,18 @@ export function ReminderDialog({ open, onOpenChange, job }: ReminderDialogProps)
     // Combine date and time into ISO 8601
     const scheduledDateTime = new Date(`${date}T${time}:00`);
 
+    if (scheduledDateTime.getTime() <= Date.now()) {
+      authToast.error(
+        'Invalid Reminder Time',
+        'The selected reminder time has already passed. Please choose a future date or time.'
+      );
+      return;
+    }
+
     const onSuccess = () => {
       setIsSuccess(true);
       setTimeout(() => {
-        resetState();
+        handleOpenChange(false);
       }, 2000);
     };
 

@@ -15,7 +15,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 import { JobApplication, useDeleteJob } from '../api/jobsApi';
 import { toast } from 'react-hot-toast';
 
@@ -49,19 +58,20 @@ function formatDate(dateStr?: string) {
 
 export function JobCard({ job, onEdit, onSetReminder }: JobCardProps) {
   const deleteMutation = useDeleteJob();
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const statusConfig = STATUS_CONFIG[job.status] ?? STATUS_CONFIG['Saved'];
 
-  const handleDelete = () => {
-    if (
-      window.confirm(
-        'Delete this job application? This action cannot be undone.'
-      )
-    ) {
-      deleteMutation.mutate(job._id, {
-        onSuccess: () => toast.success('Job deleted'),
-        onError: () => toast.error('Failed to delete job'),
-      });
-    }
+  const handleDeleteConfirm = () => {
+    deleteMutation.mutate(job._id, {
+      onSuccess: () => {
+        toast.success('Job deleted');
+        setShowDeleteDialog(false);
+      },
+      onError: () => {
+        toast.error('Failed to delete job');
+        setShowDeleteDialog(false);
+      },
+    });
   };
 
   const displayDate = job.appliedDate
@@ -69,8 +79,9 @@ export function JobCard({ job, onEdit, onSetReminder }: JobCardProps) {
     : formatDate(job.updatedAt);
 
   return (
-    <div className="group flex items-center gap-4 px-5 py-4 rounded-xl border border-border/50 bg-surface/60 hover:bg-surface/80 hover:border-border transition-all duration-150">
-      {/* Company initial avatar */}
+    <>
+      <div className="group flex items-center gap-4 px-5 py-4 rounded-xl border border-border/50 bg-surface/60 hover:bg-surface/80 hover:border-border transition-all duration-150">
+        {/* Company initial avatar */}
       <div className="hidden sm:flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm uppercase select-none border border-primary/10">
         {job.companyName?.[0] ?? '?'}
       </div>
@@ -169,7 +180,7 @@ export function JobCard({ job, onEdit, onSetReminder }: JobCardProps) {
             </DropdownMenuItem>
           )}
           <DropdownMenuItem
-            onClick={handleDelete}
+            onClick={() => setShowDeleteDialog(true)}
             className="text-destructive focus:bg-destructive/10 focus:text-destructive"
           >
             <Trash2 className="mr-2 h-4 w-4" />
@@ -178,5 +189,25 @@ export function JobCard({ job, onEdit, onSetReminder }: JobCardProps) {
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
+
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent className="sm:max-w-[400px]">
+          <DialogHeader>
+            <DialogTitle>Delete Job Application?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. Are you sure you want to delete this job application?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0 pt-2">
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)} disabled={deleteMutation.isPending}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm} disabled={deleteMutation.isPending}>
+              {deleteMutation.isPending ? 'Deleting...' : 'Delete'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }

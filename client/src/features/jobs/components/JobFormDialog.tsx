@@ -272,7 +272,7 @@ export function JobFormDialog({ open, onOpenChange, job }: JobFormDialogProps) {
                       <span className="text-muted-foreground font-normal">(optional)</span>
                     </FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input type="date" className="[&::-webkit-calendar-picker-indicator]:invert" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
