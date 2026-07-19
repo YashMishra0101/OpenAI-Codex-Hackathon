@@ -46,7 +46,7 @@ This platform brings everything together:
 
 ## ✨ Core Features
 
-### 📄 AI-Powered Resume Checker
+### 📄 AI-Powered Resume Analyzer
 
 Upload your resume (PDF) and optionally paste a job description — the AI returns a full structured analysis:
 

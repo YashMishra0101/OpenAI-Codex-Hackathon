@@ -5,7 +5,8 @@ import { AnalyzerSkeleton } from '@/features/analyzer/components/AnalyzerSkeleto
 import { AnalysisResult } from '@/features/analyzer/components/AnalysisResult';
 import { useAnalyzeResume, AnalyzeResumeResponse } from '@/features/analyzer/api/analyzerApi';
 import { Button } from '@/components/ui/button';
-import { Trash2, UploadCloud } from 'lucide-react';
+import { Trash2, UploadCloud, History } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const STORAGE_KEY = 'analyzer_result_v1';
 
@@ -83,8 +84,22 @@ export function AnalyzerPage() {
   };
 
   return (
-    <div className="min-h-full bg-background">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-8">
+    <div className="min-h-full bg-background relative">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 pb-8 relative">
+        
+        {/* ── Top Right Options ── */}
+        {!analysisData && !analyzeMutation.isPending && (
+          <div className="absolute top-4 right-4 sm:right-6 lg:right-8 z-10">
+            <Button size="sm" asChild className="gap-1.5 transition-all duration-300 bg-primary/80 text-primary-foreground hover:bg-primary hover:shadow-md hover:shadow-primary/20 hover:-translate-y-px">
+              <Link to="/dashboard/resume-analyzer">
+                <History className="h-3.5 w-3.5" />
+                <span className="hidden sm:inline">Recent Analyses</span>
+                <span className="sm:hidden">History</span>
+              </Link>
+            </Button>
+          </div>
+        )}
+
         {analysisData ? (
           <div className="space-y-6">
             {/* ── Action Bar ── */}
@@ -100,15 +115,23 @@ export function AnalyzerPage() {
                   Analyze Another Resume
                 </Button>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={handleClear}
-                className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 gap-1.5"
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-                Clear Analysis
-              </Button>
+              <div className="flex items-center gap-3">
+                <Button size="sm" asChild className="gap-1.5 transition-all duration-300 bg-primary/80 text-primary-foreground hover:bg-primary hover:shadow-md hover:shadow-primary/20 hover:-translate-y-px hidden sm:flex">
+                  <Link to="/dashboard/resume-analyzer">
+                    <History className="h-3.5 w-3.5" />
+                    Recent Analyses
+                  </Link>
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleClear}
+                  className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 gap-1.5"
+                >
+                  <Trash2 className="h-3.5 w-3.5" />
+                  Clear Analysis
+                </Button>
+              </div>
             </div>
 
             <AnalysisResult data={analysisData} />

@@ -29,7 +29,7 @@ export async function sendEmail({
   try {
     if (transporter) {
       const info: nodemailer.SentMessageInfo = await transporter.sendMail({
-        from: `"AI Resume Checker & Job Tracker" <${env.SMTP_USER}>`,
+        from: `"AI Resume Analyzer & Job Tracker" <${env.SMTP_USER}>`,
         to,
         subject,
         html,

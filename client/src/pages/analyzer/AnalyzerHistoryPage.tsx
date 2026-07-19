@@ -12,7 +12,7 @@ import {
   ShieldAlert,
   ShieldX,
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 /* ─── Verdict helpers ───────────────────────────────────────────────────────── */
@@ -38,6 +38,7 @@ const VERDICT_META = {
 /* ─── Component ─────────────────────────────────────────────────────────────── */
 
 export function AnalyzerHistoryPage() {
+  const navigate = useNavigate();
   const { data: history, isLoading, error } = useResumeHistory();
 
   return (
@@ -46,12 +47,12 @@ export function AnalyzerHistoryPage() {
         {/* ── Page Header — matches Job Tracker ── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Resume Checker</h1>
+            <h1 className="text-2xl font-bold tracking-tight">Recent Analyses</h1>
             <p className="text-sm text-muted-foreground mt-1">
               View your past AI resume analyses and insights.
             </p>
           </div>
-          <Button asChild className="w-full sm:w-auto shrink-0">
+          <Button asChild className="w-full sm:w-auto shrink-0 transition-all duration-300 bg-primary/80 text-primary-foreground hover:bg-primary hover:shadow-md hover:shadow-primary/20 hover:-translate-y-px">
             <Link to="/analyzer">
               <Plus className="mr-2 h-4 w-4" />
               New Analysis
@@ -118,7 +119,8 @@ export function AnalyzerHistoryPage() {
                   return (
                     <Card
                       key={resume._id}
-                      className="group hover:border-primary/30 transition-colors flex flex-col border-border/40"
+                      onClick={() => navigate(`/analyzer/${resume._id}`)}
+                      className="group hover:border-primary/30 transition-colors flex flex-col border-border/40 cursor-pointer"
                     >
                       <CardContent className="pt-5 pb-4 px-5 flex-1 flex flex-col">
                         {/* Top row: verdict + date */}
@@ -164,13 +166,12 @@ export function AnalyzerHistoryPage() {
                         </div>
 
                         {/* CTA */}
-                        <Link
-                          to={`/analyzer/${resume._id}`}
+                        <div
                           className="flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary-hover mt-3 group-hover:underline transition-colors"
                         >
                           View Full Analysis
                           <ArrowRight className="h-3.5 w-3.5 group-hover:translate-x-0.5 transition-transform" />
-                        </Link>
+                        </div>
                       </CardContent>
                     </Card>
                   );

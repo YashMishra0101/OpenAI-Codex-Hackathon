@@ -37,7 +37,7 @@ export function AnalyzerDetailPage() {
               This analysis may have been deleted or does not exist. Please check your history.
             </p>
             <Button asChild variant="outline">
-              <Link to="/dashboard/resume-checker">
+              <Link to="/dashboard/resume-analyzer">
                 <ArrowLeft className="h-4 w-4 mr-2" /> Back to History
               </Link>
             </Button>
@@ -52,7 +52,7 @@ export function AnalyzerDetailPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* ── Navigation ── */}
         <Button asChild variant="ghost" size="sm" className="mb-6 text-muted-foreground hover:text-foreground">
-          <Link to="/dashboard/resume-checker">
+          <Link to="/dashboard/resume-analyzer">
             <ArrowLeft className="h-4 w-4 mr-1.5" /> Back to History
           </Link>
         </Button>

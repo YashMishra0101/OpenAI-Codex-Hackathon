@@ -64,7 +64,7 @@ export function Footer() {
                   to="/analyzer"
                   className="text-sm text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Resume Checker
+                  Resume Analyzer
                 </Link>
               </li>
               <li>

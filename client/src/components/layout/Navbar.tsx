@@ -24,7 +24,7 @@ export function Navbar() {
 
   const navLinks = [
     { name: 'Home', path: '/' },
-    { name: 'Resume Checker', path: '/analyzer', protected: true },
+    { name: 'Resume Analyzer', path: '/analyzer', protected: true },
     { name: 'Job Tracker', path: '/jobs', protected: true },
   ];
 
@@ -84,7 +84,8 @@ export function Navbar() {
           {/* Desktop Menu */}
           <div className="hidden md:flex md:items-center md:space-x-1">
             {navLinks.map((link) => {
-              const isActive = link.path === '/' ? location.pathname === '/' : location.pathname.startsWith(link.path);
+              const isHistoryRoute = location.pathname.startsWith('/dashboard/resume-analyzer') && link.path === '/analyzer';
+              const isActive = link.path === '/' ? location.pathname === '/' : (location.pathname.startsWith(link.path) || isHistoryRoute);
               return (
                 <Link
                   key={link.name}
@@ -184,7 +185,8 @@ export function Navbar() {
         <div className="md:hidden border-t border-border bg-background/95 backdrop-blur-md">
           <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3">
             {navLinks.map((link) => {
-              const isActive = link.path === '/' ? location.pathname === '/' : location.pathname.startsWith(link.path);
+              const isHistoryRoute = location.pathname.startsWith('/dashboard/resume-analyzer') && link.path === '/analyzer';
+              const isActive = link.path === '/' ? location.pathname === '/' : (location.pathname.startsWith(link.path) || isHistoryRoute);
               return (
                 <Link
                   key={link.name}

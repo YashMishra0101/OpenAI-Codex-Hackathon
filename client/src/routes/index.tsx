@@ -122,7 +122,7 @@ export const router = createBrowserRouter([
                 element: <Navigate to="/analyzer" replace />,
               },
               {
-                path: '/dashboard/resume-checker',
+                path: '/dashboard/resume-analyzer',
                 element: (
                   <Suspense fallback={<div className="flex h-full items-center justify-center"><LoadingSpinner /></div>}>
                     <AnalyzerHistoryPage />

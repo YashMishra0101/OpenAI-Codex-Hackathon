@@ -37,7 +37,7 @@ const COLORS = {
 } as const;
 
 const APP_NAME = 'CodexAI';
-const APP_TAGLINE = 'AI-powered Resume Checker & Job Tracker';
+const APP_TAGLINE = 'AI-powered Resume Analyzer & Job Tracker';
 const SUPPORT_EMAIL = env.SMTP_USER ?? 'support@codexai.com';
 
 let _transporter: nodemailer.Transporter | null = null;

@@ -283,7 +283,7 @@ export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
                   <span className={`mt-0.5 shrink-0 flex h-5 w-5 items-center justify-center rounded-md ${bg}`}>
                     <Icon className={`h-3 w-3 ${color}`} />
                   </span>
-                  <span className="text-xs text-muted-foreground leading-relaxed">{text}</span>
+                  <span className="text-[13px] text-muted-foreground leading-relaxed">{text}</span>
                 </li>
               ))}
             </ul>
@@ -292,7 +292,7 @@ export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
               variant="ghost" 
               size="sm" 
               onClick={() => setShowAllNotes(!showAllNotes)}
-              className="w-full text-xs text-muted-foreground mt-2 hover:bg-warning/10 hover:text-warning-foreground h-7"
+              className="w-full text-[13px] text-muted-foreground mt-2 hover:bg-warning/10 hover:text-warning-foreground h-7"
             >
               {showAllNotes ? "Hide notes" : "See all notes"}
             </Button>

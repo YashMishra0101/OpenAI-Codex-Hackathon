@@ -152,7 +152,7 @@ export function VerifyEmailPage() {
               <div className="w-full flex flex-col gap-3 pt-1">
                 <Button asChild className="w-full h-10 text-sm font-medium">
                   <Link to="/analyzer">
-                    Continue to Resume Checker
+                    Continue to Resume Analyzer
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                 </Button>
