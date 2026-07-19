@@ -25,7 +25,7 @@ export function GoogleAuthButton({ isRegister = false }: GoogleAuthButtonProps) 
         login(res.data.data.user);
       }
       authToast.success(isRegister ? 'Account created successfully!' : 'Logged in successfully!');
-      navigate('/analyzer');
+      void navigate('/analyzer');
     } catch (err: any) {
       authToast.error(err.response?.data?.message || 'Google authentication failed');
     } finally {
