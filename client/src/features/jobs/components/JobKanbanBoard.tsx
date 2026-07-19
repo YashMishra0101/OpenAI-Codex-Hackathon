@@ -73,7 +73,7 @@ function JobRow({
         <p className="text-sm font-semibold text-foreground truncate">{job.jobTitle}</p>
         <p className="text-xs text-muted-foreground truncate">{job.companyName}</p>
         {job.notes && (
-          <p className="text-[11px] text-muted-foreground/75 italic mt-1 line-clamp-2 pr-2">
+          <p className="text-[11px] text-muted-foreground/75 mt-1 line-clamp-2 pr-2">
             {job.notes}
           </p>
         )}

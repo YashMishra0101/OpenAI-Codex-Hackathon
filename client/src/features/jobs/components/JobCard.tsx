@@ -95,7 +95,7 @@ export function JobCard({ job, onEdit, onSetReminder }: JobCardProps) {
           {job.companyName}
         </p>
         {job.notes && (
-          <p className="text-xs text-muted-foreground/75 italic mt-1.5 line-clamp-2 pr-4">
+          <p className="text-xs text-muted-foreground/75 mt-1.5 line-clamp-2 pr-4">
             {job.notes}
           </p>
         )}
