@@ -48,6 +48,8 @@ This platform brings everything together:
 
 Upload your resume (PDF) and optionally paste a job description — the AI returns a full structured analysis:
 
+> **Note:** If analysis fails, please try 2-3 times. Most times it works in 2-3 attempts.
+
 | Section                                    | What You Get                                                                                         |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
 | **Match Analysis**                         | Strong / Partial / Weak verdict with missing keywords & strengths                                    |

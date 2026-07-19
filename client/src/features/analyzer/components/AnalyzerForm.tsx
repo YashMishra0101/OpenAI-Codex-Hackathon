@@ -202,6 +202,13 @@ export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
                       <span className="text-primary">Click to upload</span> or drag and drop
                     </p>
                     <p className="text-sm text-muted-foreground mt-1.5">PDF format · Max 10MB</p>
+                    
+                    <div className="mt-5 inline-flex items-center gap-1.5 rounded-lg border border-border/50 bg-muted/20 px-3.5 py-2 text-xs text-muted-foreground shadow-sm">
+                      <RefreshCw className="h-3.5 w-3.5 shrink-0 text-primary/70" />
+                      <span className="font-medium">
+                        If analysis fails, please try 2-3 times. <span className="opacity-70">Most times it works in 2-3 attempts.</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
               )}
@@ -226,16 +233,6 @@ export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
 
             <ul className="space-y-2.5">
               {[
-                {
-                  icon: RefreshCw,
-                  color: 'text-success',
-                  bg: 'bg-success/10',
-                  text: (
-                    <>
-                      If analysis fails, please <span className="font-semibold text-foreground/80">try 2-3 times</span>. Most times it works in 2-3 attempts.
-                    </>
-                  ),
-                },
                 {
                   icon: FileWarning,
                   color: 'text-warning',
