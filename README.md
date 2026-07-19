@@ -1,10 +1,6 @@
 <div align="center">
 
-# AI-Powered Resume Analysis & Job Tracking System
-
-> This project is created using Codex for the **OpenAI Codex Hackathon**.
->
-> The OpenAI Codex Hackathon is hosted on [namasteDev.com](https://namastedev.com) and organized by **Akshay Saini**.
+# CodexAI - AI Resume Analysis & Job Tracking System
 
 [![Vercel](https://img.shields.io/badge/Frontend-Vercel-000000?logo=vercel&logoColor=white&style=for-the-badge)](https://vercel.com/)
 [![Render](https://img.shields.io/badge/Backend-Render-46E3B7?logo=render&logoColor=black&style=for-the-badge)](https://render.com/)
@@ -26,6 +22,10 @@
 [![OpenRouter](https://img.shields.io/badge/OpenRouter_Llama_3.3-362D59?style=for-the-badge&logo=openrouter&logoColor=white)](https://openrouter.ai/)
 
 🧑‍💻 Production grade platform 🚧 Actively under development ⭐ Star the repo to follow the journey
+
+> This project is created using Codex for the **OpenAI Codex Hackathon**.
+>
+> The OpenAI Codex Hackathon is hosted on [namasteDev.com](https://namastedev.com) and organized by **Akshay Saini**.
 
 </div>
 
@@ -50,15 +50,15 @@ This platform brings everything together:
 
 Upload your resume (PDF) and optionally paste a job description — the AI returns a full structured analysis:
 
-| Section                                    | What You Get                                                                         |
-| ------------------------------------------ | ------------------------------------------------------------------------------------ |
-| **Match Analysis**                         | Strong / Partial / Weak verdict with missing keywords & strengths                    |
-| **Key Strengths**                          | Brief explanations of the key strengths identified during the resume analysis        |
-| **Areas for Improvement**                  | Actionable, specific tips to strengthen your resume                                  |
+| Section                                    | What You Get                                                                                         |
+| ------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
+| **Match Analysis**                         | Strong / Partial / Weak verdict with missing keywords & strengths                                    |
+| **Key Strengths**                          | Brief explanations of the key strengths identified during the resume analysis                        |
+| **Areas for Improvement**                  | Actionable, specific tips to strengthen your resume                                                  |
 | **Interview Questions**                    | 10–50 personalized questions based on your resume + JD (generates 30 by default, customizable later) |
-| **Advanced Search Queries (Google Dorks)** | 15 highly targeted queries (8 job search, 4 interview prep, 3 interview experiences) |
-| **Analysis History**                       | All past analyses saved — revisit anytime                                            |
-| **Works without JD**                       | Analyze your resume on its own, no job description required                          |
+| **Advanced Search Queries (Google Dorks)** | 15 highly targeted queries (8 job search, 4 interview prep, 3 interview experiences)                 |
+| **Analysis History**                       | All past analyses saved — revisit anytime                                                            |
+| **Works without JD**                       | Analyze your resume on its own, no job description required                                          |
 
 **What are Google Dorks?** Advanced search queries using operators like `site:`, `"exact phrase"`, and `after:` to surface results normal searches miss. The AI generates these targeted queries from your resume and job preferences so you discover relevant opportunities faster.
 
