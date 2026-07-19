@@ -21,8 +21,6 @@
 [![Gemini AI](https://img.shields.io/badge/Gemini_3.5_Flash-4285F4?style=for-the-badge&logo=google&logoColor=white)](https://aistudio.google.com/)
 [![OpenRouter](https://img.shields.io/badge/OpenRouter_Llama_3.3-362D59?style=for-the-badge&logo=openrouter&logoColor=white)](https://openrouter.ai/)
 
-🧑‍💻 Production grade platform 🚧 Actively under development ⭐ Star the repo to follow the journey
-
 > This project is created using Codex for the **OpenAI Codex Hackathon**.
 >
 > The OpenAI Codex Hackathon is hosted on [namasteDev.com](https://namastedev.com) and organized by **Akshay Saini**.
