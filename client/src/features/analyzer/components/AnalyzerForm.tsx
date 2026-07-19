@@ -206,7 +206,7 @@ export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
                     <div className="mt-5 inline-flex items-center gap-1.5 rounded-lg border border-border/50 bg-muted/20 px-3.5 py-2 text-xs text-muted-foreground shadow-sm">
                       <RefreshCw className="h-3.5 w-3.5 shrink-0 text-primary/70" />
                       <span className="font-medium">
-                        If analysis fails, please try 2-3 times. <span className="opacity-70">Most times it works in 2-3 attempts.</span>
+                        <span className="font-semibold text-foreground/90">Note:</span> AI responses may occasionally require another attempt. <span className="opacity-70">If the analysis doesn't complete successfully, please retry 2–3 times.</span>
                       </span>
                     </div>
                   </div>

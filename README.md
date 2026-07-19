@@ -48,7 +48,7 @@ This platform brings everything together:
 
 Upload your resume (PDF) and optionally paste a job description — the AI returns a full structured analysis:
 
-> **Note:** If analysis fails, please try 2-3 times. Most times it works in 2-3 attempts.
+> **Note:** AI responses may occasionally require another attempt. If the analysis doesn't complete successfully, please retry 2–3 times.
 
 | Section                                    | What You Get                                                                                         |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
