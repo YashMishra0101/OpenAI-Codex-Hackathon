@@ -311,7 +311,7 @@ export function LandingPage() {
                   key={tech.name}
                   className="group flex flex-col items-center justify-center rounded-xl border border-border/50 bg-surface/40 px-4 py-5 hover:border-primary/30 hover:bg-primary/5 transition-colors"
                 >
-                  <span className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">
+                  <span className="text-sm font-medium text-center text-foreground group-hover:text-primary transition-colors">
                     {tech.name}
                   </span>
                   <span className="text-xs text-muted-foreground mt-1">{tech.category}</span>
