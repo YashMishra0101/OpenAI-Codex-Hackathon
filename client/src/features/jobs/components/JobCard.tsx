@@ -94,6 +94,11 @@ export function JobCard({ job, onEdit, onSetReminder }: JobCardProps) {
         <p className="text-xs text-muted-foreground truncate mt-0.5">
           {job.companyName}
         </p>
+        {job.notes && (
+          <p className="text-xs text-muted-foreground/75 italic mt-1.5 line-clamp-2 pr-4">
+            {job.notes}
+          </p>
+        )}
       </div>
 
       {/* Meta — location / salary / date */}
