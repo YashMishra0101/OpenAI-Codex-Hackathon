@@ -20,7 +20,7 @@ export function LoginPage() {
         login(res.data.data.user);
       }
       authToast.success('Logged in successfully!');
-      navigate('/analyzer');
+      void navigate('/analyzer');
     } catch (err: any) {
       authToast.error(err.response?.data?.message || 'Failed to login');
     } finally {
