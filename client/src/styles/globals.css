@@ -150,3 +150,33 @@
     transparent 100%
   );
 }
+
+/* ── Toast Animations ────────────────────────────────────────────────────────
+   Used by custom react-hot-toast implementation
+   ─────────────────────────────────────────────────────────────────────────── */
+@theme {
+  --animate-enter: enter 0.2s ease-out;
+  --animate-leave: leave 0.15s ease-in forwards;
+}
+
+@keyframes enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.9) translateY(-1rem);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes leave {
+  0% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.9) translateY(-1rem);
+  }
+}
