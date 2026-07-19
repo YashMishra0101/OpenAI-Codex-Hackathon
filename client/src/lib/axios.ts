@@ -51,10 +51,25 @@ api.interceptors.response.use(
         return await api(originalRequest);
       } catch {
         // Refresh failed — session is fully expired, redirect to login if not already there
-        const publicPaths = ['/login', '/register', '/signup', '/verify-email'];
-        if (!publicPaths.includes(window.location.pathname)) {
+        const publicPaths = [
+          '/',
+          '/login',
+          '/register',
+          '/signup',
+          '/verify-email',
+          '/forgot-password',
+          '/reset-password',
+          '/terms',
+          '/privacy',
+        ];
+        
+        // If the request that triggered this was the initial session check on app load,
+        // we defer to React Router's ProtectedRoute to handle the redirect if necessary.
+        // Otherwise, for active API calls that fail with 401, we forcefully redirect.
+        if (originalRequest.url !== '/users/me' && !publicPaths.includes(window.location.pathname)) {
           window.location.href = '/login';
         }
+        
         return Promise.reject(error);
       }
     }
