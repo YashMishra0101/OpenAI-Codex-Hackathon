@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { authToast } from '@/lib/toast';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
@@ -73,10 +73,10 @@ export function VerifyEmailPage() {
       setIsResending(true);
       await api.post('/auth/resend-verification', { email });
       setResendSuccess(true);
-      toast.success('Verification email sent! Check your inbox.');
+      authToast.success('Verification email sent! Check your inbox.');
       setEmail('');
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Something went wrong. Please try again.');
+      authToast.error(err.response?.data?.message || 'Something went wrong. Please try again.');
     } finally {
       setIsResending(false);
     }

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { authToast } from '@/lib/toast';
 import { RegisterForm } from '@/features/auth/components/RegisterForm';
 import { GoogleAuthButton } from '@/features/auth/components/GoogleAuthButton';
 import type { RegisterFormData } from '@/features/auth/schemas';
@@ -22,7 +22,7 @@ export function RegisterPage() {
       // Don't navigate — replace the form with a "check your email" screen.
       setRegisteredEmail(data.email);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to create account. Please try again.');
+      authToast.error(err.response?.data?.message || 'Failed to create account. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -33,9 +33,9 @@ export function RegisterPage() {
     try {
       setIsResending(true);
       await api.post('/auth/resend-verification', { email: registeredEmail });
-      toast.success('Verification email resent! Check your inbox.');
+      authToast.success('Verification email resent! Check your inbox.');
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Could not resend. Please try again.');
+      authToast.error(err.response?.data?.message || 'Could not resend. Please try again.');
     } finally {
       setIsResending(false);
     }

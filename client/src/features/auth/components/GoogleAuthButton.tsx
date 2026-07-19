@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
-import toast from 'react-hot-toast';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/features/auth/context/AuthContext';
+import { authToast } from '@/lib/toast';
 import api from '@/lib/axios';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
@@ -9,6 +11,8 @@ interface GoogleAuthButtonProps {
 }
 
 export function GoogleAuthButton({ isRegister = false }: GoogleAuthButtonProps) {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSuccess = async (response: CredentialResponse) => {
@@ -16,12 +20,14 @@ export function GoogleAuthButton({ isRegister = false }: GoogleAuthButtonProps) 
     
     try {
       setIsLoading(true);
-      await api.post('/auth/google', { credential: response.credential });
-      toast.success(isRegister ? 'Account created successfully!' : 'Logged in successfully!');
-      // Reload the application to hydrate the global AuthContext
-      window.location.href = '/analyzer';
+      const res = await api.post('/auth/google', { credential: response.credential });
+      if (res.data?.data?.user) {
+        login(res.data.data.user);
+      }
+      authToast.success(isRegister ? 'Account created successfully!' : 'Logged in successfully!');
+      navigate('/analyzer');
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Google authentication failed');
+      authToast.error(err.response?.data?.message || 'Google authentication failed');
     } finally {
       setIsLoading(false);
     }
@@ -36,7 +42,7 @@ export function GoogleAuthButton({ isRegister = false }: GoogleAuthButtonProps) 
       )}
       <GoogleLogin
         onSuccess={handleSuccess}
-        onError={() => toast.error('Google login failed')}
+        onError={() => authToast.error('Google login failed')}
         useOneTap
         theme="filled_black"
         size="large"

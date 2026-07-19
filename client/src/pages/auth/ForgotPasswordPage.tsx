@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { authToast } from '@/lib/toast';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { forgotPasswordSchema, type ForgotPasswordFormData } from '@/features/auth/schemas';
@@ -36,7 +36,7 @@ export function ForgotPasswordPage() {
       await api.post('/auth/forgot-password', data);
       setIsSuccess(true);
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Something went wrong');
+      authToast.error(err.response?.data?.message || 'Something went wrong');
     } finally {
       setIsLoading(false);
     }

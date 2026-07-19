@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '@/features/auth/context/AuthContext';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
-import toast from 'react-hot-toast';
+import { authToast } from '@/lib/toast';
 
 /**
  * Authentication guard for protected routes.
@@ -22,7 +22,7 @@ export function ProtectedRoute() {
   }
 
   if (!isAuthenticated) {
-    toast.error('Please log in to access this feature', { id: 'auth-redirect' });
+    authToast.error('Please log in to access this feature', undefined, 'auth-redirect');
     return <Navigate to="/login" replace />;
   }
 

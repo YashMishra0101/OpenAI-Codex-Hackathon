@@ -51,9 +51,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       console.error('Logout failed:', err);
     } finally {
       setUser(null);
-      // Let the ProtectedRoute handle redirecting if necessary,
-      // or redirect manually. Using window.location.href ensures all state is cleared.
-      window.location.href = '/login';
     }
   };
 

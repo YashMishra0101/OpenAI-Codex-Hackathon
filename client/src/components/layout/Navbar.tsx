@@ -5,7 +5,7 @@ import { Button } from '../ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu';
 import { useAuth } from '@/features/auth/context/AuthContext';
-import toast from 'react-hot-toast';
+import { authToast } from '@/lib/toast';
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -31,7 +31,7 @@ export function Navbar() {
   const handleProtectedNavigation = (e: React.MouseEvent<HTMLAnchorElement>, _path: string, isProtected?: boolean) => {
     if (isProtected && !isAuthenticated) {
       e.preventDefault();
-      toast.error('Please log in or create an account to use this feature');
+      authToast.error('Please log in or create an account to use this feature');
       void navigate('/login');
       if (isOpen) setIsOpen(false);
     } else {
@@ -41,11 +41,14 @@ export function Navbar() {
 
   const handleLogout = async () => {
     try {
+      // Navigate to a public route first. This unmounts ProtectedRoute 
+      // BEFORE we clear the user state, preventing duplicate error toasts.
+      navigate('/');
+      
       await logout();
-      toast.success('Logged out successfully');
-      void navigate('/');
+      authToast.success('Logged out successfully');
     } catch {
-      toast.error('Failed to logout');
+      authToast.error('Failed to logout');
     }
   };
 

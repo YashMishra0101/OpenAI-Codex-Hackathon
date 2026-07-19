@@ -1,22 +1,28 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { Link, useNavigate } from 'react-router-dom';
+import { authToast } from '@/lib/toast';
+import { useAuth } from '@/features/auth/context/AuthContext';
 import { LoginForm } from '@/features/auth/components/LoginForm';
 import { GoogleAuthButton } from '@/features/auth/components/GoogleAuthButton';
 import type { LoginFormData } from '@/features/auth/schemas';
 import api from '@/lib/axios';
 
 export function LoginPage() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleLogin = async (data: LoginFormData) => {
     try {
       setIsLoading(true);
-      await api.post('/auth/login', data);
-      toast.success('Logged in successfully!');
-      window.location.href = '/analyzer';
+      const res = await api.post('/auth/login', data);
+      if (res.data?.data?.user) {
+        login(res.data.data.user);
+      }
+      authToast.success('Logged in successfully!');
+      navigate('/analyzer');
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to login');
+      authToast.error(err.response?.data?.message || 'Failed to login');
     } finally {
       setIsLoading(false);
     }

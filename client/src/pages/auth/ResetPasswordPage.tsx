@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useSearchParams, useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
+import { authToast } from '@/lib/toast';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { resetPasswordSchema, type ResetPasswordFormData } from '@/features/auth/schemas';
@@ -42,10 +42,10 @@ export function ResetPasswordPage() {
         token,
         password: data.password,
       });
-      toast.success('Password reset successfully! You can now log in.');
+      authToast.success('Password reset successfully! You can now log in.');
       void navigate('/login');
     } catch (err: any) {
-      toast.error(err.response?.data?.message || 'Failed to reset password. The link may be invalid or expired.');
+      authToast.error(err.response?.data?.message || 'Failed to reset password. The link may be invalid or expired.');
     } finally {
       setIsLoading(false);
     }

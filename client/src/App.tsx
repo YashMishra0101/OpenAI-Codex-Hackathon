@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 import { router } from './routes';
 import { queryClient } from './lib/queryClient';
 import { AuthProvider } from './features/auth/context/AuthContext';
+import { TOAST_DURATION } from './lib/toast';
 
 /**
  * Root application component.
@@ -26,7 +27,7 @@ export default function App() {
           <Toaster
             position="top-right"
             toastOptions={{
-              duration: 4000,
+              duration: TOAST_DURATION,
               style: {
                 background: '#18181b',
                 color: '#fafafa',
