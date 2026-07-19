@@ -39,7 +39,7 @@ Job seekers today juggle multiple **disconnected tools**, one for **resume feedb
 
 This platform brings everything together:
 
-- **Upload your resume** → Get instant AI-powered ATS scoring, keyword analysis, personalized interview questions, and Google Dorks (advanced search queries) that help you discover relevant job postings across the web.
+- **Upload your resume** → Get instant AI-powered Match Analysis, keyword analysis, personalized interview questions, and Google Dorks (advanced search queries) that help you discover relevant job postings across the web.
 - **Track your applications** → Monitor status, set email reminders, and view application funnel analytics.
 
 ---
