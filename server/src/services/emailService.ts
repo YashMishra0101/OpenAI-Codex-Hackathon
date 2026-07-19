@@ -3,6 +3,19 @@ import { env } from '../config/env.js';
 import logger from '../utils/logger.js';
 
 /**
+ * Escapes HTML special characters to prevent XSS injection.
+ * Must be applied to ALL user-supplied values before embedding in HTML email bodies.
+ */
+function htmlEscape(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
+/**
  * Email service using Nodemailer and Gmail.
  *
  * Uses a standard SMTP transport configured for Gmail.
@@ -365,6 +378,87 @@ function passwordResetEmailHtml(name: string, resetUrl: string): string {
   return emailWrapper(body);
 }
 
+function reminderEmailHtml(
+  companyName: string,
+  jobTitle: string,
+  notes?: string,
+): string {
+  const safeCompany = htmlEscape(companyName);
+  const safeTitle   = htmlEscape(jobTitle);
+  const safeNotes   = notes ? htmlEscape(notes) : null;
+
+  const body = `
+    <!-- Icon -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" cellpadding="0" cellspacing="0" border="0">
+            <tr>
+              <td style="width:64px;height:64px;background-color:rgba(15,184,114,0.12);border:1px solid rgba(15,184,114,0.25);border-radius:14px;text-align:center;vertical-align:middle;">
+                <span style="font-size:28px;line-height:64px;display:block;">🗓️</span>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+
+    <!-- Heading -->
+    <h1 style="margin:0 0 8px;color:${COLORS.foreground};font-size:24px;font-weight:700;text-align:center;letter-spacing:-0.4px;line-height:1.2;">
+      Interview Reminder
+    </h1>
+    <p style="margin:0 0 32px;color:${COLORS.muted};font-size:14px;text-align:center;line-height:1.5;">
+      Your scheduled interview or follow-up is coming up soon
+    </p>
+
+    <!-- Divider -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr><td style="height:1px;background-color:${COLORS.border};font-size:0;line-height:0;">&nbsp;</td></tr>
+    </table>
+
+    <!-- Details card -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:28px;">
+      <tr>
+        <td style="background-color:${COLORS.surfaceRaised};border:1px solid ${COLORS.border};border-radius:10px;padding:20px 24px;">
+
+          <p style="margin:0 0 6px;color:${COLORS.muted};font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Company</p>
+          <p style="margin:0 0 18px;color:${COLORS.foreground};font-size:16px;font-weight:700;">${safeCompany}</p>
+
+          <p style="margin:0 0 6px;color:${COLORS.muted};font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Position</p>
+          <p style="margin:0;color:${COLORS.foreground};font-size:16px;font-weight:700;">${safeTitle}</p>
+
+          ${safeNotes ? `
+          <!-- Notes divider -->
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:18px 0 18px;">
+            <tr><td style="height:1px;background-color:${COLORS.border};font-size:0;line-height:0;">&nbsp;</td></tr>
+          </table>
+          <p style="margin:0 0 6px;color:${COLORS.muted};font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.8px;">Your Notes</p>
+          <p style="margin:0;color:${COLORS.muted};font-size:14px;line-height:1.65;">${safeNotes}</p>
+          ` : ''}
+
+        </td>
+      </tr>
+    </table>
+
+    <!-- Message -->
+    <p style="margin:0 0 32px;color:${COLORS.muted};font-size:14px;line-height:1.65;text-align:center;">
+      Good luck with your interview! Review the job description, prepare thoughtful answers, and bring your best. 🚀
+    </p>
+
+    <!-- Divider -->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+      <tr><td style="height:1px;background-color:${COLORS.border};font-size:0;line-height:0;">&nbsp;</td></tr>
+    </table>
+
+    <!-- Footer note -->
+    <p style="margin:0;color:${COLORS.dimmed};font-size:12px;line-height:1.5;text-align:center;">
+      This reminder was scheduled by you in ${APP_NAME}. Log in to manage your reminders.
+    </p>
+  `;
+
+  return emailWrapper(body);
+}
+
 // ── Email sending functions ────────────────────────────────────────────────────
 
 async function dispatchEmail({
@@ -407,6 +501,23 @@ async function dispatchEmail({
     // Re-throw so callers can decide whether to surface the error
     throw err;
   }
+}
+
+export async function sendReminderEmail(
+  email: string,
+  companyName: string,
+  jobTitle: string,
+  notes?: string,
+): Promise<void> {
+  // Unlike sendVerificationEmail, reminder failures ARE surfaced via throw.
+  // This lets Agenda properly mark the job as failed so it can be investigated
+  // or retried, instead of silently discarding the reminder.
+  await dispatchEmail({
+    to: email,
+    subject: `Interview Reminder: ${companyName} — ${APP_NAME}`,
+    html: reminderEmailHtml(companyName, jobTitle, notes),
+    logKey: 'EMAIL_REMINDER_SENT',
+  });
 }
 
 export async function sendVerificationEmail(

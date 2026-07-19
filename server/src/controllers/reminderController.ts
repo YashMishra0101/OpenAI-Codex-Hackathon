@@ -46,7 +46,7 @@ export async function scheduleReminderHandler(req: Request, res: Response): Prom
   }
   
   // 4. Schedule the Agenda job — include jobId for auto-decrement after send
-  await agenda.schedule(scheduledDate, 'send-interview-reminder', {
+  await agenda.schedule(scheduledDate, 'send-interview-reminder-v2', {
     to: user.email,
     companyName: job.companyName,
     jobTitle: job.jobTitle,
@@ -84,7 +84,7 @@ export async function getRemindersHandler(req: Request, res: Response): Promise<
 
   // Query agendaJobs collection directly for pending reminders matching this job
   const jobs = await agenda.jobs({
-    name: 'send-interview-reminder',
+    name: 'send-interview-reminder-v2',
     'data.jobId': id,
     'data.to': user.email,
     nextRunAt: { $ne: null }, // still pending
@@ -123,7 +123,7 @@ export async function deleteReminderHandler(req: Request, res: Response): Promis
   // Find the specific Agenda job — must match jobId AND user email (ownership)
   const [agendaJob] = await agenda.jobs({
     _id: new mongoose.Types.ObjectId(reminderId),
-    name: 'send-interview-reminder',
+    name: 'send-interview-reminder-v2',
     'data.jobId': id,
     'data.to': user.email,
   });
@@ -187,7 +187,7 @@ export async function updateReminderHandler(req: Request, res: Response): Promis
   // Find the specific Agenda job — must match jobId AND user email (ownership)
   const [agendaJob] = await agenda.jobs({
     _id: new mongoose.Types.ObjectId(reminderId),
-    name: 'send-interview-reminder',
+    name: 'send-interview-reminder-v2',
     'data.jobId': id,
     'data.to': user.email,
   });

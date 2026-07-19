@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { useScheduleReminder, useGetReminders, useDeleteReminder, useUpdateReminder, JobApplication, PendingReminder } from '../api/jobsApi';
+import { useQueryClient } from '@tanstack/react-query';
 import { authToast } from '@/lib/toast';
 import { Clock, Calendar as CalendarIcon, CheckCircle2, Trash2, BellRing, Edit2, X } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
@@ -24,6 +25,20 @@ export function ReminderDialog({ open, onOpenChange, job }: ReminderDialogProps)
   const scheduleReminder = useScheduleReminder();
   const deleteReminder = useDeleteReminder();
   const updateReminder = useUpdateReminder();
+  const queryClient = useQueryClient();
+
+  // Immediately refresh stats when the dialog opens so the Reminder badge on
+  // the dashboard reflects the current database value — not the 5-minute
+  // stale-cache value. This is important because Agenda jobs fire in the
+  // background: the count may have already been decremented by the server
+  // but the client cache is still showing the old number.
+  useEffect(() => {
+    if (open && job) {
+      void queryClient.invalidateQueries({ queryKey: ['jobStats'] });
+      void queryClient.invalidateQueries({ queryKey: ['jobs'] });
+    }
+  }, [open, job, queryClient]);
+
   
   // Fetch existing pending reminders for this job
   const { data: reminders, isLoading: isLoadingReminders } = useGetReminders(open && job ? job._id : null);

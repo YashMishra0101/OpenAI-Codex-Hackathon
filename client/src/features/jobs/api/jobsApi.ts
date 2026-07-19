@@ -55,6 +55,11 @@ export function useJobStats() {
       const response = await api.get('/jobs/stats');
       return response.data.data;
     },
+    // Poll every 30 seconds so the Reminder badge count corrects itself
+    // automatically after a background Agenda job fires an email and
+    // decrements reminderCount in the database. Without this, the 5-minute
+    // global staleTime keeps showing the stale count until a manual refresh.
+    refetchInterval: 30 * 1000,
   });
 }
 
