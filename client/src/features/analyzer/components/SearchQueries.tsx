@@ -189,7 +189,7 @@ export function SearchQueries({ queries }: SearchQueriesProps) {
           <p className="text-xs text-muted-foreground leading-relaxed">
             These AI-generated queries are tailored to your resume and use advanced search operators to uncover{' '}
             <span className="text-info font-semibold">hidden job opportunities</span>,{' '}
-            <span className="text-accent font-semibold">interview preparation resources</span>, and{' '}
+            <span className="text-accent font-semibold">interview preparation resources</span> and{' '}
             <span className="text-warning font-semibold">real interview experiences</span>{' '}
             that often don't appear in regular Google searches.
           </p>

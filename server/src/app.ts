@@ -101,8 +101,8 @@ const resendLimiter = rateLimit({
 // Tier 2: AI analysis limiter — protects AI API quota from abuse.
 // 5 resume analyses per 15 minutes per IP is generous for real users.
 const aiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5,
+  windowMs: 1 * 60 * 1000,
+  max: 30,
   standardHeaders: 'draft-7',
   legacyHeaders: false,
   message: {

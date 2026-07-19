@@ -107,7 +107,7 @@ Keep every application organized in one powerful dashboard:
 | **Language**        | TypeScript in strict mode across the client and server                                                                                                                   |
 | **Frontend**        | TypeScript, React 19, React Compiler, Vite 8, TailwindCSS 4, shadcn/ui, React Router v7, TanStack Query v5, React Hook Form, Zod, Axios, React Hot Toast, Phosphor Icons |
 | **Backend**         | TypeScript, Node.js, Express, JWT (Access + Refresh tokens), argon2, Multer, pdf-parse, Agenda.js                                                                        |
-| **AI**              | Google Gemini 3.5 Flash free tier (`gemini-3.5-flash`) — Primary · OpenRouter Llama 3.3 70B Instruct free tier (`meta-llama/llama-3.3-70b-instruct:free`) — Fallback                                           |
+| **AI**              | Google Gemini Free Tier (`gemini-3.1-flash-lite` & others) — Primary · OpenRouter Llama 3.3 70B Instruct free tier (`meta-llama/llama-3.3-70b-instruct:free`) — Fallback                                           |
 | **Database**        | MongoDB Atlas + Mongoose (ODM)                                                                                                                                           |
 | **Storage**         | Cloudinary (profile images + resume PDFs)                                                                                                                                |
 | **Email**           | Nodemailer + Gmail (500 emails/day free)                                                                                                                                 |
@@ -187,9 +187,18 @@ Before every AI call, the backend generates a `SHA-256` hash of `(resumeText + j
 <details>
 <summary><strong>🤖 Why Dual AI Providers (Gemini + OpenRouter)?</strong></summary>
 
-Gemini 3.5 Flash is the primary provider — excellent structured JSON output, strong reasoning, and Google's infrastructure reliability. However, AI APIs can experience rate limits or downtime.
+The backend implements an **automatic fallback pattern** for AI providers to maximize reliability since both services are operating on their free tiers.
 
-`aiService.ts` implements an **automatic fallback pattern**: try Gemini 3.5 Flash → if it fails/times out → retry with OpenRouter's Llama 3.3 70B Instruct (free tier) → return the result from whichever succeeds. Both provider responses are validated with Zod and normalized to one inferred TypeScript contract, so the rest of the application is unaware of which provider was used.
+When analyzing a resume, it attempts to use these models in the following order:
+1. `gemini-3.1-flash-lite` (Primary)
+2. `gemini-3.1-flash-image`
+3. `gemini-2.0-flash-lite`
+4. `gemini-2.0-flash`
+5. If all Gemini models fail, it falls back to OpenRouter's `meta-llama/llama-3.3-70b-instruct:free`.
+
+**Rate Limit Handling:** Because both Gemini and OpenRouter are free tier models, they have strict per-minute usage limits. To prevent our server from being blocked for exceeding these upstream limits, we have configured a strict rate limit in our backend (Express) that ensures users cannot send more requests than our free AI providers can handle.
+
+Both provider responses are validated with Zod and normalized to one inferred TypeScript contract, so the rest of the application is unaware of which provider was used.
 
 </details>
 

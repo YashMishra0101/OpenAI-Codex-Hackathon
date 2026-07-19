@@ -35,6 +35,11 @@ function clearPersistedResult(): void {
 }
 
 export function AnalyzerPage() {
+  // Ensure the page always starts at the top when navigated to
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, []);
+
   const analyzeMutation = useAnalyzeResume();
   const [analysisData, setAnalysisData] = useState<AnalyzeResumeResponse['data'] | null>(
     () => loadPersistedResult()
@@ -48,6 +53,9 @@ export function AnalyzerPage() {
   }, [analysisData]);
 
   const handleSubmit = (data: { resume: File; jobDescription?: string; searchPreferences?: string }) => {
+    // Scroll to top immediately when analysis starts so the loading state is in view
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    
     analyzeMutation.mutate(data, {
       onSuccess: (response) => {
         // Uploading a new resume always clears the previous result
@@ -56,8 +64,14 @@ export function AnalyzerPage() {
         toast.success('Resume analyzed successfully!');
       },
       onError: (error: any) => {
-        const message = error.response?.data?.message || 'Failed to analyze resume. Please try again.';
-        toast.error(message);
+        const baseMessage = error.response?.data?.message || 'Failed to analyze resume.';
+        toast.error(
+          <div className="flex flex-col gap-0.5 mt-0.5">
+            <span className="font-medium text-sm">{baseMessage}</span>
+            <span className="text-[13px] opacity-80 leading-snug">Please check the Important Notes section just below the upload area for troubleshooting steps.</span>
+          </div>,
+          { duration: 6000 }
+        );
       },
     });
   };

@@ -81,6 +81,7 @@ function StepIndicator({ currentStep }: { currentStep: number }) {
 export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [fileError, setFileError] = useState<string | null>(null);
+  const [showAllNotes, setShowAllNotes] = useState(false);
 
   const form = useForm<AnalyzerFormValues>({
     resolver: zodResolver(analyzerFormSchema),
@@ -131,7 +132,12 @@ export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
           <Sparkles className="h-8 w-8 text-primary" />
         </div>
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">AI Resume Analyzer</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight inline-flex items-center justify-center gap-3">
+            AI Resume Analyzer
+            <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs uppercase font-bold tracking-wider text-primary ring-1 ring-inset ring-primary/20 translate-y-0.5">
+              Beta
+            </span>
+          </h1>
           <p className="text-muted-foreground mt-2 max-w-5xl mx-auto text-sm sm:text-base leading-relaxed">
             Upload your resume and get instant AI-powered feedback, personalized interview questions, and advanced job search queries.
           </p>
@@ -221,12 +227,12 @@ export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
             <ul className="space-y-2.5">
               {[
                 {
-                  icon: Wifi,
-                  color: 'text-info',
-                  bg: 'bg-info/10',
+                  icon: RefreshCw,
+                  color: 'text-success',
+                  bg: 'bg-success/10',
                   text: (
                     <>
-                      Use a <span className="font-semibold text-foreground/80">stable internet connection</span> while uploading. A weak connection may interrupt the upload or AI analysis.
+                      If analysis fails, please <span className="font-semibold text-foreground/80">try 2-3 times</span>. Most times it works in 2-3 attempts.
                     </>
                   ),
                 },
@@ -239,6 +245,16 @@ export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
                       If your <span className="font-semibold text-foreground/80">PDF filename contains numbers</span> (e.g.{' '}
                       <code className="text-[10.5px] bg-muted/60 px-1 py-0.5 rounded">Resume123.pdf</code>), the upload may occasionally fail.{' '}
                       Rename it using only letters (e.g. <code className="text-[10.5px] bg-muted/60 px-1 py-0.5 rounded">UserResume.pdf</code>) and try again.
+                    </>
+                  ),
+                },
+                {
+                  icon: Wifi,
+                  color: 'text-info',
+                  bg: 'bg-info/10',
+                  text: (
+                    <>
+                      Use a <span className="font-semibold text-foreground/80">stable internet connection</span> while uploading. A weak connection may interrupt the upload or AI analysis.
                     </>
                   ),
                 },
@@ -262,18 +278,8 @@ export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
                     </>
                   ),
                 },
-                {
-                  icon: RefreshCw,
-                  color: 'text-success',
-                  bg: 'bg-success/10',
-                  text: (
-                    <>
-                      If the analysis fails, verify your internet connection, rename the PDF if necessary, and <span className="font-semibold text-foreground/80">upload again</span>.
-                    </>
-                  ),
-                },
-              ].map(({ icon: Icon, color, bg, text }, i) => (
-                <li key={i} className="flex items-start gap-2.5">
+              ].slice(0, showAllNotes ? undefined : 3).map(({ icon: Icon, color, bg, text }, i) => (
+                <li key={i} className="flex items-start gap-2.5 animate-in fade-in duration-300">
                   <span className={`mt-0.5 shrink-0 flex h-5 w-5 items-center justify-center rounded-md ${bg}`}>
                     <Icon className={`h-3 w-3 ${color}`} />
                   </span>
@@ -281,6 +287,15 @@ export function AnalyzerForm({ onSubmit, isLoading }: AnalyzerFormProps) {
                 </li>
               ))}
             </ul>
+            <Button 
+              type="button"
+              variant="ghost" 
+              size="sm" 
+              onClick={() => setShowAllNotes(!showAllNotes)}
+              className="w-full text-xs text-muted-foreground mt-2 hover:bg-warning/10 hover:text-warning-foreground h-7"
+            >
+              {showAllNotes ? "Hide notes" : "See all notes"}
+            </Button>
           </div>
 
           {/* ── Optional Fields ── */}

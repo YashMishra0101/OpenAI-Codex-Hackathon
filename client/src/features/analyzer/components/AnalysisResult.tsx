@@ -61,68 +61,62 @@ export function AnalysisResult({ data: initialData }: AnalysisResultProps) {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-      {/* ── Score / Verdict Hero ── */}
-      <Card className={`${verdict.border} overflow-hidden`}>
-        <CardContent className="py-10 sm:py-12">
-          <div className="flex flex-col items-center text-center gap-4">
-            <div className={`w-16 h-16 rounded-2xl ${verdict.bg} flex items-center justify-center`}>
-              <VerdictIcon className={`h-8 w-8 ${verdict.color}`} />
+      {/* ── Dashboard Header (Evaluation Card) ── */}
+      <div className="flex flex-col mb-8 rounded-2xl border border-border/50 bg-card overflow-hidden shadow-sm p-6 sm:p-8 pb-4 sm:pb-5">
+        
+        {/* Top Header Row */}
+        <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-2">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+                AI Evaluation
+              </h1>
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-success/10 text-success text-xs font-medium border border-success/20">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                Complete
+              </span>
             </div>
-            <div className="space-y-2">
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">Analysis Complete</h2>
-              <Badge variant={verdict.badgeVariant} className="text-sm px-4 py-1.5">
-                {verdict.label}
-              </Badge>
-            </div>
-            <p className="text-sm text-foreground/70 max-w-xl leading-relaxed">
-              {verdict.description}
+            <p className="text-sm text-muted-foreground">
+              Resume successfully analyzed.
             </p>
-            {/* ── Completion Status Indicators ── */}
-            <div className="flex flex-wrap justify-center items-center gap-2 pt-2">
-              {/* Feedback */}
-              {data.analysis &&
-                (data.analysis.strengths?.length > 0 ||
-                  data.analysis.improvements?.length > 0) && (
-                  <div className="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success/10 px-3 py-1 shadow-sm opacity-90 hover:opacity-100 transition-opacity">
-                    <span className="relative flex h-2 w-2">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
-                      <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
-                    </span>
-                    <span className="text-xs font-medium text-success tracking-wide">
-                      Resume Feedback Generated
-                    </span>
-                  </div>
-                )}
-
-              {/* Interview Questions */}
-              {data.interviewQuestions && data.interviewQuestions.length > 0 && (
-                <div className="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success/10 px-3 py-1 shadow-sm opacity-90 hover:opacity-100 transition-opacity">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
-                  </span>
-                  <span className="text-xs font-medium text-success tracking-wide">
-                    Interview Questions Generated
-                  </span>
-                </div>
-              )}
-
-              {/* Search Queries */}
-              {data.searchQueries && data.searchQueries.length > 0 && (
-                <div className="inline-flex items-center gap-1.5 rounded-full border border-success/25 bg-success/10 px-3 py-1 shadow-sm opacity-90 hover:opacity-100 transition-opacity">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
-                  </span>
-                  <span className="text-xs font-medium text-success tracking-wide">
-                    Google Dork Queries Generated
-                  </span>
-                </div>
-              )}
-            </div>
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Generated Artifacts Badges */}
+          <div className="flex flex-wrap items-center gap-2">
+            {data.analysis && (data.analysis.strengths?.length > 0 || data.analysis.improvements?.length > 0) && (
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-transparent px-3 py-1 text-xs font-medium text-foreground">
+                <CheckCircle2 className="w-3.5 h-3.5 text-success" />
+                Feedback
+              </div>
+            )}
+            {data.interviewQuestions && data.interviewQuestions.length > 0 && (
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-transparent px-3 py-1 text-xs font-medium text-foreground">
+                <CheckCircle2 className="w-3.5 h-3.5 text-success" />
+                Questions
+              </div>
+            )}
+            {data.searchQueries && data.searchQueries.length > 0 && (
+              <div className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-transparent px-3 py-1 text-xs font-medium text-foreground">
+                <CheckCircle2 className="w-3.5 h-3.5 text-success" />
+                Dorks
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Center Verdict Section */}
+        <div className="flex flex-col items-center text-center max-w-2xl mx-auto">
+          <div className={`flex items-center justify-center w-16 h-16 rounded-2xl ${verdict.bg} mb-5`}>
+            <VerdictIcon className={`w-8 h-8 ${verdict.color}`} />
+          </div>
+          <h2 className={`text-2xl sm:text-3xl font-bold mb-3 ${verdict.color}`}>
+            {verdict.label}
+          </h2>
+          <p className="text-sm text-foreground/80 leading-relaxed">
+            {verdict.description}
+          </p>
+        </div>
+      </div>
       <div className="flex items-center gap-3">
         <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
           <Sparkles className="h-[18px] w-[18px] text-primary" />

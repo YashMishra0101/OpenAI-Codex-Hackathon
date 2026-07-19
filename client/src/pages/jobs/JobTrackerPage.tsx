@@ -87,7 +87,12 @@ export function JobTrackerPage() {
         {/* ── Page Header ── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-2xl font-bold tracking-tight">Job Tracker</h1>
+            <h1 className="text-2xl font-bold tracking-tight inline-flex items-center gap-3">
+              Job Tracker
+              <span className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs uppercase font-bold tracking-wider text-primary ring-1 ring-inset ring-primary/20 translate-y-0.5">
+                Beta
+              </span>
+            </h1>
             <p className="text-sm text-muted-foreground mt-1">
               Manage and track your job applications in one place.
             </p>
