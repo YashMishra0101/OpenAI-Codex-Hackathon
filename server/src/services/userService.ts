@@ -4,7 +4,6 @@ import { User } from '../models/User.js';
 import cloudinary from '../config/cloudinary.js';
 import { ApiError } from '../utils/ApiError.js';
 import { HTTP } from '../constants/httpStatus.js';
-import { MSG } from '../constants/messages.js';
 import logger from '../utils/logger.js';
 import type { SafeUser } from '../types/auth.js';
 import type { UpdateProfileDto } from '../validations/userValidation.js';
