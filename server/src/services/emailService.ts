@@ -81,7 +81,7 @@ function getTransporter(): nodemailer.Transporter | null {
     socketTimeout: 15000,
     logger: true,
     debug: true,
-  });
+  } as unknown as nodemailer.TransportOptions);
   return _transporter;
 }
 
