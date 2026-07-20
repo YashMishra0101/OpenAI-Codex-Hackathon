@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { useScheduleReminder, useGetReminders, useDeleteReminder, useUpdateReminder, JobApplication, PendingReminder } from '../api/jobsApi';
 import { useQueryClient } from '@tanstack/react-query';
 import { authToast } from '@/lib/toast';
-import { Clock, Calendar as CalendarIcon, CheckCircle2, Trash2, BellRing, Edit2, X } from 'lucide-react';
+import { Clock, Calendar as CalendarIcon, CheckCircle2, Trash2, BellRing, Edit2, X, Info } from 'lucide-react';
 import { LoadingSpinner } from '@/components/common/LoadingSpinner';
 
 interface ReminderDialogProps {
@@ -278,6 +278,18 @@ export function ReminderDialog({ open, onOpenChange, job }: ReminderDialogProps)
                     className="resize-none"
                     rows={2}
                   />
+                </div>
+
+                <div className="flex items-start gap-2 p-3 mt-3 bg-yellow-500/10 border border-yellow-500/20 rounded-md">
+                  <Info className="h-4 w-4 text-yellow-600 dark:text-yellow-500 shrink-0 mt-0.5" />
+                  <div className="space-y-2">
+                    <p className="text-[11px] text-yellow-700 dark:text-yellow-400 leading-relaxed">
+                      <strong>Note:</strong> Since this uses a free personal email for testing, reminders may land in your <strong>Spam folder</strong>. If you don't see it, please check there and mark it as "Looks safe" or "Report not spam" to train Google's filters.
+                    </p>
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      I'm using Nodemailer with my personal Gmail account instead of a premium email service because this is a hackathon project. I'm working within free-tier resources, so purchasing a paid service isn't an option.
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
