@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import toast from 'react-hot-toast';
+import { Eye, EyeOff } from 'lucide-react';
 import { updateProfileSchema, type UpdateProfileFormData } from '../schemas';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,6 +35,7 @@ interface ProfileFormProps {
 
 export function ProfileForm({ initialData, isGoogleUser = false, onSuccess }: ProfileFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const form = useForm<UpdateProfileFormData>({
     resolver: zodResolver(updateProfileSchema),
@@ -55,10 +57,31 @@ export function ProfileForm({ initialData, isGoogleUser = false, onSuccess }: Pr
   }, [initialData, form]);
 
   const onSubmit = async (data: UpdateProfileFormData) => {
+    const isNameChanged = data.name !== initialData?.name;
+    const isPasswordChanged = !!data.password;
+
+    if (!isNameChanged && !isPasswordChanged) {
+      toast('No changes to save.');
+      return;
+    }
+
     try {
       setIsLoading(true);
-      const res = await api.put('/users/me', data);
-      toast.success('Profile updated successfully');
+      // We don't send the email since it's read-only now
+      const payload: Partial<UpdateProfileFormData> = {};
+      if (isNameChanged) payload.name = data.name;
+      if (isPasswordChanged) payload.password = data.password;
+      
+      const res = await api.put('/users/me', payload);
+      
+      if (isNameChanged && isPasswordChanged) {
+        toast.success('Profile updated successfully.');
+      } else if (isNameChanged) {
+        toast.success('Name updated successfully.');
+      } else if (isPasswordChanged) {
+        toast.success('Password updated successfully.');
+      }
+
       form.setValue('password', '');
       onSuccess(res.data.data);
     } catch (err: any) {
@@ -123,9 +146,15 @@ export function ProfileForm({ initialData, isGoogleUser = false, onSuccess }: Pr
           name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Email (Changing this requires re-verification)</FormLabel>
+              <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" placeholder="m@example.com" disabled={isLoading} {...field} />
+                <Input 
+                  type="email" 
+                  placeholder="m@example.com" 
+                  readOnly 
+                  className="bg-muted/50 text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 cursor-not-allowed"
+                  {...field} 
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -139,7 +168,27 @@ export function ProfileForm({ initialData, isGoogleUser = false, onSuccess }: Pr
             <FormItem>
               <FormLabel>New Password (leave blank to keep current)</FormLabel>
               <FormControl>
-                <Input type="password" placeholder="••••••••" disabled={isLoading} {...field} />
+                <div className="relative">
+                  <Input 
+                    type={showPassword ? 'text' : 'password'} 
+                    placeholder="••••••••" 
+                    disabled={isLoading} 
+                    className="pr-10"
+                    {...field} 
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground focus:outline-none"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="h-4 w-4" />
+                    ) : (
+                      <Eye className="h-4 w-4" />
+                    )}
+                  </button>
+                </div>
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -160,3 +209,4 @@ export function ProfileForm({ initialData, isGoogleUser = false, onSuccess }: Pr
     </Form>
   );
 }
+

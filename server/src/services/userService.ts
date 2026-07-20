@@ -40,35 +40,16 @@ export async function updateProfile(userId: string, dto: UpdateProfileDto): Prom
     throw new ApiError(HTTP.NOT_FOUND, 'User not found');
   }
 
-  // Handle email change -> email already exists check
-  if (dto.email && dto.email !== user.email) {
-    const existingEmail = await User.findOne({ email: dto.email }).lean();
-    if (existingEmail) {
-      throw new ApiError(HTTP.CONFLICT, MSG.EMAIL_ALREADY_EXISTS);
-    }
-    user.email = dto.email;
-    // When changing email, the user is no longer verified until they click a new link
-    user.isVerified = false;
-  }
+  // Email changes are disabled from the profile settings screen per requirements.
+  // The email is read-only in the UI.
 
   if (dto.name) user.name = dto.name;
 
-  // Password change requires verification of the current password to prevent
-  // account takeover via a stolen session cookie.
+  // Password update (directly from the settings page)
   if (dto.password) {
-    if (!dto.currentPassword) {
-      throw new ApiError(HTTP.BAD_REQUEST, 'Current password is required to set a new password');
-    }
-
-    if (!user.password) {
+    if (!user.password && user.authProvider === 'google') {
       // OAuth-only accounts have no password to verify against
       throw new ApiError(HTTP.BAD_REQUEST, 'Password cannot be changed for accounts signed in with Google');
-    }
-
-    const isCurrentPasswordValid = await argon2.verify(user.password, dto.currentPassword);
-    if (!isCurrentPasswordValid) {
-      logger.warn('USER_PASSWORD_CHANGE_FAILED', { userId, reason: 'wrong_current_password' });
-      throw new ApiError(HTTP.UNAUTHORIZED, 'Current password is incorrect');
     }
 
     user.password = await argon2.hash(dto.password);

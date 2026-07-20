@@ -24,17 +24,6 @@ export const updateProfileSchema = z
       .min(8, 'Password must be at least 8 characters')
       .max(72, 'Password must be 72 characters or fewer')
       .optional(),
-  })
-  .refine(
-    (data) => {
-      // If a new password is being set, currentPassword must also be provided
-      if (data.password && !data.currentPassword) return false;
-      return true;
-    },
-    {
-      message: 'Current password is required to set a new password',
-      path: ['currentPassword'],
-    },
-  );
+  });
 
 export type UpdateProfileDto = z.infer<typeof updateProfileSchema>;
