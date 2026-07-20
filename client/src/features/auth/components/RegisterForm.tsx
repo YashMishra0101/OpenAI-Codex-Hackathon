@@ -58,6 +58,22 @@ export function RegisterForm({ onSubmit, isLoading }: RegisterFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+        {/* Live Demo Warning */}
+        <div className="flex items-start gap-2 p-3 mb-2 bg-yellow-500/10 border border-yellow-500/20 rounded-md">
+          <ShieldAlert className="h-4 w-4 text-yellow-600 dark:text-yellow-500 shrink-0 mt-0.5" />
+          <div className="space-y-2">
+            <p className="text-[11px] text-yellow-700 dark:text-yellow-400 font-semibold">
+              Live Demo Limitation
+            </p>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              Email Signup is disabled in this live demo. Please use the <strong className="text-white">Google Sign-In</strong> button to create an account!
+            </p>
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
+              I am using Nodemailer with my personal Gmail account instead of a premium email service because this is a hackathon project. I'm working entirely with free-tier resources, so purchasing a paid email service isn't an option. That's why email signup isn't working reliably in production. I have tried every possible method and configuration I could find, but I haven't found a free solution that works reliably in a production environment.
+            </p>
+          </div>
+        </div>
+
         {/* Row 1: Full Name + Email */}
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <FormField
@@ -210,14 +226,16 @@ export function RegisterForm({ onSubmit, isLoading }: RegisterFormProps) {
             <span
               className={cn(
                 'text-xs font-semibold',
-                passwordStrength.label === 'Strong'
+                !password
+                  ? 'text-muted-foreground'
+                  : passwordStrength.label === 'Strong'
                   ? 'text-emerald-400'
                   : passwordStrength.label === 'Medium'
                     ? 'text-amber-300'
                     : 'text-destructive',
               )}
             >
-              {passwordStrength.label}
+              {password ? passwordStrength.label : ''}
             </span>
           </div>
           <div className="h-1.5 overflow-hidden rounded-full bg-border/50">

@@ -137,7 +137,7 @@ export function ReminderDialog({ open, onOpenChange, job }: ReminderDialogProps)
             <p className="text-sm text-muted-foreground">You will receive an email exactly when scheduled.</p>
           </div>
         ) : (
-          <div className="grid gap-6 py-2">
+          <div className="grid gap-6 py-2 max-h-[60vh] overflow-y-auto px-1">
             
             {/* ── Existing Reminders List ── */}
             {(isLoadingReminders || (reminders && reminders.length > 0)) && (
@@ -284,10 +284,10 @@ export function ReminderDialog({ open, onOpenChange, job }: ReminderDialogProps)
                   <Info className="h-4 w-4 text-yellow-600 dark:text-yellow-500 shrink-0 mt-0.5" />
                   <div className="space-y-2">
                     <p className="text-[11px] text-yellow-700 dark:text-yellow-400 leading-relaxed">
-                      <strong>Note:</strong> Since this uses a free personal email for testing, reminders may land in your <strong>Spam folder</strong>. If you don't see it, please check there and mark it as "Looks safe" or "Report not spam" to train Google's filters.
+                      <strong>Live Demo Limitation:</strong> Email Reminders are disabled in this live demo. Google's security blocks automated Gmail logins from our free-tier cloud servers. 
                     </p>
                     <p className="text-[11px] text-muted-foreground leading-relaxed">
-                      I'm using Nodemailer with my personal Gmail account instead of a premium email service because this is a hackathon project. I'm working within free-tier resources, so purchasing a paid service isn't an option.
+                      I am using Nodemailer with my personal Gmail account instead of a premium email service because this is a hackathon project. I'm working entirely with free-tier resources, so purchasing a paid email service isn't an option. That's why email reminders aren't working reliably in production. I have tried every possible method and configuration I could find, but I haven't found a free solution that works reliably in a production environment.
                     </p>
                   </div>
                 </div>
