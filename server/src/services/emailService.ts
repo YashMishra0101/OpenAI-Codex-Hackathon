@@ -68,11 +68,19 @@ function getTransporter(): nodemailer.Transporter | null {
   }
 
   _transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
     auth: {
       user: env.SMTP_USER,
       pass: env.SMTP_PASS,
     },
+    family: 4, // Force IPv4 to prevent Render freezing issues
+    connectionTimeout: 10000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000,
+    logger: true,
+    debug: true,
   });
   return _transporter;
 }
