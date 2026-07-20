@@ -66,7 +66,7 @@ export function RegisterForm({ onSubmit, isLoading }: RegisterFormProps) {
               Live Demo Limitation
             </p>
             <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Email Signup is disabled in this live demo. Please use the <strong className="text-white">Google Sign-In</strong> button to create an account!
+              Email sign-up is not available in the live demo. Please use the <strong className="text-white">Google Sign-In</strong> button to create an account!
             </p>
             <p className="text-[11px] text-muted-foreground leading-relaxed">
               I am using Nodemailer with my personal Gmail account instead of a premium email service because this is a hackathon project. I'm working entirely with free-tier resources, so purchasing a paid email service isn't an option. That's why email signup isn't working reliably in production. I have tried every possible method and configuration I could find, but I haven't found a free solution that works reliably in a production environment.

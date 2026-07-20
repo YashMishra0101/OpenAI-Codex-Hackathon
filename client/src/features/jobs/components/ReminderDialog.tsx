@@ -284,7 +284,7 @@ export function ReminderDialog({ open, onOpenChange, job }: ReminderDialogProps)
                   <Info className="h-4 w-4 text-yellow-600 dark:text-yellow-500 shrink-0 mt-0.5" />
                   <div className="space-y-2">
                     <p className="text-[11px] text-yellow-700 dark:text-yellow-400 leading-relaxed">
-                      <strong>Live Demo Limitation:</strong> Email Reminders are disabled in this live demo. Google's security blocks automated Gmail logins from our free-tier cloud servers. 
+                      Email reminders are not available in the live demo.
                     </p>
                     <p className="text-[11px] text-muted-foreground leading-relaxed">
                       I am using Nodemailer with my personal Gmail account instead of a premium email service because this is a hackathon project. I'm working entirely with free-tier resources, so purchasing a paid email service isn't an option. That's why email reminders aren't working reliably in production. I have tried every possible method and configuration I could find, but I haven't found a free solution that works reliably in a production environment.
