@@ -267,7 +267,7 @@ The monorepo setup lets `client/` and `server/` share a single Git repo, unified
 
 If you fork, clone, or build upon this project, please credit the original author:
 
-**Yash Mishra** — [GitHub](https://github.com/YashMishra0101) · [Original Repository](https://github.com/YashMishra0101/AI-Resume-Analysis-Job-Tracking-System)
+**Yash Mishra** — [GitHub](https://github.com/YashMishra0101) · [Original Repository](https://github.com/YashMishra0101/OpenAI-Codex-Hackathon)
 
 ---
 
