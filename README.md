@@ -29,6 +29,23 @@
 
 ---
 
+## 📸 Project Snapshots
+
+![Screenshot 1](./client/public/1.png)
+![Screenshot 2](./client/public/2.png)
+![Screenshot 3](./client/public/3.png)
+![Screenshot 4](./client/public/4.png)
+
+---
+
+## 📝 Note
+
+Although I was **not selected in the winner list**, designing, building, and shipping this platform end-to-end was an immensely rewarding learning experience. I'm grateful for the opportunity to participate and to grow as a developer through this challenge.
+
+**This project will no longer be actively maintained.**
+
+---
+
 ## 🧐 The Problem
 
 Job seekers today juggle multiple **disconnected tools**, one for **resume feedback** and another for **tracking job applications**. This platform brings AI-driven resume feedback, interview preparation, and application tracking into one unified workflow.
@@ -47,8 +64,6 @@ This platform brings everything together:
 ### 📄 AI-Powered Resume Analyzer
 
 Upload your resume (PDF) and optionally paste a job description — the AI returns a full structured analysis:
-
-> **Note:** AI responses may occasionally require another attempt. If the analysis doesn't complete successfully, please retry 2–3 times.
 
 | Section                                    | What You Get                                                                                         |
 | ------------------------------------------ | ---------------------------------------------------------------------------------------------------- |
@@ -286,7 +301,7 @@ I'm actively open to **Software Engineering** and **Full Stack Developer** roles
 ---
 
 <div align="center">
-  <i>Built with passion for learning, job preparation and pushing the boundaries of what a portfolio project can be.</i>
+  <i>Built with passion for learning.</i>
   <br/><br/>
   <i> If this project inspires you, give it a star ⭐</i>
 </div>
