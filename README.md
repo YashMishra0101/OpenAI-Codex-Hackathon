@@ -31,10 +31,16 @@
 
 ## 📸 Project Snapshots
 
-![Screenshot 1](./client/public/1.png)
-![Screenshot 2](./client/public/2.png)
-![Screenshot 3](./client/public/3.png)
-![Screenshot 4](./client/public/4.png)
+<table>
+  <tr>
+    <td><img src="./client/public/1.png" alt="Screenshot 1" width="100%"></td>
+    <td><img src="./client/public/2.png" alt="Screenshot 2" width="100%"></td>
+  </tr>
+  <tr>
+    <td><img src="./client/public/3.png" alt="Screenshot 3" width="100%"></td>
+    <td><img src="./client/public/4.png" alt="Screenshot 4" width="100%"></td>
+  </tr>
+</table>
 
 ---
 
